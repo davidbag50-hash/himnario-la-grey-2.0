@@ -1,0 +1,22 @@
+{
+  "name": "Himnario-Cancionero La Grey",
+  "short_name": "La Grey",
+  "description": "Himnario y cancionero del Grupo de Alabanza La Grey",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#17324d",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
