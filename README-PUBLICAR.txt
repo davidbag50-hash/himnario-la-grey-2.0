@@ -1,42 +1,27 @@
-Himnario-Cancionero La Grey — PWA v1.0
+Himnario-Cancionero La Grey — PWA v1.1
 
-Esta versión está lista para publicarse como sitio web y PWA.
+NOVEDADES
+- Cada acorde visible es tocable/clicable.
+- Al tocar un acorde aparece un diagrama de guitarra con trastes, cuerdas y dedos.
+- Botón global para alternar:
+    C D E F G A B
+    Do Re Mi Fa Sol La Si
+- La preferencia de cifrado queda guardada en el dispositivo.
+- La tonalidad de cada canción también cambia de nombre visualmente.
+- Se conserva el espaciado monoespaciado del cancionero.
+- El service worker cambió de caché para actualizar instalaciones existentes.
 
-Incluye:
-- 6 cantos de la versión v0.8
-- Diseño adaptable a PC, Android, iPhone/iPad
-- Instalación como app desde el navegador compatible
-- Funcionamiento offline después de la primera visita
-- Favoritos guardados localmente
-- Buscador
-- Ajuste de tamaño de letra
-- Acordes en fuente monoespaciada
+PARA ACTUALIZAR TU WEB EN GITHUB
+Sube/reemplaza en la raíz del repositorio TODOS los archivos de este ZIP.
+En especial:
+- index.html
+- sw.js
+- manifest.webmanifest
 
-PUBLICAR CON GITHUB PAGES
+No necesitas crear otro repositorio ni cambiar GitHub Pages.
+Tu misma dirección seguirá funcionando.
 
-1. En GitHub crea un repositorio nuevo, por ejemplo:
-   himnario-la-grey
-
-2. Sube TODO el contenido de esta carpeta a la raíz del repositorio:
-   index.html
-   manifest.webmanifest
-   sw.js
-   icon.svg
-   icon-192.png
-   icon-512.png
-   .nojekyll
-
-3. En GitHub abre:
-   Settings > Pages
-
-4. En "Build and deployment":
-   Source: Deploy from a branch
-   Branch: main
-   Folder: / (root)
-   Save
-
-GitHub mostrará la dirección pública del sitio.
-
-IMPORTANTE
-El service worker/PWA funciona correctamente cuando el sitio se sirve por HTTPS
-(como GitHub Pages), no simplemente abriendo index.html como archivo local.
+Si el teléfono muestra la versión vieja inmediatamente después de publicar:
+1. Cierra completamente la app.
+2. Ábrela otra vez con Internet.
+3. Si aún no cambia, abre primero la página en el navegador y recárgala una vez.
