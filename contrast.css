@@ -1,0 +1,25 @@
+/* Contraste reforzado para listas de Cantos, Himnos, Favoritos y búsqueda */
+body.stage-ui .song b,
+body.stage-ui #listing .song b,
+body.stage-ui #results .song b,
+body.stage-ui #setlistSongs .song b{
+  color:#79d1ff!important;
+  font-weight:850!important;
+  letter-spacing:.1px;
+}
+body.stage-ui .song small,
+body.stage-ui .song .muted,
+body.stage-ui #listing .song small,
+body.stage-ui #results .song small,
+body.stage-ui #setlistSongs .song small{
+  color:#f3f8fc!important;
+  opacity:.94!important;
+}
+body.stage-ui .song .tone{
+  color:#ffffff!important;
+  font-weight:850!important;
+}
+@media(max-width:620px){
+  body.stage-ui .song b{font-size:17px!important}
+  body.stage-ui .song small{font-size:13px!important}
+}
