@@ -166,3 +166,6 @@ async function share(){const v=verses[current],text=`${v.text}\n— ${v.ref}\n\n
 function wireVerse(){inject();render(dayIndex());$('verseHomeFeature')?.addEventListener('click',show);$('verseBack')?.addEventListener('click',back);$('verseToday')?.addEventListener('click',()=>render(dayIndex()));$('verseAnother')?.addEventListener('click',()=>{let n=current;while(verses.length>1&&n===current)n=Math.floor(Math.random()*verses.length);render(n)});$('verseShare')?.addEventListener('click',share)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wireVerse);else wireVerse();
 })();
+
+/* Himnos: carga diferida para mantener app.js ligero */
+(()=>{const s=document.createElement('script');s.src='hymns.js';s.onload=()=>{const t=document.createElement('script');t.src='hymn-tools.js';document.head.appendChild(t)};document.head.appendChild(s)})();
