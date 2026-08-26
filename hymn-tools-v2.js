@@ -5,7 +5,7 @@ const songs=()=>window.LAGREY_SONGS||[];
 const SHARP=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const FLAT=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
 const FLAT_TO_SHARP={Db:'C#',Eb:'D#',Gb:'F#',Ab:'G#',Bb:'A#'};
-const LATIN={C:'Do','C#':'Do#',Db:'Reb',D:'Re',D#:'Re#',Eb:'Mib',E:'Mi',F:'Fa',F#:'Fa#',Gb:'Solb',G:'Sol',G#:'Sol#',Ab:'Lab',A:'La',A#:'La#',Bb:'Sib',B:'Si'};
+const LATIN={'C':'Do','C#':'Do#','Db':'Reb','D':'Re','D#':'Re#','Eb':'Mib','E':'Mi','F':'Fa','F#':'Fa#','Gb':'Solb','G':'Sol','G#':'Sol#','Ab':'Lab','A':'La','A#':'La#','Bb':'Sib','B':'Si'};
 const KEY='lagrey_hymn_default_shifts';
 let currentSong=null,currentShift=0;
 function defaults(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch{return{}}}
