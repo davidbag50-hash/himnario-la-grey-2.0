@@ -9,14 +9,16 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="profiles.css">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="La Grey">
 </head>
 <body>
-<header><div class="header-row"><div><div class="eyebrow">GRUPO DE ALABANZA</div><div class="title">Himnario-Cancionero La Grey</div></div><button id="notationBtn" class="notation-btn">🎼 C D E</button></div></header>
+<header><div class="header-row"><div><div class="eyebrow">GRUPO DE ALABANZA</div><div class="title">Himnario-Cancionero La Grey</div></div><div class="header-actions"><button id="profileBtn" class="notation-btn profile-btn">👤 <span>Perfil</span></button><button id="notationBtn" class="notation-btn">🎼 C D E</button></div></div></header>
 <main>
 <section id="home" class="view">
+ <div id="profileWelcome" class="profile-welcome hidden"></div>
  <div class="search"><input id="q" placeholder="🔎 Buscar canto o grupo..." autocomplete="off"></div>
  <div class="grid home-grid">
   <button class="card" data-open="songs"><div class="icon">🎵</div><h2>Cantos</h2><div class="muted">Repertorio de cantos</div><div id="countSongs" class="count"></div></button>
@@ -38,6 +40,22 @@
 <div id="chordModal" class="modal hidden"><div class="modal-card chord-modal-card"><div class="modal-top"><div><h2 id="chordModalTitle"></h2><div id="chordModalSub" class="chord-sub"></div></div><button class="close" data-close="chordModal">×</button></div><div class="tabs"><button id="guitarTab" class="seg active">🎸 Guitarra</button><button id="pianoTab" class="seg">🎹 Piano</button></div><div id="guitarPanel"><div id="guitarVariants" class="chips"></div><div class="diagram-wrap"><svg id="diagramSvg" viewBox="0 0 360 380"></svg></div><p class="finger-help"><b>Dedos:</b> 1 índice · 2 medio · 3 anular · 4 meñique · T pulgar. ○ = al aire · × = no tocar.</p></div><div id="pianoPanel" class="hidden"><div id="pianoInversions" class="chips"></div><div id="pianoNotes" class="piano-notes"></div><div class="piano-wrap"><svg id="pianoSvg" viewBox="0 0 700 250"></svg></div><p id="pianoFingers" class="finger-help"></p></div></div></div>
 <div id="dayModal" class="modal hidden"><div class="modal-card"><div class="modal-top"><div><h2 id="dayTitle"></h2><div class="chord-sub">Eventos de esta fecha</div></div><button class="close" data-close="dayModal">×</button></div><div id="dayEvents" class="event-list"></div><button id="addEventBtn" class="btn primary wide">＋ Añadir evento</button></div></div>
 <div id="eventModal" class="modal hidden"><div class="modal-card event-editor"><div class="modal-top"><div><h2 id="eventEditorTitle">Añadir evento</h2><div id="eventDateLabel" class="chord-sub"></div></div><button class="close" data-close="eventModal">×</button></div><input id="eventId" type="hidden"><label>Nombre del evento<input id="eventName" class="field" placeholder="Culto dominical"></label><div class="two-cols"><label>Hora<input id="eventTime" class="field" type="time"></label><label>Ensayo previo<input id="eventRehearsal" class="field" type="datetime-local"></label></div><div class="two-cols"><label>Dirige<input id="eventLeader" class="field" placeholder="Nombre"></label><label>Voces / cantantes<input id="eventSingers" class="field" placeholder="Nombres"></label></div><label>Notas<textarea id="eventNotes" class="field" rows="3" placeholder="Indicaciones para el grupo..."></textarea></label><h3>Repertorio</h3><div class="search"><input id="eventSongSearch" placeholder="Buscar canción..." autocomplete="off"></div><div id="eventSongChoices" class="song-choices"></div><h3>Orden del servicio</h3><div id="selectedSetlist" class="selected-setlist"></div><div class="editor-actions"><button id="deleteEventBtn" class="btn danger hidden">Eliminar</button><button id="saveEventBtn" class="btn primary">Guardar evento</button></div></div></div>
+<div id="profileModal" class="modal hidden">
+ <div class="modal-card profile-modal-card">
+  <div class="modal-top">
+   <div><h2>👋 ¿Quién eres?</h2><div class="chord-sub">Si eres parte del grupo de alabanza, la app personalizará tu experiencia.</div></div>
+   <button id="profileCloseBtn" class="close" type="button">×</button>
+  </div>
+  <div class="profile-hero">🎵 <b>Himnario-Cancionero La Grey</b></div>
+  <label>Tu nombre
+   <input id="profileName" class="field" autocomplete="name" placeholder="Escribe tu nombre">
+  </label>
+  <div id="profileStatus" class="profile-status"></div>
+  <button id="profileLoginBtn" class="btn primary wide" type="button">Entrar con mi perfil</button>
+  <button id="profileVisitorBtn" class="btn wide" type="button">Continuar como visitante</button>
+  <p class="hint">Este perfil personaliza la aplicación en este dispositivo. No es una cuenta con contraseña.</p>
+ </div>
+</div>
 <div id="toast" class="toast hidden"></div>
-<script src="songs.js"></script><script src="chords.js"></script><script src="app.js"></script>
+<script src="songs.js"></script><script src="chords.js"></script><script src="members.js"></script><script src="app.js"></script><script src="profiles.js"></script>
 </body></html>
