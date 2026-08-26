@@ -1,25 +1,34 @@
 /* Contraste reforzado para listas de Cantos, Himnos, Favoritos y búsqueda */
-body.stage-ui .song b,
-body.stage-ui #listing .song b,
-body.stage-ui #results .song b,
-body.stage-ui #setlistSongs .song b{
+.song{
   color:#79d1ff!important;
-  font-weight:850!important;
-  letter-spacing:.1px;
 }
-body.stage-ui .song small,
-body.stage-ui .song .muted,
-body.stage-ui #listing .song small,
-body.stage-ui #results .song small,
-body.stage-ui #setlistSongs .song small{
+.song b,
+.song .song-main b,
+#listing .song b,
+#results .song b,
+#setlistSongs .song b{
+  color:#79d1ff!important;
+  -webkit-text-fill-color:#79d1ff!important;
+  font-weight:900!important;
+  letter-spacing:.1px!important;
+}
+.song small,
+.song .muted,
+#listing .song small,
+#results .song small,
+#setlistSongs .song small{
   color:#f3f8fc!important;
-  opacity:.94!important;
+  -webkit-text-fill-color:#f3f8fc!important;
+  opacity:1!important;
 }
-body.stage-ui .song .tone{
+.song .tone,
+#listing .song .tone,
+#results .song .tone{
   color:#ffffff!important;
-  font-weight:850!important;
+  -webkit-text-fill-color:#ffffff!important;
+  font-weight:900!important;
 }
 @media(max-width:620px){
-  body.stage-ui .song b{font-size:17px!important}
-  body.stage-ui .song small{font-size:13px!important}
+  .song b,.song .song-main b{font-size:17px!important}
+  .song small{font-size:13px!important}
 }
