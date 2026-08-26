@@ -1,5 +1,5 @@
-const CACHE='la-grey-v2-9-immersive-reader';
-const ASSETS=['./','./index.html','./styles.css','./profiles.css','./performance.css','./stage-ui.css','./song-reader.css','./immersive-reader.css','./songs.js','./chords.js','./members.js','./app.js','./profiles.js','./stage-ui.js','./song-reader.js','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png'];
+const CACHE='la-grey-v2-10-touch-scroll';
+const ASSETS=['./','./index.html','./styles.css','./profiles.css','./performance.css','./stage-ui.css','./song-reader.css','./songs.js','./chords.js','./members.js','./app.js','./profiles.js','./stage-ui.js','./song-reader.js','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
 self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;event.respondWith(fetch(event.request).then(response=>{const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));return response}).catch(()=>caches.match(event.request).then(cached=>cached||caches.match('./index.html'))))});
