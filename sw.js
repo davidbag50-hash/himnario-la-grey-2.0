@@ -1,4 +1,4 @@
-const CACHE='la-grey-v2-17-hymns-pilot';
+const CACHE='la-grey-v2-18-hymn-controls-fix';
 const ASSETS=['./','./index.html','./styles.css','./profiles.css','./performance.css','./stage-ui.css','./song-reader.css','./contrast.css','./verses.css','./songs.js','./hymns.js','./hymn-tools.js','./chords.js','./members.js','./app.js','./profiles.js','./stage-ui.js','./song-reader.js','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
