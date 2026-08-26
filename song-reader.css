@@ -1,22 +1,28 @@
 /* Modo músico: lectura compacta, zoom táctil y auto-scroll */
 .reader-tools{margin-top:14px;padding:12px 13px;border:1px solid rgba(80,168,244,.20);border-radius:16px;background:linear-gradient(145deg,rgba(7,31,54,.84),rgba(4,19,34,.92))}
-.reader-tools-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.reader-tools .btn{margin:0}.reader-speed-wrap{display:grid;grid-template-columns:auto minmax(120px,1fr) auto;gap:9px;align-items:center;margin-top:10px;color:var(--muted);font-size:12px;font-weight:700}.reader-speed{width:100%;accent-color:var(--accent)}.reader-speed-value{color:var(--gold2);min-width:36px;text-align:right}.reader-tip{margin:8px 0 0;color:var(--muted);font-size:11px;line-height:1.35}.reader-play.active{background:linear-gradient(180deg,#f3bc3d,#c98b12);border-color:#f3bc3d;color:#071522}.reader-reset{padding-left:11px;padding-right:11px}
-#detail .chart{overscroll-behavior:contain}.chart-inner{transform-origin:top left}
+.reader-tools-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.reader-tools .btn{margin:0}.reader-speed-wrap{display:grid;grid-template-columns:auto minmax(120px,1fr) auto;gap:9px;align-items:center;margin-top:10px;color:var(--muted);font-size:12px;font-weight:700}.reader-speed{width:100%;accent-color:var(--accent)}.reader-speed-value{color:var(--gold2);min-width:36px;text-align:right}.reader-tip{margin:8px 0 0;color:var(--muted);font-size:11px;line-height:1.35}.reader-play.active{background:linear-gradient(180deg,#f3bc3d,#c98b12);border-color:#f3bc3d;color:#071522}.reader-reset,.reader-fit{padding-left:11px;padding-right:11px}
+/* La letra forma parte del scroll normal de la página. No crea una zona táctil separada. */
+#detail .chart{overscroll-behavior:auto;overflow-x:hidden;overflow-y:visible;touch-action:pan-y}.chart-inner{transform-origin:top left}
+body.song-immersive header,body.song-immersive nav{display:none!important}
+body.song-immersive main{padding-top:8px;padding-bottom:18px;max-width:none}
+body.song-immersive #detail{max-width:1100px;margin:0 auto}
+body.song-immersive #detail .back{position:sticky;top:6px;z-index:8;display:inline-flex;align-items:center;background:rgba(4,20,35,.92);border:1px solid rgba(80,168,244,.20);border-radius:999px;padding:8px 12px;margin:0 0 8px;color:#79c5ff}
 @media(max-width:900px){
  #detail .chart{padding:13px 9px}
  #detail .chart-inner{line-height:1.30}
  #detail .line{min-height:1.30em}
 }
 @media(max-width:620px){
- #detail .head{padding:16px}
- #detail .head h1{font-size:25px}
+ body.song-immersive main{padding-left:5px;padding-right:5px;padding-bottom:12px}
+ #detail .head{padding:13px 11px}
+ #detail .head h1{font-size:24px}
  #detail .actions{gap:6px}
  #detail .actions .btn{padding:8px 10px}
- #detail .chart{margin-top:10px;border-radius:16px;padding:11px 7px}
- #detail .chart-inner{font-size:15px;line-height:1.22}
- #detail .line{min-height:1.22em}
- .reader-tools{padding:10px;margin-top:11px}
- .reader-tools-top{display:grid;grid-template-columns:1fr auto}.reader-play{width:100%}.reader-reset{min-width:45px}
+ #detail .chart{margin-top:8px;border-radius:14px;padding:9px 4px;width:100%}
+ #detail .chart-inner{font-size:15px;line-height:1.18}
+ #detail .line{min-height:1.18em}
+ .reader-tools{padding:9px;margin-top:10px}
+ .reader-tools-top{display:grid;grid-template-columns:1fr auto auto}.reader-play{width:100%}.reader-reset,.reader-fit{min-width:42px}
  .reader-speed-wrap{grid-template-columns:auto 1fr auto;gap:7px}.reader-tip{font-size:10px}
 }
-@media(pointer:coarse){#detail .chart{touch-action:pan-x pan-y}}
+@media(pointer:coarse){#detail .chart,#detail .chart-inner,#detail .line{touch-action:pan-y}}
