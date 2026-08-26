@@ -1,7 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" rx="96" fill="#17324d"/>
-<path d="M146 116h220c17 0 30 13 30 30v220c0 17-13 30-30 30H146c-17 0-30-13-30-30V146c0-17 13-30 30-30z" fill="#ffffff"/>
-<path d="M180 175h152v30H180zm0 66h152v30H180zm0 66h100v30H180z" fill="#17324d"/>
-<circle cx="340" cy="326" r="44" fill="#b88a2c"/>
-<path d="M329 298v62l52-31z" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="La Grey">
+<defs>
+ <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8ddf6"/><stop offset=".55" stop-color="#f7fbff"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+ <linearGradient id="blue" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#139be7"/><stop offset="1" stop-color="#064c9e"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#ffd22e"/><stop offset="1" stop-color="#e5a400"/></linearGradient>
+</defs>
+<rect x="12" y="12" width="488" height="488" rx="100" fill="url(#sky)" stroke="#c8d9e5" stroke-width="4"/>
+<g fill="#d99b00"><rect x="251" y="58" width="10" height="52" rx="4"/><rect x="232" y="77" width="48" height="10" rx="4"/></g>
+<text x="252" y="300" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="238" font-weight="700" fill="#07366e" letter-spacing="-28">LG</text>
+<text x="256" y="346" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="41" letter-spacing="12" fill="#17324d">LA GREY</text>
+<path d="M70 392 C170 338 281 438 443 376 C342 482 223 402 74 431 C60 434 55 420 70 392Z" fill="url(#blue)"/>
+<path d="M91 446 C188 399 296 493 431 424 C346 510 230 455 96 475 C80 478 78 462 91 446Z" fill="url(#gold)"/>
+<path d="M374 154 v58 c0 22-35 31-45 11-9-19 18-38 35-24v-65l43 18v15z" fill="#075f91"/>
+<path d="M332 220 C361 204 397 199 432 202" fill="none" stroke="#075f91" stroke-width="5" stroke-linecap="round"/>
 </svg>
