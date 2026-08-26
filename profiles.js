@@ -119,7 +119,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (()=>{const s=document.createElement('script');s.src='stage-ui.js';s.defer=true;document.head.appendChild(s)})();
 (()=>{const s=document.createElement('script');s.src='song-reader.js';s.defer=true;document.head.appendChild(s)})();
 
-/* Versículo diario integrado: sin carga encadenada */
+/* Versículo diario integrado: destacado bajo el buscador */
 (()=>{
 'use strict';
 const verses=[
@@ -142,12 +142,16 @@ const $=id=>document.getElementById(id);let current=0;
 function dayIndex(){const d=new Date(),start=new Date(d.getFullYear(),0,0),day=Math.floor((d-start)/86400000);return Math.abs(d.getFullYear()*367+day)%verses.length}
 function dateText(){return new Intl.DateTimeFormat('es-PA',{weekday:'long',day:'numeric',month:'long'}).format(new Date())}
 function inject(){
- const grid=document.querySelector('#home .home-grid');
- if(grid&&!document.querySelector('[data-open="verse"]')){
-   const b=document.createElement('button');b.className='card verse-home-card';b.dataset.open='verse';
-   b.innerHTML='<div class="icon">📖</div><h2>Versículo del día</h2><div class="muted">Una palabra para hoy</div><div id="dailyVerseHome" class="count"></div>';
-   grid.appendChild(b);
+ const home=$('home'),search=home?.querySelector('.search'),results=$('results'),grid=home?.querySelector('.home-grid');
+ if(search&&results&&search.nextElementSibling!==results)search.insertAdjacentElement('afterend',results);
+ let feature=$('verseHomeFeature');
+ if(home&&!feature){
+   feature=document.createElement('button');
+   feature.id='verseHomeFeature';feature.className='verse-home-feature';feature.type='button';feature.dataset.open='verse';
+   feature.innerHTML='<div class="verse-home-top"><span class="verse-home-icon">📖</span><span class="verse-home-kicker">VERSÍCULO DEL DÍA</span><span class="verse-home-arrow">›</span></div><div id="dailyVerseText" class="verse-home-text"></div><div id="dailyVerseHome" class="verse-home-ref"></div>';
+   if(results)results.insertAdjacentElement('afterend',feature);else if(search)search.insertAdjacentElement('afterend',feature);else home.prepend(feature);
  }
+ const old=grid?.querySelector('.verse-home-card');if(old)old.remove();
  const main=document.querySelector('main');
  if(main&&!$('verseView')){
    const s=document.createElement('section');s.id='verseView';s.className='view hidden';
@@ -155,10 +159,10 @@ function inject(){
    main.appendChild(s);
  }
 }
-function render(i){current=(i+verses.length)%verses.length;const v=verses[current];if($('verseText'))$('verseText').textContent='“'+v.text+'”';if($('verseRef'))$('verseRef').textContent=v.ref;if($('verseDate'))$('verseDate').textContent=dateText();if($('dailyVerseHome'))$('dailyVerseHome').textContent=v.ref}
+function render(i){current=(i+verses.length)%verses.length;const v=verses[current];if($('verseText'))$('verseText').textContent='“'+v.text+'”';if($('verseRef'))$('verseRef').textContent=v.ref;if($('verseDate'))$('verseDate').textContent=dateText();if($('dailyVerseText'))$('dailyVerseText').textContent='“'+v.text+'”';if($('dailyVerseHome'))$('dailyVerseHome').textContent=v.ref}
 function show(){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));$('verseView')?.classList.remove('hidden');document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));window.scrollTo(0,0);render(dayIndex())}
 function back(){document.querySelector('nav button[data-nav="home"]')?.click()}
 async function share(){const v=verses[current],text=`${v.text}\n— ${v.ref}\n\nHimnario-Cancionero La Grey`;try{if(navigator.share)await navigator.share({title:'Versículo del día',text});else if(navigator.clipboard){await navigator.clipboard.writeText(text)}}catch(e){}}
-function wireVerse(){inject();render(dayIndex());document.querySelector('[data-open="verse"]')?.addEventListener('click',show);$('verseBack')?.addEventListener('click',back);$('verseToday')?.addEventListener('click',()=>render(dayIndex()));$('verseAnother')?.addEventListener('click',()=>{let n=current;while(verses.length>1&&n===current)n=Math.floor(Math.random()*verses.length);render(n)});$('verseShare')?.addEventListener('click',share)}
+function wireVerse(){inject();render(dayIndex());$('verseHomeFeature')?.addEventListener('click',show);$('verseBack')?.addEventListener('click',back);$('verseToday')?.addEventListener('click',()=>render(dayIndex()));$('verseAnother')?.addEventListener('click',()=>{let n=current;while(verses.length>1&&n===current)n=Math.floor(Math.random()*verses.length);render(n)});$('verseShare')?.addEventListener('click',share)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wireVerse);else wireVerse();
 })();
