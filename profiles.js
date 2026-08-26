@@ -134,3 +134,4 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 (()=>{const s=document.createElement('script');s.src='stage-ui.js';s.defer=true;document.head.appendChild(s)})();
 (()=>{const s=document.createElement('script');s.src='song-reader.js';s.defer=true;document.head.appendChild(s)})();
+(()=>{const data=document.createElement('script');data.src='verses.js';data.onload=()=>{const ui=document.createElement('script');ui.src='verses-ui.js';document.head.appendChild(ui)};document.head.appendChild(data)})();
