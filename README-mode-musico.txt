@@ -1,1 +1,0 @@
-El modo músico añade zoom táctil y desplazamiento automático a la vista de canciones.
