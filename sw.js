@@ -1,5 +1,5 @@
-const CACHE='la-grey-v2-18-hymn-controls-fix';
-const ASSETS=['./','./index.html','./styles.css','./profiles.css','./performance.css','./stage-ui.css','./song-reader.css','./contrast.css','./verses.css','./songs.js','./hymns.js','./hymn-tools.js','./chords.js','./members.js','./app.js','./profiles.js','./stage-ui.js','./song-reader.js','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png'];
+const CACHE='la-grey-v2-19-hymn-controls-v2';
+const ASSETS=['./','./index.html','./styles.css','./profiles.css','./performance.css','./stage-ui.css','./song-reader.css','./contrast.css','./verses.css','./songs.js','./hymns.js','./hymn-tools-v2.js','./chords.js','./members.js','./app.js','./profiles.js','./stage-ui.js','./song-reader.js','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting()});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
 self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;event.respondWith(fetch(event.request).then(response=>{const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));return response}).catch(()=>caches.match(event.request).then(cached=>cached||caches.match('./index.html'))))});
