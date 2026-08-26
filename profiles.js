@@ -132,3 +132,4 @@ function wire(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();
 })();
+(()=>{const s=document.createElement('script');s.src='stage-ui.js';s.defer=true;document.head.appendChild(s)})();
