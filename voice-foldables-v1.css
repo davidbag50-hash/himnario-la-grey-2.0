@@ -5,4 +5,5 @@
 .voice-foldable-panel{margin:0 0 12px!important;border-top-left-radius:0!important;border-top-right-radius:0!important}
 .voice-pro-grid>.voice-foldable-panel{grid-column:1/-1;width:100%}
 .voice-routines>.voice-foldable-panel{width:100%}
+html.voice-foldable-lock,html.voice-foldable-lock body,html.voice-foldable-lock #voiceView,html.voice-foldable-lock .voice-pro-tools,html.voice-foldable-lock .voice-routines{overflow-anchor:none!important;scroll-behavior:auto!important}
 @media(max-width:520px){.voice-foldable-trigger{padding-right:42px!important}.voice-foldable-trigger::after{right:13px}}
