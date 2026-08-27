@@ -21,5 +21,5 @@ document.write('<script src="hymns-271-280.js"><\/script>');
 document.write('<script src="hymns-281-290.js"><\/script>');
 document.write('<script src="hymns-291-300.js"><\/script>');
 
-/* Entrenamiento vocal + herramientas + interfaz compacta. */
-(()=>{const s=document.createElement('script');s.src='voice.js';s.onload=()=>{const p=document.createElement('script');p.src='voice-pro.js';p.defer=true;p.onload=()=>{const c=document.createElement('script');c.src='compact-ui.js';c.defer=true;document.head.appendChild(c)};document.head.appendChild(p)};s.defer=true;document.head.appendChild(s)})();
+/* Entrenamiento vocal + herramientas + interfaz compacta + remodelación global. */
+(()=>{const s=document.createElement('script');s.src='voice.js';s.onload=()=>{const p=document.createElement('script');p.src='voice-pro.js';p.defer=true;p.onload=()=>{const c=document.createElement('script');c.src='compact-ui.js';c.defer=true;c.onload=()=>{const r=document.createElement('script');r.src='redesign.js';r.defer=true;document.head.appendChild(r)};document.head.appendChild(c)};document.head.appendChild(p)};s.defer=true;document.head.appendChild(s)})();
