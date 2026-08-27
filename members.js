@@ -20,3 +20,6 @@ document.write('<script src="hymns-261-270.js"><\/script>');
 document.write('<script src="hymns-271-280.js"><\/script>');
 document.write('<script src="hymns-281-290.js"><\/script>');
 document.write('<script src="hymns-291-300.js"><\/script>');
+
+/* Entrenamiento vocal: módulo independiente para no tocar la lógica estable de app.js. */
+(()=>{const s=document.createElement('script');s.src='voice.js';s.defer=true;document.head.appendChild(s)})();
