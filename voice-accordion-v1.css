@@ -1,0 +1,13 @@
+.voice-exercise.voice-accordion-item{padding:0;overflow:hidden}
+.voice-exercise-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.voice-exercise-toggle:hover{background:rgba(142,216,255,.06)}
+.voice-exercise-toggle:focus-visible{outline:2px solid #8ed8ff;outline-offset:-2px}
+.voice-exercise-toggle-copy{display:block;min-width:0;line-height:1.35}
+.voice-exercise-number{font-weight:900;color:#8ed8ff}
+.voice-exercise-title{font-weight:800;color:#fff}
+.voice-exercise-chevron{flex:0 0 auto;color:#8ed8ff;font-size:22px;line-height:1;transition:transform .18s ease}
+.voice-exercise.is-open .voice-exercise-chevron{transform:rotate(180deg)}
+.voice-exercise-body{padding:14px 15px 15px;border-top:1px solid rgba(255,255,255,.09)}
+.voice-exercise-body[hidden]{display:none!important}
+.voice-exercise-body>.voice-pattern:first-child,.voice-exercise-body>p:first-child{margin-top:0}
+@media(max-width:520px){.voice-exercise-toggle{padding:14px 13px}.voice-exercise-body{padding:13px}.voice-exercise-title{display:inline}}
