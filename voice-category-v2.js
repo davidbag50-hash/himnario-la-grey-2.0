@@ -23,13 +23,13 @@ function loadFoldables(){
     const link=document.createElement('link');
     link.id='voiceFoldablesCss';
     link.rel='stylesheet';
-    link.href='voice-foldables-v1.css?v=46';
+    link.href='voice-foldables-v1.css?v=47';
     document.head.appendChild(link);
   }
   if(!document.getElementById('voiceFoldablesJs')){
     const script=document.createElement('script');
     script.id='voiceFoldablesJs';
-    script.src='voice-foldables-v1.js?v=46';
+    script.src='voice-foldables-v1.js?v=47';
     document.body.appendChild(script);
   }
 }
@@ -51,8 +51,6 @@ function openCategoryScreen(){
   screen.classList.remove('hidden');
   active=true;
 
-  // Se comporta como una pantalla nueva: empieza arriba y no conserva
-  // el desplazamiento de la lista principal de Voz.
   window.scrollTo(0,0);
   requestAnimationFrame(()=>window.scrollTo(0,0));
   setTimeout(()=>window.scrollTo(0,0),80);
@@ -79,9 +77,6 @@ function closeCategoryScreen(scroll=true){
 
 function scheduleOpen(){
   clearTimeout(reopenTimer);
-  // layout-v35 todavía intenta colocar voicePanel debajo de la tarjeta con
-  // un setTimeout(0). Esperamos a que termine y luego lo movemos a la
-  // subpantalla definitiva. La segunda pasada lo blinda ante otros ajustes.
   reopenTimer=setTimeout(openCategoryScreen,25);
   setTimeout(openCategoryScreen,110);
 }
