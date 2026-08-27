@@ -56,10 +56,20 @@ function enhanceExercise(article,index){
   button.addEventListener('click',event=>{
     event.preventDefault();
     event.stopPropagation();
+
+    // El detalle pertenece a este ejercicio y siempre se abre aquí mismo.
+    // Conservamos la posición visual del encabezado para evitar saltos de scroll.
+    const topBefore=button.getBoundingClientRect().top;
     const willOpen=button.getAttribute('aria-expanded')!=='true';
     button.setAttribute('aria-expanded',String(willOpen));
     body.hidden=!willOpen;
     article.classList.toggle('is-open',willOpen);
+
+    requestAnimationFrame(()=>{
+      const topAfter=button.getBoundingClientRect().top;
+      const delta=topAfter-topBefore;
+      if(Math.abs(delta)>1)window.scrollBy(0,delta);
+    });
   });
 }
 
