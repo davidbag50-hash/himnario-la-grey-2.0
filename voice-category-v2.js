@@ -23,13 +23,13 @@ function loadFoldables(){
     const link=document.createElement('link');
     link.id='voiceFoldablesCss';
     link.rel='stylesheet';
-    link.href='voice-foldables-v1.css?v=47';
+    link.href='voice-foldables-v1.css?v=48';
     document.head.appendChild(link);
   }
   if(!document.getElementById('voiceFoldablesJs')){
     const script=document.createElement('script');
     script.id='voiceFoldablesJs';
-    script.src='voice-foldables-v1.js?v=47';
+    script.src='voice-foldables-v1.js?v=48';
     document.body.appendChild(script);
   }
 }
