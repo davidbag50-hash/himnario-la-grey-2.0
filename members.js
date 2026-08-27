@@ -20,11 +20,5 @@ document.write('<script src="hymns-271-280.js"><\/script>');
 document.write('<script src="hymns-281-290.js"><\/script>');
 document.write('<script src="hymns-291-300.js"><\/script>');
 
-/* Rediseño global: carga directa, independiente y con versión para evitar caché vieja. */
-(()=>{
- const css=document.createElement('link');css.rel='stylesheet';css.href='redesign.css?v=34';css.id='lgRedesignCss';document.head.appendChild(css);
- const r=document.createElement('script');r.src='redesign.js?v=34';r.defer=true;document.head.appendChild(r);
-})();
-
-/* Voz mantiene su cadena propia; el rediseño ya no depende de ella. */
-(()=>{const s=document.createElement('script');s.src='voice.js?v=34';s.onload=()=>{const p=document.createElement('script');p.src='voice-pro.js?v=34';p.defer=true;p.onload=()=>{const c=document.createElement('script');c.src='compact-ui.js?v=34';c.defer=true;document.head.appendChild(c)};document.head.appendChild(p)};s.defer=true;document.head.appendChild(s)})();
+/* Voz + herramientas avanzadas. El diseño v35 se carga directamente desde index.html. */
+(()=>{const s=document.createElement('script');s.src='voice.js?v=35';s.onload=()=>{const p=document.createElement('script');p.src='voice-pro.js?v=35';p.defer=true;document.head.appendChild(p)};s.defer=true;document.head.appendChild(s)})();
