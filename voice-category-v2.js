@@ -22,15 +22,23 @@ function loadFoldables(){
     const link=document.createElement('link');
     link.id='voiceFoldablesCss';
     link.rel='stylesheet';
-    link.href='voice-foldables-v1.css?v=49';
+    link.href='voice-foldables-v1.css?v=50';
     document.head.appendChild(link);
   }
   if(!document.getElementById('voiceFoldablesJs')){
     const script=document.createElement('script');
     script.id='voiceFoldablesJs';
-    script.src='voice-foldables-v1.js?v=49';
+    script.src='voice-foldables-v1.js?v=50';
     document.body.appendChild(script);
   }
+}
+
+function loadExtraExercises(){
+  if(document.getElementById('voiceExtraExercisesJs'))return;
+  const script=document.createElement('script');
+  script.id='voiceExtraExercisesJs';
+  script.src='voice-extra-exercises-v1.js?v=50';
+  document.body.appendChild(script);
 }
 
 function panelReady(mode,panel){
@@ -116,6 +124,7 @@ document.addEventListener('click',event=>{
 function boot(){
   ensureScreen();
   loadFoldables();
+  loadExtraExercises();
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
