@@ -2,27 +2,20 @@
 'use strict';
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
-const configs=[
-  {name:'pro',selector:'.voice-pro-card',panel:'#voiceProPanel'},
-  {name:'routine',selector:'.voice-routine',panel:'#voicePanel'}
-];
+const config={name:'pro',selector:'.voice-pro-card',panel:'#voiceProPanel'};
 let restoreTimer=0;
 let savedScrollIntoView=null;
 let savedScrollTo=null;
 let savedScroll=null;
 
-function configFor(button){return configs.find(c=>button.matches(c.selector));}
-
 function markButtons(){
-  configs.forEach(c=>{
-    $$(c.selector).forEach(button=>{
-      button.classList.add('voice-foldable-trigger');
-      if(!button.hasAttribute('aria-expanded'))button.setAttribute('aria-expanded','false');
-    });
+  $$(config.selector).forEach(button=>{
+    button.classList.add('voice-foldable-trigger');
+    if(!button.hasAttribute('aria-expanded'))button.setAttribute('aria-expanded','false');
   });
 }
 
-function setExpanded(config,active){
+function setExpanded(active){
   $$(config.selector).forEach(button=>{
     const open=button===active;
     button.setAttribute('aria-expanded',String(open));
@@ -30,33 +23,17 @@ function setExpanded(config,active){
   });
 }
 
-function stopInside(config,panel){
-  if(config.name==='routine'){
-    panel?.querySelector('[data-routine-stop]')?.click();
-    panel?.querySelector('[data-stop]')?.click();
-  }else{
-    $('#vproMicStop')?.click();
-    $('#groupStop')?.click();
-  }
+function stopInside(){
+  $('#vproMicStop')?.click();
+  $('#groupStop')?.click();
 }
 
 function suppressLegacyAutoScroll(){
   clearTimeout(restoreTimer);
   document.documentElement.classList.add('voice-foldable-lock');
-
-  if(!savedScrollIntoView){
-    savedScrollIntoView=Element.prototype.scrollIntoView;
-    Element.prototype.scrollIntoView=function(){};
-  }
-  if(!savedScrollTo){
-    savedScrollTo=window.scrollTo;
-    window.scrollTo=function(){};
-  }
-  if(!savedScroll){
-    savedScroll=window.scroll;
-    window.scroll=function(){};
-  }
-
+  if(!savedScrollIntoView){savedScrollIntoView=Element.prototype.scrollIntoView;Element.prototype.scrollIntoView=function(){};}
+  if(!savedScrollTo){savedScrollTo=window.scrollTo;window.scrollTo=function(){};}
+  if(!savedScroll){savedScroll=window.scroll;window.scroll=function(){};}
   restoreTimer=setTimeout(()=>{
     if(savedScrollIntoView){Element.prototype.scrollIntoView=savedScrollIntoView;savedScrollIntoView=null;}
     if(savedScrollTo){window.scrollTo=savedScrollTo;savedScrollTo=null;}
@@ -83,21 +60,19 @@ function holdAnchor(button,anchorTop,duration=760){
   requestAnimationFrame(keep);
 }
 
-function finishToggle(button,config,wasOpen,topBefore){
+function finishToggle(button,wasOpen,topBefore){
   const panel=$(config.panel);
   if(!panel)return;
-
   if(wasOpen){
-    stopInside(config,panel);
+    stopInside();
     panel.classList.add('hidden');
     panel.classList.remove('voice-foldable-panel');
-    setExpanded(config,null);
+    setExpanded(null);
     stabilizeNow(button,topBefore);
     holdAnchor(button,topBefore,420);
     return;
   }
-
-  setExpanded(config,button);
+  setExpanded(button);
   panel.classList.remove('hidden');
   panel.classList.add('voice-foldable-panel');
   button.insertAdjacentElement('afterend',panel);
@@ -106,21 +81,13 @@ function finishToggle(button,config,wasOpen,topBefore){
 }
 
 function handleClick(event){
-  const button=event.target.closest('.voice-pro-card,.voice-routine');
+  const button=event.target.closest('.voice-pro-card');
   if(!button)return;
-  const config=configFor(button);
-  if(!config)return;
-
   const wasOpen=button.getAttribute('aria-expanded')==='true';
   const topBefore=button.getBoundingClientRect().top;
-
-  // Bloquea durante el cambio tanto el auto-scroll de los scripts viejos
-  // como el scroll anchoring del navegador. El usuario conserva exactamente
-  // la posición visual de la tarjeta que tocó.
   suppressLegacyAutoScroll();
   holdAnchor(button,topBefore,900);
-
-  setTimeout(()=>finishToggle(button,config,wasOpen,topBefore),45);
+  setTimeout(()=>finishToggle(button,wasOpen,topBefore),45);
   setTimeout(()=>{
     if(!wasOpen&&button.getAttribute('aria-expanded')==='true'){
       const panel=$(config.panel);
@@ -132,16 +99,14 @@ function handleClick(event){
 }
 
 function cleanupWhenLeaving(event){
-  if(!event.target.closest('nav button,[data-home],[data-nav],[data-voice-home],[data-voice-cat]'))return;
-  configs.forEach(config=>{
-    const panel=$(config.panel);
-    if(panel?.classList.contains('voice-foldable-panel')){
-      stopInside(config,panel);
-      panel.classList.add('hidden');
-      panel.classList.remove('voice-foldable-panel');
-      setExpanded(config,null);
-    }
-  });
+  if(!event.target.closest('nav button,[data-home],[data-nav],[data-voice-home],[data-voice-cat],[data-routine]'))return;
+  const panel=$(config.panel);
+  if(panel?.classList.contains('voice-foldable-panel')){
+    stopInside();
+    panel.classList.add('hidden');
+    panel.classList.remove('voice-foldable-panel');
+    setExpanded(null);
+  }
 }
 
 function boot(){
