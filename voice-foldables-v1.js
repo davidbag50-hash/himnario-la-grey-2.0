@@ -6,8 +6,10 @@ const configs=[
   {name:'pro',selector:'.voice-pro-card',panel:'#voiceProPanel'},
   {name:'routine',selector:'.voice-routine',panel:'#voicePanel'}
 ];
-let restoreScrollIntoViewTimer=0;
+let restoreTimer=0;
 let savedScrollIntoView=null;
+let savedScrollTo=null;
+let savedScroll=null;
 
 function configFor(button){return configs.find(c=>button.matches(c.selector));}
 
@@ -38,31 +40,44 @@ function stopInside(config,panel){
   }
 }
 
-// voice.js y voice-pro.js llaman scrollIntoView({behavior:'smooth'}) al abrir.
-// Durante el clic plegable lo anulamos brevemente para que la pantalla se
-// quede exactamente donde el usuario tocó. Después restauramos el método.
 function suppressLegacyAutoScroll(){
-  clearTimeout(restoreScrollIntoViewTimer);
+  clearTimeout(restoreTimer);
+  document.documentElement.classList.add('voice-foldable-lock');
+
   if(!savedScrollIntoView){
     savedScrollIntoView=Element.prototype.scrollIntoView;
     Element.prototype.scrollIntoView=function(){};
   }
-  restoreScrollIntoViewTimer=setTimeout(()=>{
-    if(savedScrollIntoView){
-      Element.prototype.scrollIntoView=savedScrollIntoView;
-      savedScrollIntoView=null;
-    }
-  },420);
+  if(!savedScrollTo){
+    savedScrollTo=window.scrollTo;
+    window.scrollTo=function(){};
+  }
+  if(!savedScroll){
+    savedScroll=window.scroll;
+    window.scroll=function(){};
+  }
+
+  restoreTimer=setTimeout(()=>{
+    if(savedScrollIntoView){Element.prototype.scrollIntoView=savedScrollIntoView;savedScrollIntoView=null;}
+    if(savedScrollTo){window.scrollTo=savedScrollTo;savedScrollTo=null;}
+    if(savedScroll){window.scroll=savedScroll;savedScroll=null;}
+    document.documentElement.classList.remove('voice-foldable-lock');
+  },850);
 }
 
-function holdAnchor(button,anchorTop,duration=520){
+function stabilizeNow(button,anchorTop){
+  if(!button||!button.isConnected||!Number.isFinite(anchorTop))return;
+  const now=button.getBoundingClientRect().top;
+  const delta=now-anchorTop;
+  if(Math.abs(delta)>0.5)window.scrollBy(0,delta);
+}
+
+function holdAnchor(button,anchorTop,duration=760){
   if(!button||!Number.isFinite(anchorTop))return;
   const start=performance.now();
   const keep=()=>{
     if(!button.isConnected)return;
-    const now=button.getBoundingClientRect().top;
-    const delta=now-anchorTop;
-    if(Math.abs(delta)>0.75)window.scrollBy(0,delta);
+    stabilizeNow(button,anchorTop);
     if(performance.now()-start<duration)requestAnimationFrame(keep);
   };
   requestAnimationFrame(keep);
@@ -77,7 +92,8 @@ function finishToggle(button,config,wasOpen,topBefore){
     panel.classList.add('hidden');
     panel.classList.remove('voice-foldable-panel');
     setExpanded(config,null);
-    holdAnchor(button,topBefore,260);
+    stabilizeNow(button,topBefore);
+    holdAnchor(button,topBefore,420);
     return;
   }
 
@@ -85,6 +101,7 @@ function finishToggle(button,config,wasOpen,topBefore){
   panel.classList.remove('hidden');
   panel.classList.add('voice-foldable-panel');
   button.insertAdjacentElement('afterend',panel);
+  stabilizeNow(button,topBefore);
   holdAnchor(button,topBefore);
 }
 
@@ -97,17 +114,19 @@ function handleClick(event){
   const wasOpen=button.getAttribute('aria-expanded')==='true';
   const topBefore=button.getBoundingClientRect().top;
 
-  // Esto corre en captura, antes de los listeners originales.
+  // Bloquea durante el cambio tanto el auto-scroll de los scripts viejos
+  // como el scroll anchoring del navegador. El usuario conserva exactamente
+  // la posición visual de la tarjeta que tocó.
   suppressLegacyAutoScroll();
+  holdAnchor(button,topBefore,900);
 
-  // Los scripts originales generan el contenido; después lo dejamos
-  // definitivamente debajo de la tarjeta correspondiente.
   setTimeout(()=>finishToggle(button,config,wasOpen,topBefore),45);
   setTimeout(()=>{
     if(!wasOpen&&button.getAttribute('aria-expanded')==='true'){
       const panel=$(config.panel);
       if(panel&&button.nextElementSibling!==panel)button.insertAdjacentElement('afterend',panel);
-      holdAnchor(button,topBefore,260);
+      stabilizeNow(button,topBefore);
+      holdAnchor(button,topBefore,500);
     }
   },130);
 }
