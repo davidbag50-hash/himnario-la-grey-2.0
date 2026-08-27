@@ -35,8 +35,8 @@ function openCategoryScreen(){
   screen.classList.remove('hidden');
   active=true;
 
-  // Cancela el scroll suave que hacía la vista anterior y empieza arriba,
-  // como una pantalla nueva dentro de Voz.
+  // Se comporta como una pantalla nueva: empieza arriba y no conserva
+  // el desplazamiento de la lista principal de Voz.
   window.scrollTo(0,0);
   requestAnimationFrame(()=>window.scrollTo(0,0));
   setTimeout(()=>window.scrollTo(0,0),80);
@@ -63,10 +63,11 @@ function closeCategoryScreen(scroll=true){
 
 function scheduleOpen(){
   clearTimeout(reopenTimer);
-  // voice.js crea el contenido primero y layout-v35 termina sus ajustes en el
-  // mismo clic. Después lo movemos definitivamente a esta subpantalla.
-  reopenTimer=setTimeout(openCategoryScreen,0);
-  setTimeout(()=>{ if(!active)openCategoryScreen(); },50);
+  // layout-v35 todavía intenta colocar voicePanel debajo de la tarjeta con
+  // un setTimeout(0). Esperamos a que termine y luego lo movemos a la
+  // subpantalla definitiva. La segunda pasada lo blinda ante otros ajustes.
+  reopenTimer=setTimeout(openCategoryScreen,25);
+  setTimeout(openCategoryScreen,110);
 }
 
 document.addEventListener('click',event=>{
