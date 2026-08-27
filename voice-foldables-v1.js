@@ -6,6 +6,8 @@ const configs=[
   {name:'pro',selector:'.voice-pro-card',panel:'#voiceProPanel'},
   {name:'routine',selector:'.voice-routine',panel:'#voicePanel'}
 ];
+let restoreScrollIntoViewTimer=0;
+let savedScrollIntoView=null;
 
 function configFor(button){return configs.find(c=>button.matches(c.selector));}
 
@@ -36,19 +38,34 @@ function stopInside(config,panel){
   }
 }
 
-function cancelScroll(anchorTop){
-  const restore=()=>{
-    if(!Number.isFinite(anchorTop))return;
-    const active=$('.voice-foldable-open');
-    if(!active)return;
-    const now=active.getBoundingClientRect().top;
+// voice.js y voice-pro.js llaman scrollIntoView({behavior:'smooth'}) al abrir.
+// Durante el clic plegable lo anulamos brevemente para que la pantalla se
+// quede exactamente donde el usuario tocó. Después restauramos el método.
+function suppressLegacyAutoScroll(){
+  clearTimeout(restoreScrollIntoViewTimer);
+  if(!savedScrollIntoView){
+    savedScrollIntoView=Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView=function(){};
+  }
+  restoreScrollIntoViewTimer=setTimeout(()=>{
+    if(savedScrollIntoView){
+      Element.prototype.scrollIntoView=savedScrollIntoView;
+      savedScrollIntoView=null;
+    }
+  },420);
+}
+
+function holdAnchor(button,anchorTop,duration=520){
+  if(!button||!Number.isFinite(anchorTop))return;
+  const start=performance.now();
+  const keep=()=>{
+    if(!button.isConnected)return;
+    const now=button.getBoundingClientRect().top;
     const delta=now-anchorTop;
-    if(Math.abs(delta)>1)window.scrollBy(0,delta);
+    if(Math.abs(delta)>0.75)window.scrollBy(0,delta);
+    if(performance.now()-start<duration)requestAnimationFrame(keep);
   };
-  requestAnimationFrame(restore);
-  setTimeout(restore,70);
-  setTimeout(restore,180);
-  setTimeout(restore,340);
+  requestAnimationFrame(keep);
 }
 
 function finishToggle(button,config,wasOpen,topBefore){
@@ -60,7 +77,7 @@ function finishToggle(button,config,wasOpen,topBefore){
     panel.classList.add('hidden');
     panel.classList.remove('voice-foldable-panel');
     setExpanded(config,null);
-    cancelScroll(topBefore);
+    holdAnchor(button,topBefore,260);
     return;
   }
 
@@ -68,7 +85,7 @@ function finishToggle(button,config,wasOpen,topBefore){
   panel.classList.remove('hidden');
   panel.classList.add('voice-foldable-panel');
   button.insertAdjacentElement('afterend',panel);
-  cancelScroll(topBefore);
+  holdAnchor(button,topBefore);
 }
 
 function handleClick(event){
@@ -80,14 +97,17 @@ function handleClick(event){
   const wasOpen=button.getAttribute('aria-expanded')==='true';
   const topBefore=button.getBoundingClientRect().top;
 
-  // voice.js / voice-pro.js generan el contenido y layout-v35 lo mueve primero.
-  // Después de eso lo dejamos definitivamente bajo la tarjeta y aplicamos
-  // el comportamiento abrir/cerrar del acordeón.
+  // Esto corre en captura, antes de los listeners originales.
+  suppressLegacyAutoScroll();
+
+  // Los scripts originales generan el contenido; después lo dejamos
+  // definitivamente debajo de la tarjeta correspondiente.
   setTimeout(()=>finishToggle(button,config,wasOpen,topBefore),45);
   setTimeout(()=>{
     if(!wasOpen&&button.getAttribute('aria-expanded')==='true'){
       const panel=$(config.panel);
       if(panel&&button.nextElementSibling!==panel)button.insertAdjacentElement('afterend',panel);
+      holdAnchor(button,topBefore,260);
     }
   },130);
 }
