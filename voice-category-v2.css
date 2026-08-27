@@ -1,0 +1,9 @@
+#voiceCategoryScreen.hidden{display:none!important}
+#voiceCategoryScreen{display:block;min-height:60vh}
+#voiceView>.voice-category-main-hidden{display:none!important}
+.voice-category-back{margin-bottom:14px}
+#voiceCategoryHost{display:block}
+#voiceCategoryHost .voice-category-panel{display:block!important;margin:0;border-radius:18px;padding:16px}
+#voiceCategoryHost .voice-category-panel>h2{margin-top:6px}
+#voiceCategoryHost .voice-exercise-list{margin-top:14px}
+@media(max-width:520px){#voiceCategoryHost .voice-category-panel{padding:13px}}
