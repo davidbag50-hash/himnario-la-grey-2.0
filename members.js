@@ -9,7 +9,6 @@ window.LAGREY_MEMBERS=[
  {id:'david',name:'David',aliases:['david'],roles:['Voz'],instrument:'voice',icon:'🎤'}
 ];
 
-/* Himnos 201-300: carga sincrónica antes de app.js para que formen parte del repertorio desde el arranque. */
 document.write('<script src="hymns-201-210.js"><\/script>');
 document.write('<script src="hymns-211-220.js"><\/script>');
 document.write('<script src="hymns-221-230.js"><\/script>');
@@ -21,5 +20,11 @@ document.write('<script src="hymns-271-280.js"><\/script>');
 document.write('<script src="hymns-281-290.js"><\/script>');
 document.write('<script src="hymns-291-300.js"><\/script>');
 
-/* Entrenamiento vocal + herramientas + interfaz compacta + remodelación global. */
-(()=>{const s=document.createElement('script');s.src='voice.js';s.onload=()=>{const p=document.createElement('script');p.src='voice-pro.js';p.defer=true;p.onload=()=>{const c=document.createElement('script');c.src='compact-ui.js';c.defer=true;c.onload=()=>{const r=document.createElement('script');r.src='redesign.js';r.defer=true;document.head.appendChild(r)};document.head.appendChild(c)};document.head.appendChild(p)};s.defer=true;document.head.appendChild(s)})();
+/* Rediseño global: carga directa, independiente y con versión para evitar caché vieja. */
+(()=>{
+ const css=document.createElement('link');css.rel='stylesheet';css.href='redesign.css?v=34';css.id='lgRedesignCss';document.head.appendChild(css);
+ const r=document.createElement('script');r.src='redesign.js?v=34';r.defer=true;document.head.appendChild(r);
+})();
+
+/* Voz mantiene su cadena propia; el rediseño ya no depende de ella. */
+(()=>{const s=document.createElement('script');s.src='voice.js?v=34';s.onload=()=>{const p=document.createElement('script');p.src='voice-pro.js?v=34';p.defer=true;p.onload=()=>{const c=document.createElement('script');c.src='compact-ui.js?v=34';c.defer=true;document.head.appendChild(c)};document.head.appendChild(p)};s.defer=true;document.head.appendChild(s)})();
