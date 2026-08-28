@@ -1,29 +1,57 @@
 /* Contraste reforzado para listas de Cantos, Himnos, Favoritos y búsqueda */
-.song{
-  color:#79d1ff!important;
+html[data-theme="light"] .song{color:#173a5d!important}
+html[data-theme="light"] .song b,
+html[data-theme="light"] .song .song-main b,
+html[data-theme="light"] #listing .song b,
+html[data-theme="light"] #results .song b,
+html[data-theme="light"] #setlistSongs .song b{
+  color:#0b3768!important;
+  -webkit-text-fill-color:#0b3768!important;
+  font-weight:900!important;
+  letter-spacing:.1px!important;
 }
-.song b,
-.song .song-main b,
-#listing .song b,
-#results .song b,
-#setlistSongs .song b{
+html[data-theme="light"] .song small,
+html[data-theme="light"] .song .muted,
+html[data-theme="light"] #listing .song small,
+html[data-theme="light"] #results .song small,
+html[data-theme="light"] #setlistSongs .song small{
+  color:#5b7085!important;
+  -webkit-text-fill-color:#5b7085!important;
+  opacity:1!important;
+}
+html[data-theme="light"] .song .tone,
+html[data-theme="light"] #listing .song .tone,
+html[data-theme="light"] #results .song .tone{
+  color:#0b3768!important;
+  -webkit-text-fill-color:#0b3768!important;
+  background:#eef6fd!important;
+  border-color:#cfe2f3!important;
+  font-weight:900!important;
+}
+
+html[data-theme="dark"] .song{color:#79d1ff!important}
+html[data-theme="dark"] .song b,
+html[data-theme="dark"] .song .song-main b,
+html[data-theme="dark"] #listing .song b,
+html[data-theme="dark"] #results .song b,
+html[data-theme="dark"] #setlistSongs .song b{
   color:#79d1ff!important;
   -webkit-text-fill-color:#79d1ff!important;
   font-weight:900!important;
   letter-spacing:.1px!important;
 }
-.song small,
-.song .muted,
-#listing .song small,
-#results .song small,
-#setlistSongs .song small{
-  color:#f3f8fc!important;
-  -webkit-text-fill-color:#f3f8fc!important;
+html[data-theme="dark"] .song small,
+html[data-theme="dark"] .song .muted,
+html[data-theme="dark"] #listing .song small,
+html[data-theme="dark"] #results .song small,
+html[data-theme="dark"] #setlistSongs .song small{
+  color:#dbe7f1!important;
+  -webkit-text-fill-color:#dbe7f1!important;
   opacity:1!important;
 }
-.song .tone,
-#listing .song .tone,
-#results .song .tone{
+html[data-theme="dark"] .song .tone,
+html[data-theme="dark"] #listing .song .tone,
+html[data-theme="dark"] #results .song .tone{
   color:#ffffff!important;
   -webkit-text-fill-color:#ffffff!important;
   font-weight:900!important;
