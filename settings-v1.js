@@ -1,0 +1,1 @@
+(()=>{const s=document.createElement('script');s.src='settings-v2.js?v=2';document.head.appendChild(s)})();
