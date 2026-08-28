@@ -1,0 +1,162 @@
+/* La Grey v70 · saneamiento completo del tema claro */
+html[data-theme='light']{
+  --lg70-ink:#0b3768;
+  --lg70-text:#173a5d;
+  --lg70-muted:#5f7489;
+  --lg70-border:#dce6ee;
+  --lg70-paper:#ffffff;
+  --lg70-soft:#f5f9fc;
+  --lg70-blue-soft:#edf6ff;
+  --lg70-gold:#d8a52d;
+  --lg70-shadow:0 8px 24px rgba(31,61,91,.09);
+}
+
+/* formularios y texto general */
+html[data-theme='light'] label{color:var(--lg70-text)!important}
+html[data-theme='light'] input,
+html[data-theme='light'] textarea,
+html[data-theme='light'] select{color:var(--lg70-text)!important}
+html[data-theme='light'] input::placeholder,
+html[data-theme='light'] textarea::placeholder{color:#8091a2!important}
+
+/* CALENDARIO */
+html[data-theme='light'] #calendarView .calendar-toolbar h2,
+html[data-theme='light'] #calendarView .calendar-week,
+html[data-theme='light'] #calendarView .day-num{color:var(--lg70-ink)!important}
+html[data-theme='light'] #calendarView .calendar-week{color:#667d92!important}
+html[data-theme='light'] #calendarView .day-cell{
+  background:#fff!important;color:var(--lg70-text)!important;border:1px solid var(--lg70-border)!important;
+  box-shadow:0 4px 14px rgba(31,61,91,.05)!important
+}
+html[data-theme='light'] #calendarView .day-cell.outside{opacity:.48!important}
+html[data-theme='light'] #calendarView .day-cell.today{border-color:#d8a52d!important;box-shadow:inset 0 0 0 1px rgba(216,165,45,.28)!important}
+html[data-theme='light'] #calendarView .event-dot{
+  background:#edf6ff!important;color:#0b5fa8!important;border:1px solid #d2e7f7!important;font-weight:700!important
+}
+html[data-theme='light'] #dayModal .modal-card,
+html[data-theme='light'] #eventModal .modal-card{background:#fff!important;color:var(--lg70-text)!important;border-color:var(--lg70-border)!important}
+html[data-theme='light'] #dayModal .modal-top h2,
+html[data-theme='light'] #eventModal .modal-top h2,
+html[data-theme='light'] #eventModal .event-editor h3{color:var(--lg70-ink)!important}
+html[data-theme='light'] #dayModal .event-card{
+  background:#fff!important;color:var(--lg70-text)!important;border:1px solid var(--lg70-border)!important;box-shadow:var(--lg70-shadow)!important
+}
+html[data-theme='light'] #dayModal .event-card-meta{color:var(--lg70-muted)!important}
+html[data-theme='light'] #eventModal .song-choices{background:#fbfdff!important;border-color:var(--lg70-border)!important}
+html[data-theme='light'] #eventModal .choice-row{background:#fff!important;color:var(--lg70-text)!important;border-color:#e7edf2!important}
+html[data-theme='light'] #eventModal .choice-row small{color:var(--lg70-muted)!important;-webkit-text-fill-color:var(--lg70-muted)!important}
+html[data-theme='light'] #eventModal .selected-row{background:#f8fbfd!important;color:var(--lg70-text)!important;border-color:var(--lg70-border)!important}
+html[data-theme='light'] #eventModal .tiny-btn{background:#fff!important;color:var(--lg70-ink)!important;border-color:#ccdce8!important}
+html[data-theme='light'] #eventModal .tone-field{background:#fff!important;color:var(--lg70-ink)!important;-webkit-text-fill-color:var(--lg70-ink)!important;border-color:#cbdce9!important}
+html[data-theme='light'] #eventModal .field{background:#fff!important;color:var(--lg70-text)!important;border-color:var(--lg70-border)!important}
+html[data-theme='light'] #eventModal .event-notes{color:var(--lg70-muted)!important}
+
+/* VOZ: todas las superficies y estados */
+html[data-theme='light'] #voiceView .voice-hero,
+html[data-theme='light'] #voiceView .voice-card,
+html[data-theme='light'] #voiceView .voice-routine,
+html[data-theme='light'] #voiceView .voice-panel,
+html[data-theme='light'] #voiceView .voice-exercise,
+html[data-theme='light'] #voiceView .voice-pro-card,
+html[data-theme='light'] #voiceView .voice-pro-panel,
+html[data-theme='light'] #voiceView .pitch-live,
+html[data-theme='light'] #voiceView .preset-card,
+html[data-theme='light'] #voiceView .group-session,
+html[data-theme='light'] #voiceView .routine-item{
+  background:#fff!important;color:var(--lg70-text)!important;border:1px solid var(--lg70-border)!important;box-shadow:var(--lg70-shadow)!important
+}
+html[data-theme='light'] #voiceView .voice-hero{background:linear-gradient(135deg,#f4f9fe,#fff)!important}
+html[data-theme='light'] #voiceView .voice-hero h1,
+html[data-theme='light'] #voiceView .voice-exercise h3,
+html[data-theme='light'] #voiceView .routine-item b,
+html[data-theme='light'] #voiceView .pitch-note,
+html[data-theme='light'] #voiceView .range-summary b,
+html[data-theme='light'] #voiceView .group-step b,
+html[data-theme='light'] #voiceView .group-plan b{color:var(--lg70-ink)!important}
+html[data-theme='light'] #voiceView .voice-hero p,
+html[data-theme='light'] #voiceView .voice-card small,
+html[data-theme='light'] #voiceView .voice-routine small,
+html[data-theme='light'] #voiceView .voice-pro-card small,
+html[data-theme='light'] #voiceView .voice-pro-intro,
+html[data-theme='light'] #voiceView .pitch-hz,
+html[data-theme='light'] #voiceView .pitch-labels,
+html[data-theme='light'] #voiceView .range-summary small,
+html[data-theme='light'] #voiceView .preset-card small,
+html[data-theme='light'] #voiceView .preset-card span,
+html[data-theme='light'] #voiceView .group-step span,
+html[data-theme='light'] #voiceView .group-plan small{color:var(--lg70-muted)!important}
+html[data-theme='light'] #voiceView .voice-card b,
+html[data-theme='light'] #voiceView .voice-routine b,
+html[data-theme='light'] #voiceView .voice-panel h2,
+html[data-theme='light'] #voiceView .voice-pro-card b,
+html[data-theme='light'] #voiceView .voice-pro-panel h2,
+html[data-theme='light'] #voiceView .preset-card b,
+html[data-theme='light'] #voiceView .voice-pattern,
+html[data-theme='light'] #voiceView .voice-badge,
+html[data-theme='light'] #voiceView .voice-syllable-chip,
+html[data-theme='light'] #voiceView .group-countdown{color:#0d72d8!important}
+html[data-theme='light'] #voiceView .voice-controls select,
+html[data-theme='light'] #voiceView .voice-controls input{background:#fff!important;color:var(--lg70-text)!important;border:1px solid #cfdee9!important}
+html[data-theme='light'] #voiceView .voice-status,
+html[data-theme='light'] #voiceView .routine-current,
+html[data-theme='light'] #voiceView .voice-warning{background:#edf7ff!important;color:var(--lg70-text)!important;border-color:#cde4f6!important}
+html[data-theme='light'] #voiceView .routine-bar,
+html[data-theme='light'] #voiceView .group-progress{background:#e3ebf2!important}
+html[data-theme='light'] #voiceView .routine-bar span,
+html[data-theme='light'] #voiceView .group-progress div{background:#0d72d8!important}
+html[data-theme='light'] #voiceView .pitch-meter{background:linear-gradient(90deg,#e8f0f7,#dcecf8,#e8f0f7)!important}
+html[data-theme='light'] #voiceView .pitch-center{background:#0d72d8!important}
+html[data-theme='light'] #voiceView .pitch-needle{background:#0b3768!important}
+html[data-theme='light'] #voiceView .range-summary>div,
+html[data-theme='light'] #voiceView .group-plan div{background:#f6f9fc!important;color:var(--lg70-text)!important}
+html[data-theme='light'] #voiceView .voice-foldable-trigger::after{color:#0d72d8!important}
+html[data-theme='light'] #voiceView .voice-foldable-trigger.voice-foldable-open{background:#edf7ff!important;border-color:#8fc2ec!important;box-shadow:none!important}
+
+/* ACORDES Y MODAL */
+html[data-theme='light'] #chordsView .chord-card{background:#fff!important;color:var(--lg70-text)!important;border-color:var(--lg70-border)!important}
+html[data-theme='light'] #chordsView .chord-card b{color:var(--lg70-ink)!important;-webkit-text-fill-color:var(--lg70-ink)!important;text-shadow:none!important}
+html[data-theme='light'] #chordsView .chord-card small{color:var(--lg70-muted)!important}
+html[data-theme='light'] #chordModal .modal-card{background:#fff!important;color:var(--lg70-text)!important;border-color:var(--lg70-border)!important}
+html[data-theme='light'] #chordModal .modal-top h2{color:var(--lg70-ink)!important}
+html[data-theme='light'] #chordModal .chord-sub,
+html[data-theme='light'] #chordModal .finger-help{color:var(--lg70-muted)!important}
+html[data-theme='light'] #chordModal .diagram-wrap,
+html[data-theme='light'] #chordModal .piano-wrap{background:#fbfdff!important;border-color:#dce7f0!important}
+html[data-theme='light'] #chordModal .close{background:#eef6fd!important;color:var(--lg70-ink)!important;border-color:#d4e4ef!important}
+
+/* AJUSTES Y PERFIL */
+html[data-theme='light'] #settingsView .settings-group{background:#fff!important;color:var(--lg70-text)!important;border-color:var(--lg70-border)!important}
+html[data-theme='light'] #settingsView .settings-label,
+html[data-theme='light'] #settingsView .settings-group h2{color:var(--lg70-ink)!important}
+html[data-theme='light'] #settingsView .settings-help,
+html[data-theme='light'] #settingsView .settings-footer{color:var(--lg70-muted)!important}
+html[data-theme='light'] #settingsView .settings-select{background:#fff!important;color:var(--lg70-text)!important;border-color:#cfdee9!important}
+html[data-theme='light'] .profile-modal-card,
+html[data-theme='light'] .profile-hero,
+html[data-theme='light'] .profile-welcome{background:#fff!important;color:var(--lg70-text)!important;border-color:var(--lg70-border)!important;box-shadow:var(--lg70-shadow)!important}
+html[data-theme='light'] .profile-welcome b{color:var(--lg70-ink)!important}
+html[data-theme='light'] .profile-welcome .muted{color:var(--lg70-muted)!important}
+html[data-theme='light'] .profile-hero{color:#0d72d8!important}
+
+/* LECTOR / DETALLE */
+html[data-theme='light'] #detail .head,
+html[data-theme='light'] #detail .chart{background:#fff!important;color:var(--lg70-text)!important;border-color:var(--lg70-border)!important}
+html[data-theme='light'] #detail .chart-inner{color:#1c3853!important}
+html[data-theme='light'] #detail .hint,
+html[data-theme='light'] #detail .artist{color:var(--lg70-muted)!important}
+html[data-theme='light'] #detail .badge{background:#fff7e8!important;color:#946b13!important;border-color:#ead9a8!important}
+
+/* AFINADOR: estados secundarios */
+html[data-theme='light'] #tunerView .string-btn{background:#fff!important;color:var(--lg70-ink)!important;border-color:#cfdee9!important}
+html[data-theme='light'] #tunerView .string-btn.active{background:#0d72d8!important;color:#fff!important;border-color:#0d72d8!important}
+html[data-theme='light'] #tunerView .meter-labels,
+html[data-theme='light'] #tunerView .tuning-row{color:var(--lg70-muted)!important}
+
+/* MODALES GENERALES */
+html[data-theme='light'] .modal{background:rgba(20,39,57,.28)!important}
+html[data-theme='light'] .modal-card{background:#fff!important;color:var(--lg70-text)!important;border-color:var(--lg70-border)!important;box-shadow:0 24px 70px rgba(31,61,91,.20)!important}
+html[data-theme='light'] .modal-top h2{color:var(--lg70-ink)!important}
+html[data-theme='light'] .close{background:#eef6fd!important;color:var(--lg70-ink)!important;border-color:#d4e4ef!important}
+
+/* mensajes flotantes */
+html[data-theme='light'] .toast{background:#fff!important;color:var(--lg70-ink)!important;border-color:#d4e4ef!important;box-shadow:0 12px 34px rgba(31,61,91,.16)!important}
