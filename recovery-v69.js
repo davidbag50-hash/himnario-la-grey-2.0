@@ -1,6 +1,8 @@
 (()=>{
 'use strict';
 const $=s=>document.querySelector(s);
+let modalScrollY=0;
+let modalLocked=false;
 
 /* La Grey vuelve a un único tema: oscuro. */
 function forceDarkOnly(){
@@ -14,6 +16,34 @@ function forceDarkOnly(){
    const row=themeSelect.closest('.settings-row');
    if(row)row.remove();
    else themeSelect.remove();
+ }
+}
+
+/* Congela por completo la página de atrás mientras haya cualquier modal abierto. */
+function syncModalLock(){
+ const openModal=document.querySelector('.modal:not(.hidden)');
+ if(openModal&&!modalLocked){
+   modalScrollY=window.scrollY||window.pageYOffset||0;
+   document.documentElement.classList.add('lg-modal-open');
+   document.body.classList.add('lg-modal-open');
+   document.body.style.position='fixed';
+   document.body.style.top=`-${modalScrollY}px`;
+   document.body.style.left='0';
+   document.body.style.right='0';
+   document.body.style.width='100%';
+   document.body.style.overflow='hidden';
+   modalLocked=true;
+ }else if(!openModal&&modalLocked){
+   document.documentElement.classList.remove('lg-modal-open');
+   document.body.classList.remove('lg-modal-open');
+   document.body.style.position='';
+   document.body.style.top='';
+   document.body.style.left='';
+   document.body.style.right='';
+   document.body.style.width='';
+   document.body.style.overflow='';
+   modalLocked=false;
+   window.scrollTo(0,modalScrollY);
  }
 }
 
@@ -59,6 +89,10 @@ function restoreCriticalControls(){
  document.querySelectorAll('#calendarGrid .day-cell').forEach(el=>{el.disabled=false;el.style.pointerEvents='auto'});
 }
 
-forceDarkOnly();buildHeader();restoreCriticalControls();
-document.addEventListener('click',()=>setTimeout(()=>{forceDarkOnly();buildHeader();restoreCriticalControls()},30),true);
+function refreshUiState(){forceDarkOnly();buildHeader();restoreCriticalControls();syncModalLock()}
+
+refreshUiState();
+document.addEventListener('click',()=>{setTimeout(refreshUiState,0);setTimeout(refreshUiState,60)},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setTimeout(syncModalLock,0)},true);
+window.addEventListener('pageshow',()=>setTimeout(refreshUiState,0));
 })();
