@@ -1,0 +1,74 @@
+/* La Grey · encabezados internos + afinador claro/oscuro */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&display=swap');
+
+/* Encabezados internos: misma familia visual del menú principal */
+#listing>h1,#detail .head>h1,#chordsView .section-title-row h1,#tunerView .head h1,#calendarView .calendar-head h1,#setlistView .head h1,#settingsView .settings-title h1,#voiceView h1{
+  font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif!important;
+  font-style:normal!important;
+  font-weight:800!important;
+  letter-spacing:-.025em!important;
+  line-height:1.08!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  text-shadow:none!important;
+}
+html[data-theme='light'] #listing>h1,html[data-theme='light'] #detail .head>h1,html[data-theme='light'] #chordsView .section-title-row h1,html[data-theme='light'] #tunerView .head h1,html[data-theme='light'] #calendarView .calendar-head h1,html[data-theme='light'] #setlistView .head h1,html[data-theme='light'] #settingsView .settings-title h1,html[data-theme='light'] #voiceView h1{color:#0b3768!important}
+html[data-theme='dark'] #listing>h1,html[data-theme='dark'] #detail .head>h1,html[data-theme='dark'] #chordsView .section-title-row h1,html[data-theme='dark'] #tunerView .head h1,html[data-theme='dark'] #calendarView .calendar-head h1,html[data-theme='dark'] #setlistView .head h1,html[data-theme='dark'] #settingsView .settings-title h1,html[data-theme='dark'] #voiceView h1{color:#f5f8fc!important}
+.lg-section-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:14px}
+.lg-section-icon svg{width:34px;height:34px;display:block}
+html[data-theme='light'] .lg-section-icon{background:#edf6ff;color:#0d72d8;border:1px solid #d7e9f8}
+html[data-theme='dark'] .lg-section-icon{background:#092b49;color:#78c7ff;border:1px solid #174d76}
+#listing>h1{margin-top:10px!important;margin-bottom:22px!important}
+#chordsView .section-title-row,#calendarView .calendar-head{padding:18px!important}
+#chordsView .section-title-row p,#calendarView .calendar-head p,#tunerView .head .artist{font-family:'Nunito',system-ui,sans-serif!important}
+
+/* Afinador CLARO: realmente claro, no panel oscuro reutilizado */
+html[data-theme='light'] #tunerView .head{
+  background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%)!important;
+  color:#173a5d!important;
+  border:1px solid #dfe6ed!important;
+  box-shadow:0 10px 30px rgba(31,61,91,.10)!important;
+}
+html[data-theme='light'] #tunerView .head .artist{color:#5b7085!important;-webkit-text-fill-color:#5b7085!important}
+html[data-theme='light'] #tunerView .tuner-card{
+  background:linear-gradient(180deg,#ffffff 0%,#f6fbff 100%)!important;
+  color:#173a5d!important;
+  border:1px solid #d9e5ef!important;
+  box-shadow:0 12px 34px rgba(31,61,91,.12)!important;
+}
+html[data-theme='light'] #tunerView .tuner-card:before{background:none!important}
+html[data-theme='light'] #tunerView .tuner-mode{background:#eef5fb!important;border-radius:22px!important;padding:7px!important}
+html[data-theme='light'] #tunerView .tuner-mode .seg{background:#fff!important;color:#0b3768!important;border:1px solid #d7e4ef!important;box-shadow:0 4px 12px rgba(31,61,91,.07)!important}
+html[data-theme='light'] #tunerView .tuner-mode .seg.active{background:#0d72d8!important;color:#fff!important;border-color:#0d72d8!important}
+html[data-theme='light'] #tunerView .tuner-note{color:#0b3768!important;-webkit-text-fill-color:#0b3768!important;text-shadow:none!important}
+html[data-theme='light'] #tunerView .tuner-hz{color:#5b7085!important;-webkit-text-fill-color:#5b7085!important}
+html[data-theme='light'] #tunerView .meter{
+  background:linear-gradient(180deg,#fafdff,#edf6fd)!important;
+  border:1px solid #cfdfea!important;
+  box-shadow:inset 0 1px 0 #fff,0 5px 16px rgba(31,61,91,.08)!important;
+}
+html[data-theme='light'] #tunerView .meter:before{background:linear-gradient(90deg,#89bdea,#d6a52d)!important}
+html[data-theme='light'] #tunerView .meter-center{background:#d8a52d!important;box-shadow:0 0 8px rgba(216,165,45,.28)!important}
+html[data-theme='light'] #tunerView .meter-needle{background:#0d72d8!important;box-shadow:0 0 8px rgba(13,114,216,.22)!important}
+html[data-theme='light'] #tunerView .meter-labels{color:#60788f!important}
+html[data-theme='light'] #tunerView .tuner-advice{background:#edf7ff!important;color:#0b3768!important;border:1px solid #cfe5f7!important;box-shadow:none!important}
+html[data-theme='light'] #tunerView .info-card{background:#fff!important;color:#173a5d!important;border:1px solid #dfe6ed!important}
+html[data-theme='light'] #tunerView .info-card b{color:#0b3768!important}
+html[data-theme='light'] #tunerView .tuning-row{color:#5b7085!important}
+
+/* Afinador OSCURO: conserva identidad azul profunda */
+html[data-theme='dark'] #tunerView .head{background:linear-gradient(180deg,#071a2d,#061523)!important;border-color:#173f60!important;color:#f4f8fc!important}
+html[data-theme='dark'] #tunerView .tuner-card{background:radial-gradient(circle at 50% 25%,rgba(39,136,217,.15),transparent 34%),linear-gradient(180deg,#071a2d,#051522)!important;border-color:#244b68!important;color:#f4f8fc!important}
+html[data-theme='dark'] #tunerView .tuner-mode{background:#0a2238!important;border-radius:22px!important;padding:7px!important}
+html[data-theme='dark'] #tunerView .tuner-mode .seg{background:#09233c!important;color:#eaf6ff!important;border-color:#1b4e73!important}
+html[data-theme='dark'] #tunerView .tuner-mode .seg.active{background:#0c3356!important;color:#7fd0ff!important;border-color:#286b9b!important}
+html[data-theme='dark'] #tunerView .tuner-note{color:#79d1ff!important;-webkit-text-fill-color:#79d1ff!important}
+html[data-theme='dark'] #tunerView .tuner-hz{color:#c3d1df!important;-webkit-text-fill-color:#c3d1df!important}
+html[data-theme='dark'] #tunerView .tuner-advice{background:#0a2b49!important;color:#eef7ff!important;border-color:#37617e!important}
+html[data-theme='dark'] #tunerView .info-card{background:#071a2d!important;border-color:#173f60!important;color:#f4f8fc!important}
+
+@media(max-width:620px){
+  #listing>h1,#detail .head>h1,#chordsView .section-title-row h1,#tunerView .head h1,#calendarView .calendar-head h1,#settingsView .settings-title h1,#voiceView h1{font-size:30px!important}
+  .lg-section-icon{width:40px;height:40px;flex-basis:40px;border-radius:13px}.lg-section-icon svg{width:30px;height:30px}
+}
