@@ -1,0 +1,36 @@
+/* La Grey · correcciones de contraste y navegación interna */
+html[data-theme="light"] body:not(.exact-home-screen) #listing .song,
+html[data-theme="light"] body:not(.exact-home-screen) #setlistView .song,
+html[data-theme="light"] body:not(.exact-home-screen) #results .song{background:#fff!important;color:#173a5d!important;border-color:#dfe6ed!important}
+html[data-theme="light"] body:not(.exact-home-screen) #listing .song .song-main b,
+html[data-theme="light"] body:not(.exact-home-screen) #setlistView .song .song-main b,
+html[data-theme="light"] body:not(.exact-home-screen) #results .song b{color:#0b3768!important;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif!important;font-size:17px!important;font-weight:800!important;text-shadow:none!important;opacity:1!important}
+html[data-theme="light"] body:not(.exact-home-screen) #listing .song .song-main small,
+html[data-theme="light"] body:not(.exact-home-screen) #setlistView .song .song-main small,
+html[data-theme="light"] body:not(.exact-home-screen) #results .song small,
+html[data-theme="light"] body:not(.exact-home-screen) .artist,
+html[data-theme="light"] body:not(.exact-home-screen) .muted{color:#5b7085!important;opacity:1!important}
+html[data-theme="light"] body:not(.exact-home-screen) #listing .song .song-main small,
+html[data-theme="light"] body:not(.exact-home-screen) #setlistView .song .song-main small,
+html[data-theme="light"] body:not(.exact-home-screen) #results .song small{font-size:13px!important;font-weight:600!important;line-height:1.35!important}
+html[data-theme="light"] body:not(.exact-home-screen) .tone{background:#eef6fd!important;color:#0b3768!important;border:1px solid #cfe2f3!important;font-weight:800!important;opacity:1!important;box-shadow:none!important}
+html[data-theme="light"] body:not(.exact-home-screen) #listing>h1,
+html[data-theme="light"] body:not(.exact-home-screen) #detail h1,
+html[data-theme="light"] body:not(.exact-home-screen) #chordsView h1,
+html[data-theme="light"] body:not(.exact-home-screen) #tunerView h1,
+html[data-theme="light"] body:not(.exact-home-screen) #calendarView h1,
+html[data-theme="light"] body:not(.exact-home-screen) #setlistView h1,
+html[data-theme="light"] body:not(.exact-home-screen) #settingsView h1,
+html[data-theme="light"] body:not(.exact-home-screen) #voiceView h1{color:#0b3768!important;text-shadow:none!important}
+
+/* La misma barra inferior del menú principal en todas las vistas internas */
+body:not(.exact-home-screen)>nav{position:fixed!important;left:50%!important;right:auto!important;bottom:0!important;transform:translateX(-50%)!important;width:min(760px,100%)!important;height:101px!important;background:rgba(255,255,255,.985)!important;border:0!important;border-top:1px solid #e3e7eb!important;border-radius:0!important;display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:0!important;padding:7px 26px calc(7px + env(safe-area-inset-bottom))!important;box-shadow:0 -2px 10px rgba(30,57,82,.05)!important;backdrop-filter:none!important;z-index:80!important}
+body:not(.exact-home-screen)>nav button{border:0!important;background:transparent!important;color:#526a82!important;min-width:0!important;padding:0!important;border-radius:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif!important;font-size:14px!important;font-weight:600!important;position:relative!important;text-shadow:none!important;box-shadow:none!important}
+body:not(.exact-home-screen)>nav button svg{width:32px!important;height:32px!important;display:block!important}
+body:not(.exact-home-screen)>nav button span{display:block!important;font-size:14px!important;line-height:1!important;margin:0!important;color:inherit!important}
+body:not(.exact-home-screen)>nav button.active{color:#086ed3!important;background:transparent!important}
+body:not(.exact-home-screen)>nav button.active:before{content:""!important;position:absolute!important;top:-7px!important;left:50%!important;transform:translateX(-50%)!important;width:82px!important;height:4px!important;border-radius:4px!important;background:#0878e5!important}
+html[data-theme="dark"] body:not(.exact-home-screen)>nav{background:rgba(4,18,33,.985)!important;border-top-color:#173a58!important;box-shadow:0 -10px 30px rgba(0,0,0,.32)!important}
+html[data-theme="dark"] body:not(.exact-home-screen)>nav button{color:#8ca4b8!important}
+html[data-theme="dark"] body:not(.exact-home-screen)>nav button.active{color:#67c0ff!important}
+@media(max-width:620px){body:not(.exact-home-screen)>nav{height:90px!important;padding-left:12px!important;padding-right:12px!important}body:not(.exact-home-screen)>nav button{font-size:12px!important}body:not(.exact-home-screen)>nav button svg{width:28px!important;height:28px!important}body:not(.exact-home-screen)>nav button span{font-size:12px!important}body:not(.exact-home-screen)>nav button.active:before{width:56px!important}}
