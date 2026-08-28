@@ -27,8 +27,14 @@ function ensureModalLockCss(){
  style.textContent=`
  html.lg-modal-open,body.lg-modal-open{overflow:hidden!important;overscroll-behavior:none!important}
  body.lg-modal-open{touch-action:none!important}
- .modal:not(.hidden){position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important}
- .modal:not(.hidden)>.modal-card{position:relative!important;max-height:calc(100dvh - 28px)!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+ body.lg-modal-open>nav,
+ body.lg-modal-open .exact-bottom,
+ body.lg-modal-open #readerTools,
+ body.lg-modal-open .reader-tools,
+ body.lg-modal-open .voice-fab,
+ body.lg-modal-open .voice-fab-menu{display:none!important}
+ .modal:not(.hidden){position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important;z-index:5000!important}
+ .modal:not(.hidden)>.modal-card{position:relative!important;max-height:calc(100dvh - 28px)!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;z-index:5001!important}
  #chordModal:not(.hidden){position:fixed!important;inset:0!important;transform:none!important;margin:0!important}
  #chordModal:not(.hidden)>.modal-card{position:relative!important;transform:none!important;margin:auto!important}
  @media(max-width:620px){.modal:not(.hidden)>.modal-card{max-height:calc(100dvh - 16px)!important}}
