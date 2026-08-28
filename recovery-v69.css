@@ -110,4 +110,25 @@ html[data-theme='light'] .modal-top h2{color:var(--lg70-ink)!important}
 html[data-theme='light'] .close{background:#eef6fd!important;color:var(--lg70-ink)!important;border-color:#d4e4ef!important}
 html[data-theme='light'] .toast{background:#fff!important;color:var(--lg70-ink)!important;border-color:#d4e4ef!important;box-shadow:0 12px 34px rgba(31,61,91,.16)!important}
 
+/* ===== v72: lector y acordes sin residuos oscuros ===== */
+html[data-theme='light'] #detail #songTitle,
+html[data-theme='light'] #detail .head h1{
+ color:#0b3768!important;-webkit-text-fill-color:#0b3768!important;text-shadow:none!important;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif!important;font-weight:800!important
+}
+html[data-theme='light'] #detail .back,
+html[data-theme='light'] #songBackBtn{
+ background:transparent!important;color:#0d72d8!important;-webkit-text-fill-color:#0d72d8!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:8px 0!important
+}
+html[data-theme='light'] #detail .hint{color:#6d8193!important;-webkit-text-fill-color:#6d8193!important}
+html[data-theme='light'] #detail .tone{background:#edf6ff!important;color:#0b3768!important;-webkit-text-fill-color:#0b3768!important;border-color:#cbdfea!important}
+html[data-theme='light'] #chordModal .tabs{background:#eef5fa!important;border:1px solid #d8e4ed!important}
+html[data-theme='light'] #chordModal .tabs .seg{background:#fff!important;color:#173a5d!important;border:1px solid #d7e3ec!important;box-shadow:none!important}
+html[data-theme='light'] #chordModal .tabs .seg.active{background:#0d72d8!important;color:#fff!important;border-color:#0d72d8!important}
+html[data-theme='light'] #chordModal .finger-help{background:#f6f9fc!important;color:#5f7489!important;border:1px solid #dce6ee!important}
+html[data-theme='light'] #chordModal .piano-notes{color:#0d72d8!important;-webkit-text-fill-color:#0d72d8!important}
+html[data-theme='light'] #chordModal .diagram-wrap,
+html[data-theme='light'] #chordModal .piano-wrap{background:#f8fbfd!important;box-shadow:inset 0 0 0 1px #edf2f6!important}
+html[data-theme='light'] #diagramSvg,
+html[data-theme='light'] #pianoSvg{filter:none!important}
+
 @media(max-width:620px){body:not(.exact-home-screen)>header .lg-global-shell{padding-left:12px!important;padding-right:12px!important}body:not(.exact-home-screen)>header .lg-global-actions{grid-template-columns:1fr 1fr 66px!important;gap:12px!important}body:not(.exact-home-screen)>header .lg-global-actions #profileBtn,body:not(.exact-home-screen)>header .lg-global-actions #notationBtn{height:54px!important;font-size:16px!important;border-radius:24px!important}body:not(.exact-home-screen)>header .lg-global-actions #settingsBtn{height:54px!important;width:66px!important;border-radius:24px!important}}
