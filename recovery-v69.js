@@ -19,6 +19,19 @@ function forceDarkOnly(){
  }
 }
 
+function ensureModalLockCss(){
+ if(document.getElementById('lgModalLockCss'))return;
+ const style=document.createElement('style');
+ style.id='lgModalLockCss';
+ style.textContent=`
+ html.lg-modal-open,body.lg-modal-open{overflow:hidden!important;overscroll-behavior:none!important}
+ .modal:not(.hidden){position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;overscroll-behavior:contain!important}
+ .modal:not(.hidden)>.modal-card{position:relative!important;max-height:calc(100dvh - 28px)!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+ @media(max-width:620px){.modal:not(.hidden)>.modal-card{max-height:calc(100dvh - 16px)!important}}
+ `;
+ document.head.appendChild(style);
+}
+
 /* Congela por completo la página de atrás mientras haya cualquier modal abierto. */
 function syncModalLock(){
  const openModal=document.querySelector('.modal:not(.hidden)');
@@ -89,7 +102,7 @@ function restoreCriticalControls(){
  document.querySelectorAll('#calendarGrid .day-cell').forEach(el=>{el.disabled=false;el.style.pointerEvents='auto'});
 }
 
-function refreshUiState(){forceDarkOnly();buildHeader();restoreCriticalControls();syncModalLock()}
+function refreshUiState(){forceDarkOnly();ensureModalLockCss();buildHeader();restoreCriticalControls();syncModalLock()}
 
 refreshUiState();
 document.addEventListener('click',()=>{setTimeout(refreshUiState,0);setTimeout(refreshUiState,60)},true);
