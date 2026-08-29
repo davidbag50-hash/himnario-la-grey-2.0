@@ -4,7 +4,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const STANDARD=['home','listing','detail','chordsView','tunerView','calendarView','setlistView'];
 const navLabels={home:'Inicio',songs:'Cantos',chords:'Acordes',calendar:'Calendario',tuner:'Afinador'};
 const sectionIcons={
- songs:'<svg viewBox="0 0 32 32"><path d="M6 9c6-3 11-2 14 1v15c-4-2-9-2-14 0zM26 9c-6-3-11-2-14 1v15c4-2-9-2-14 0zM26 9c-6-3-11-2-14 1v15c4-2 9-2 14 0z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 10v15" stroke="#d8a52d" stroke-width="2"/></svg>',
+ songs:'<svg viewBox="0 0 32 32"><path d="M6 9c6-3 11-2 14 1v15c-4-2-9-2-14 0zM26 9c-6-3-11-2-14 1v15c4-2 9-2 14 0z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 10v15" stroke="#d8a52d" stroke-width="2"/></svg>',
  hymns:'<svg viewBox="0 0 32 32"><rect x="7" y="4" width="18" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 9v10M11 14h10" stroke="#d8a52d" stroke-width="2.4" stroke-linecap="round"/></svg>',
  chords:'<svg viewBox="0 0 32 32"><path d="M7 4h5l-1 24H8z" fill="#9b652f"/><rect x="14" y="8" width="13" height="15" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M18 8v15M22 8v15M14 13h13M14 18h13" stroke="currentColor" stroke-width="1.3"/><circle cx="18" cy="18" r="1.8" fill="#0d72d8"/><circle cx="22" cy="13" r="1.8" fill="#0d72d8"/></svg>',
  tuner:'<svg viewBox="0 0 32 32"><path d="M6 22a10 10 0 0 1 20 0" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M16 22l5-11" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="22" r="2.5" fill="currentColor"/><path d="M7 25h18" stroke="#d8a52d" stroke-width="2"/></svg>',
