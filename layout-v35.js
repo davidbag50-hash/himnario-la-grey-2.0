@@ -2,13 +2,6 @@
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const STANDARD=['home','listing','detail','chordsView','tunerView','calendarView','setlistView'];
-const navIcons={
- home:`<svg viewBox="0 0 32 32"><path d="M3 15L16 4l13 11v14H20v-9h-8v9H3z" fill="currentColor"/></svg>`,
- songs:`<svg viewBox="0 0 32 32"><path d="M19 5v17.5a5 5 0 1 1-3-4.6V8.5l11-2.6v13.5a5 5 0 1 1-3-4.6V4.2z" fill="currentColor"/></svg>`,
- chords:`<svg viewBox="0 0 32 32"><rect x="5" y="4" width="22" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M10 4v24M16 4v24M22 4v24M5 10h22M5 16h22M5 22h22" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="16" r="2.4" fill="currentColor"/><circle cx="16" cy="10" r="2.4" fill="currentColor"/><circle cx="22" cy="22" r="2.4" fill="currentColor"/></svg>`,
- calendar:`<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="22" rx="3" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M4 12h24M10 3v6M22 3v6" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><path d="M9 17h3v3H9zm6 0h3v3h-3zm6 0h3v3h-3zM9 22h3v3H9zm6 0h3v3h-3z" fill="currentColor"/></svg>`,
- tuner:`<svg viewBox="0 0 32 32"><path d="M5 23a11 11 0 0 1 22 0" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M16 23l5-11" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"/><circle cx="16" cy="23" r="2.5" fill="currentColor"/><path d="M7 25h18" stroke="currentColor" stroke-width="2.4"/></svg>`
-};
 const navLabels={home:'Inicio',songs:'Cantos',chords:'Acordes',calendar:'Calendario',tuner:'Afinador'};
 const sectionIcons={
  songs:'<svg viewBox="0 0 32 32"><path d="M6 9c6-3 11-2 14 1v15c-4-2-9-2-14 0zM26 9c-6-3-11-2-14 1v15c4-2 9-2 14 0z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 10v15" stroke="#d8a52d" stroke-width="2"/></svg>',
@@ -19,7 +12,7 @@ const sectionIcons={
  settings:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M25.2 6.8l-2.8 2.8M9.6 22.4l-2.8 2.8" stroke="currentColor" stroke-width="2.4"/></svg>',
  voice:'<svg viewBox="0 0 32 32"><rect x="11" y="4" width="10" height="16" rx="5" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M8 16a8 8 0 0 0 16 0M16 24v5M11 29h10" stroke="currentColor" stroke-width="2.3"/></svg>'
 };
-function refreshLegacyNavIcons(){const nav=$('body>nav');if(!nav)return;nav.querySelectorAll('[data-nav]').forEach(b=>{const k=b.dataset.nav;if(!navIcons[k]||b.querySelector('svg'))return;const t=b.querySelector('span')?.textContent?.trim()||navLabels[k];b.innerHTML=navIcons[k]+`<span>${t}</span>`})}
+function refreshLegacyNavIcons(){const nav=$('body>nav'),source=$('#lgExactHome .exact-bottom');if(!nav||!source)return;nav.querySelectorAll('[data-nav]').forEach(b=>{const k=b.dataset.nav,src=source.querySelector(`[data-nav="${k}"]`),svg=src?.querySelector('svg');if(!svg)return;const t=b.querySelector('span')?.textContent?.trim()||src.querySelector('span')?.textContent?.trim()||navLabels[k]||'';b.replaceChildren(svg.cloneNode(true),Object.assign(document.createElement('span'),{textContent:t}))})}
 function cleanTitle(h){if(!h)return'';const c=h.cloneNode(true);c.querySelectorAll('.lg-section-icon').forEach(n=>n.remove());return c.textContent.replace(/[🎵🎼🎤🎸🎹📅⚙️⭐✨]/g,'').trim()}
 function decorateTitle(h,type){if(!h||h.querySelector('.lg-section-icon'))return;const t=cleanTitle(h);h.textContent='';const i=document.createElement('span');i.className='lg-section-icon';i.innerHTML=sectionIcons[type]||sectionIcons.songs;const l=document.createElement('span');l.textContent=t;h.append(i,l)}
 function refreshSectionIcons(){const list=$('#listing>h1');if(list){const t=cleanTitle(list).toLowerCase();decorateTitle(list,t.includes('himno')?'hymns':'songs')}decorateTitle($('#chordsView .section-title-row h1'),'chords');decorateTitle($('#tunerView .head h1'),'tuner');decorateTitle($('#calendarView .calendar-head h1'),'calendar');decorateTitle($('#settingsView .settings-title h1'),'settings');decorateTitle($('#voiceView h1'),'voice')}
