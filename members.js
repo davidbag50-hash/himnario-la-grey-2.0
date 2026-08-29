@@ -20,6 +20,3 @@ document.write('<script src="hymns-271-280.js"><\/script>');
 document.write('<script src="hymns-281-290.js"><\/script>');
 document.write('<script src="hymns-291-300.js"><\/script>');
 document.write('<script src="hymns-301-310.js"><\/script>');
-
-/* Voz + herramientas avanzadas. El diseño v35 se carga directamente desde index.html. */
-(()=>{const s=document.createElement('script');s.src='voice.js?v=35';s.onload=()=>{const p=document.createElement('script');p.src='voice-pro.js?v=35';p.defer=true;document.head.appendChild(p)};s.defer=true;document.head.appendChild(s)})();
