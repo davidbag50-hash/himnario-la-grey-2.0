@@ -55,5 +55,5 @@ body.exact-home-screen{background:#020b17!important;color:#f4f8fc!important}
 @media(max-width:390px){.exact-logo-mark{width:90px}.exact-kicker{font-size:13px;padding-left:58px;letter-spacing:1.7px}.exact-wordmark{font-size:65px;padding-left:38px}.exact-cross{font-size:64px!important}.exact-actions{gap:8px}.exact-pill{font-size:15px}.exact-card{height:270px}.exact-illustration{height:121px}.exact-card h2{font-size:19px}.exact-card p{font-size:11.5px}.exact-favorite{grid-template-columns:112px 1fr 22px}.exact-favorite:before{width:112px}}
 
 /* Apertura oficial de La Grey: collage original en alta resolución durante 5 segundos. */
-body.exact-home-screen::after{content:'';position:fixed;inset:0;z-index:2147483647;background:#f4eee4 url('la-grey-collage-recorte-como-referencia-2.png') center/contain no-repeat;pointer-events:none;opacity:1;visibility:visible;animation:lgStartupCollage 5s linear forwards}
+body.exact-home-screen:not(.lg-startup-finished)::after{content:'';position:fixed;inset:0;z-index:2147483647;background:#f4eee4 url('la-grey-collage-recorte-como-referencia-2.png') center/contain no-repeat;pointer-events:none;opacity:1;visibility:visible;animation:lgStartupCollage 5s linear forwards}
 @keyframes lgStartupCollage{0%,98%{opacity:1;visibility:visible}100%{opacity:0;visibility:hidden}}
