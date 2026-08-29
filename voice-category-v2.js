@@ -88,6 +88,10 @@ function closeVoiceSubscreen(scroll=true){
     view.appendChild(panel);
   }
 
+  view.querySelectorAll('.voice-routine,.voice-card').forEach(button=>{
+    button.classList.remove('lg35-expanded');
+    if(document.activeElement===button)button.blur();
+  });
   [...view.children].forEach(child=>child.classList.remove('voice-category-main-hidden'));
   screen.classList.add('hidden');
   delete screen.dataset.voiceMode;
