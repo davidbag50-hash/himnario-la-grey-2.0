@@ -5,7 +5,13 @@ const lang=()=>localStorage.getItem('lagrey_language')==='en'?'en':'es';
 let active=false;
 let reopenTimer=0;
 
-function refreshLanguage(){const back=$('[data-voice-category-back]');if(back)back.textContent=lang()==='en'?'← Voice':'← Voz'}
+function refreshLanguage(){
+  const back=$('[data-voice-category-back]');if(back)back.textContent=lang()==='en'?'← Voice':'← Voz';
+  if(!active){
+    const panel=$('#voicePanel'),view=$('#voiceView');
+    if(panel&&view){panel.classList.add('hidden');if(panel.parentElement!==view)view.appendChild(panel)}
+  }
+}
 function ensureScreen(){
   const view=$('#voiceView');
   if(!view)return null;
