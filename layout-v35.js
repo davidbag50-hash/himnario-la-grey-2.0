@@ -1,8 +1,9 @@
 (()=>{
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const lang=()=>localStorage.getItem('lagrey_language')==='en'?'en':'es',tx=(es,en)=>lang()==='en'?en:es;
 const STANDARD=['home','listing','detail','chordsView','tunerView','calendarView','setlistView'];
-const navLabels={home:'Inicio',songs:'Cantos',chords:'Acordes',calendar:'Calendario',tuner:'Afinador'};
+const navLabels={home:['Inicio','Home'],songs:['Cantos','Songs'],chords:['Acordes','Chords'],calendar:['Calendario','Calendar'],tuner:['Afinador','Tuner']};
 const sectionIcons={
  songs:'<svg viewBox="0 0 32 32"><path d="M6 9c6-3 11-2 14 1v15c-4-2-9-2-14 0zM26 9c-6-3-11-2-14 1v15c4-2 9-2 14 0z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 10v15" stroke="#d8a52d" stroke-width="2"/></svg>',
  hymns:'<svg viewBox="0 0 32 32"><rect x="7" y="4" width="18" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 9v10M11 14h10" stroke="#d8a52d" stroke-width="2.4" stroke-linecap="round"/></svg>',
@@ -12,29 +13,50 @@ const sectionIcons={
  settings:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M25.2 6.8l-2.8 2.8M9.6 22.4l-2.8 2.8" stroke="currentColor" stroke-width="2.4"/></svg>',
  voice:'<svg viewBox="0 0 32 32"><rect x="11" y="4" width="10" height="16" rx="5" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M8 16a8 8 0 0 0 16 0M16 24v5M11 29h10" stroke="currentColor" stroke-width="2.3"/></svg>'
 };
-function refreshLegacyNavIcons(){const nav=$('body>nav'),source=$('#lgExactHome .exact-bottom');if(!nav||!source)return;nav.querySelectorAll('[data-nav]').forEach(b=>{const k=b.dataset.nav,src=source.querySelector(`[data-nav="${k}"]`),svg=src?.querySelector('svg');if(!svg)return;const t=b.querySelector('span')?.textContent?.trim()||src.querySelector('span')?.textContent?.trim()||navLabels[k]||'';b.replaceChildren(svg.cloneNode(true),Object.assign(document.createElement('span'),{textContent:t}))})}
+function navLabel(k){const p=navLabels[k];return p?tx(p[0],p[1]):''}
+function refreshLegacyNavIcons(){const nav=$('body>nav'),source=$('#lgExactHome .exact-bottom');if(!nav||!source)return;nav.querySelectorAll('[data-nav]').forEach(b=>{const k=b.dataset.nav,src=source.querySelector(`[data-nav="${k}"]`),svg=src?.querySelector('svg');if(!svg)return;const t=b.querySelector('span')?.textContent?.trim()||src.querySelector('span')?.textContent?.trim()||navLabel(k);b.replaceChildren(svg.cloneNode(true),Object.assign(document.createElement('span'),{textContent:t}))})}
 function cleanTitle(h){if(!h)return'';const c=h.cloneNode(true);c.querySelectorAll('.lg-section-icon').forEach(n=>n.remove());return c.textContent.replace(/[🎵🎼🎤🎸🎹📅⚙️⭐✨]/g,'').trim()}
 function decorateTitle(h,type){if(!h||h.querySelector('.lg-section-icon'))return;const t=cleanTitle(h);h.textContent='';const i=document.createElement('span');i.className='lg-section-icon';i.innerHTML=sectionIcons[type]||sectionIcons.songs;const l=document.createElement('span');l.textContent=t;h.append(i,l)}
 function refreshSectionIcons(){const list=$('#listing>h1');if(list){const t=cleanTitle(list).toLowerCase();decorateTitle(list,t.includes('himno')||t.includes('hymn')?'hymns':'songs')}decorateTitle($('#chordsView .section-title-row h1'),'chords');decorateTitle($('#tunerView .head h1'),'tuner');decorateTitle($('#calendarView .calendar-head h1'),'calendar');decorateTitle($('#settingsView .settings-title h1'),'settings');decorateTitle($('#voiceView h1'),'voice')}
-function ensureHomeOrder(){const grid=$('#home .home-grid');if(!grid)return;const wanted=['songs','hymns','voice','chords','tuner','calendar','favorites'];const cards=new Map([...grid.querySelectorAll('[data-open]')].map(x=>[x.dataset.open,x]));const current=[...grid.querySelectorAll('[data-open]')].map(x=>x.dataset.open);if(current.join('|')!==wanted.filter(k=>cards.has(k)).join('|'))wanted.forEach(k=>{const c=cards.get(k);if(c)grid.appendChild(c)});if(!$('#lg35HomeLabel')){const l=document.createElement('div');l.id='lg35HomeLabel';l.className='lg35-home-label';l.textContent='Explora La Grey';grid.before(l)}}
+function ensureHomeOrder(){const grid=$('#home .home-grid');if(!grid)return;const wanted=['songs','hymns','voice','chords','tuner','calendar','favorites'];const cards=new Map([...grid.querySelectorAll('[data-open]')].map(x=>[x.dataset.open,x]));const current=[...grid.querySelectorAll('[data-open]')].map(x=>x.dataset.open);if(current.join('|')!==wanted.filter(k=>cards.has(k)).join('|'))wanted.forEach(k=>{const c=cards.get(k);if(c)grid.appendChild(c)});let l=$('#lg35HomeLabel');if(!l){l=document.createElement('div');l.id='lg35HomeLabel';l.className='lg35-home-label';grid.before(l)}l.textContent=tx('Explora La Grey','Explore La Grey')}
 function proxyButton(id,icon,label,target){const b=document.createElement('button');b.id=id;b.className='lg38-tool';b.type='button';b.textContent=icon;b.title=label;b.setAttribute('aria-label',label);b.onclick=e=>{e.stopPropagation();const t=$(target);if(t)t.click()};return b}
-function ensureSongDrawer(){if($('#lg35SongToolsTab'))return;const detail=$('#detail');if(!detail)return;const tab=document.createElement('button');tab.id='lg35SongToolsTab';tab.type='button';tab.textContent='⋮';tab.setAttribute('aria-label','Abrir herramientas de canción');tab.setAttribute('title','Herramientas');const drawer=document.createElement('aside');drawer.id='lg35SongToolsDrawer';drawer.setAttribute('aria-label','Herramientas de canción');const strip=document.createElement('div');strip.id='lg38ToolStrip';strip.className='lg38-tool-strip';strip.append(
- proxyButton('lg38Rotate','↻','Rotar pantalla','#lg38RotateTarget'),
- proxyButton('lg38ToneDown','½−','Bajar medio tono','#hymnDownV2'),
- proxyButton('lg38ToneUp','½+','Subir medio tono','#hymnUpV2'),
- proxyButton('lg38ToneReset','↺','Restablecer tono','#hymnResetV2'),
- proxyButton('lg38ToneSave','★','Guardar tono predeterminado','#hymnSaveV2'),
- proxyButton('lg38Fav','♡','Favorito','#favBtn'),
- proxyButton('lg38FontDown','A−','Reducir letra','#fontDown'),
- proxyButton('lg38FontUp','A+','Aumentar letra','#fontUp')
+function setToolLabel(id,es,en){const b=$('#'+id);if(!b)return;const v=tx(es,en);b.title=v;b.setAttribute('aria-label',v)}
+function refreshSongToolLanguage(){
+ ensureHomeOrder();
+ const tab=$('#lg35SongToolsTab');if(tab){tab.title=tx('Herramientas','Tools');tab.setAttribute('aria-label',tx('Abrir herramientas de canción','Open song tools'))}
+ const drawer=$('#lg35SongToolsDrawer');if(drawer)drawer.setAttribute('aria-label',tx('Herramientas de canción','Song tools'));
+ setToolLabel('lg38Rotate','Rotar pantalla','Rotate screen');
+ setToolLabel('lg38ToneDown','Bajar medio tono','Lower one semitone');
+ setToolLabel('lg38ToneUp','Subir medio tono','Raise one semitone');
+ setToolLabel('lg38ToneReset','Restablecer tono','Reset key');
+ setToolLabel('lg38ToneSave','Guardar tono predeterminado','Save default key');
+ setToolLabel('lg38Fav','Favorito','Favorite');
+ setToolLabel('lg38FontDown','Reducir letra','Decrease text size');
+ setToolLabel('lg38FontUp','Aumentar letra','Increase text size');
+ setToolLabel('lg38Scroll','Auto-scroll','Auto-scroll');
+ setToolLabel('lg38Fit','Ajustar al ancho','Fit to width');
+ setToolLabel('lg38Top','Volver al inicio de la letra','Back to the start of the lyrics');
+ const toggle=$('#lg40ScrollToggle');if(toggle)toggle.setAttribute('aria-label',tx('Iniciar o pausar auto-scroll','Start or pause auto-scroll'));
+ const speed=$('#lg40ScrollSpeed');if(speed)speed.setAttribute('aria-label',tx('Velocidad de auto-scroll','Auto-scroll speed'));
+}
+function ensureSongDrawer(){if($('#lg35SongToolsTab')){refreshSongToolLanguage();return}const detail=$('#detail');if(!detail)return;const tab=document.createElement('button');tab.id='lg35SongToolsTab';tab.type='button';tab.textContent='⋮';const drawer=document.createElement('aside');drawer.id='lg35SongToolsDrawer';const strip=document.createElement('div');strip.id='lg38ToolStrip';strip.className='lg38-tool-strip';strip.append(
+ proxyButton('lg38Rotate','↻',tx('Rotar pantalla','Rotate screen'),'#lg38RotateTarget'),
+ proxyButton('lg38ToneDown','½−',tx('Bajar medio tono','Lower one semitone'),'#hymnDownV2'),
+ proxyButton('lg38ToneUp','½+',tx('Subir medio tono','Raise one semitone'),'#hymnUpV2'),
+ proxyButton('lg38ToneReset','↺',tx('Restablecer tono','Reset key'),'#hymnResetV2'),
+ proxyButton('lg38ToneSave','★',tx('Guardar tono predeterminado','Save default key'),'#hymnSaveV2'),
+ proxyButton('lg38Fav','♡',tx('Favorito','Favorite'),'#favBtn'),
+ proxyButton('lg38FontDown','A−',tx('Reducir letra','Decrease text size'),'#fontDown'),
+ proxyButton('lg38FontUp','A+',tx('Aumentar letra','Increase text size'),'#fontUp')
  );
- const scrollBtn=document.createElement('button');scrollBtn.id='lg38Scroll';scrollBtn.className='lg38-tool';scrollBtn.type='button';scrollBtn.textContent='▶';scrollBtn.title='Auto-scroll';scrollBtn.setAttribute('aria-label','Auto-scroll');scrollBtn.onclick=e=>{e.stopPropagation();toggleScrollPopup()};strip.append(scrollBtn,
- proxyButton('lg38Fit','↔','Ajustar al ancho','#readerFit'),
- proxyButton('lg38Top','⇡','Volver al inicio de la letra','#readerReset')
+ const scrollBtn=document.createElement('button');scrollBtn.id='lg38Scroll';scrollBtn.className='lg38-tool';scrollBtn.type='button';scrollBtn.textContent='▶';scrollBtn.onclick=e=>{e.stopPropagation();toggleScrollPopup()};strip.append(scrollBtn,
+ proxyButton('lg38Fit','↔',tx('Ajustar al ancho','Fit to width'),'#readerFit'),
+ proxyButton('lg38Top','⇡',tx('Volver al inicio de la letra','Back to the start of the lyrics'),'#readerReset')
  );
  const rotateTarget=document.createElement('button');rotateTarget.id='lg38RotateTarget';rotateTarget.type='button';rotateTarget.hidden=true;rotateTarget.onclick=toggleLandscape;
- const popup=document.createElement('div');popup.id='lg40ScrollPopup';popup.innerHTML='<button id="lg40ScrollToggle" type="button" aria-label="Iniciar o pausar auto-scroll">▶</button><input id="lg40ScrollSpeed" type="range" min="1" max="100" step="1" value="32" aria-label="Velocidad de auto-scroll"><span id="lg40ScrollValue">32%</span>';
+ const popup=document.createElement('div');popup.id='lg40ScrollPopup';popup.innerHTML='<button id="lg40ScrollToggle" type="button">▶</button><input id="lg40ScrollSpeed" type="range" min="1" max="100" step="1" value="32"><span id="lg40ScrollValue">32%</span>';
  drawer.append(strip,rotateTarget,popup);detail.appendChild(tab);detail.appendChild(drawer);
+ refreshSongToolLanguage();
  tab.onclick=e=>{e.stopPropagation();const opening=!drawer.classList.contains('open');drawer.classList.toggle('open',opening);if(!opening)popup.classList.remove('open')};
  wireScrollPopup()}
 function wireScrollPopup(){const slider=$('#lg40ScrollSpeed'),value=$('#lg40ScrollValue'),toggle=$('#lg40ScrollToggle');if(!slider||slider.dataset.wired)return;slider.dataset.wired='1';const source=$('#readerSpeed');if(source)slider.value=source.value;value.textContent=slider.value+'%';slider.addEventListener('input',()=>{const r=$('#readerSpeed');if(r){r.value=slider.value;r.dispatchEvent(new Event('input',{bubbles:true}))}value.textContent=slider.value+'%'});toggle.onclick=e=>{e.stopPropagation();$('#readerPlay')?.click();setTimeout(syncSongToolbar,20)}}
@@ -51,6 +73,6 @@ function navIsolation(){document.addEventListener('click',e=>{const a=e.target.c
 function updateViews(){const detail=$('#detail');document.body.classList.toggle('lg35-song-open',!!detail&&!detail.classList.contains('hidden'));if(detail?.classList.contains('hidden'))closeSongTools();collectSongTools();isolateViews()}
 function restoreCriticalControls(){['startTunerBtn','stopTunerBtn','addEventBtn','saveEventBtn','deleteEventBtn'].forEach(id=>{const e=$('#'+id);if(e){e.disabled=false;e.style.pointerEvents='auto';e.style.touchAction='manipulation'}});$$('#calendarGrid .day-cell').forEach(e=>{e.disabled=false;e.style.pointerEvents='auto'})}
 function refreshDecorations(){refreshSectionIcons();refreshLegacyNavIcons()}
-function init(){ensureHomeOrder();ensureSongDrawer();navIsolation();observeVoicePro();tunePolish();collectSongTools();restoreCriticalControls();refreshDecorations();const main=$('main');if(main)new MutationObserver(()=>{isolateViews();voiceInline();syncSongToolbar()}).observe(main,{subtree:true,attributes:true,attributeFilter:['class']});const detail=$('#detail');if(detail)new MutationObserver(updateViews).observe(detail,{attributes:true,attributeFilter:['class']});const head=$('#detail .head');if(head)new MutationObserver(()=>{collectSongTools();syncSongToolbar();wireScrollPopup()}).observe(head,{childList:true,subtree:true});document.addEventListener('click',e=>{if(e.target.closest('#favBtn,#readerPlay,#hymnDownV2,#hymnUpV2,#hymnResetV2,#hymnSaveV2'))setTimeout(syncSongToolbar,30);setTimeout(()=>{restoreCriticalControls();refreshDecorations()},50)},true);setTimeout(refreshDecorations,120);setTimeout(refreshDecorations,500);window.addEventListener('pageshow',()=>setTimeout(refreshDecorations,0));setInterval(()=>{voiceInline();collectSongTools();isolateViews()},1400)}
+function init(){ensureHomeOrder();ensureSongDrawer();navIsolation();observeVoicePro();tunePolish();collectSongTools();restoreCriticalControls();refreshDecorations();const main=$('main');if(main)new MutationObserver(()=>{isolateViews();voiceInline();syncSongToolbar()}).observe(main,{subtree:true,attributes:true,attributeFilter:['class']});const detail=$('#detail');if(detail)new MutationObserver(updateViews).observe(detail,{attributes:true,attributeFilter:['class']});const head=$('#detail .head');if(head)new MutationObserver(()=>{collectSongTools();syncSongToolbar();wireScrollPopup()}).observe(head,{childList:true,subtree:true});document.addEventListener('click',e=>{if(e.target.closest('#favBtn,#readerPlay,#hymnDownV2,#hymnUpV2,#hymnResetV2,#hymnSaveV2'))setTimeout(syncSongToolbar,30);setTimeout(()=>{restoreCriticalControls();refreshDecorations()},50)},true);new MutationObserver(muts=>{if(muts.some(m=>m.attributeName==='lang')){refreshSongToolLanguage();refreshDecorations()}}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});setTimeout(refreshDecorations,120);setTimeout(refreshDecorations,500);window.addEventListener('pageshow',()=>setTimeout(refreshDecorations,0));setInterval(()=>{voiceInline();collectSongTools();isolateViews()},1400)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
