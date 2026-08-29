@@ -5,7 +5,8 @@
 #detail .chart{overscroll-behavior:auto!important;overflow:hidden!important;touch-action:pan-y!important;-webkit-overflow-scrolling:auto!important}
 #detail .chart-inner{transform-origin:top left;touch-action:pan-y!important}
 #detail .line,#detail .chord-line,#detail .section,#detail .chord-link{touch-action:pan-y!important}
-body.song-immersive header,body.song-immersive nav{display:none!important}
+/* En modo lectura solo importa la canción: se ocultan ambos menús inferiores, incluido el del rediseño actual. */
+body.song-immersive header,body.song-immersive nav,body.song-immersive .exact-bottom{display:none!important}
 body.song-immersive main{padding-top:8px;padding-bottom:18px;max-width:none;overflow:visible!important}
 body.song-immersive #detail{max-width:1100px;margin:0 auto;overflow:visible!important}
 body.song-immersive #detail .back{position:sticky;top:6px;z-index:8;display:inline-flex;align-items:center;background:rgba(4,20,35,.92);border:1px solid rgba(80,168,244,.20);border-radius:999px;padding:8px 12px;margin:0 0 8px;color:#79c5ff}
