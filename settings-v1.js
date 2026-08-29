@@ -8,6 +8,5 @@
  const d=document.createElement('script');d.src='exact-home-v1.js?v=1';d.async=false;document.head.appendChild(d);
  const f=document.createElement('script');f.src='app-fixes-v1.js?v=1';f.async=false;document.head.appendChild(f);
  const recovery=document.createElement('script');recovery.src='recovery-v69.js?v=73';recovery.async=false;document.head.appendChild(recovery);
- const listFix=document.createElement('script');listFix.src='list-scroll-fix-v81.js?v=82';listFix.async=false;document.head.appendChild(listFix);
- const homeSearchFix=document.createElement('script');homeSearchFix.src='home-search-results-v84.js?v=84';homeSearchFix.async=false;document.head.appendChild(homeSearchFix);
+ const consolidated=document.createElement('script');consolidated.src='la-grey-consolidation-v1.js?v=88';consolidated.async=false;document.head.appendChild(consolidated);
 })();
