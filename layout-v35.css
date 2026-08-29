@@ -7,6 +7,8 @@
 #detail{position:relative}#detail>.head{padding:4px 2px 8px!important;background:transparent!important;border:0!important;box-shadow:none!important}#detail #songTitle{color:var(--lg35-cyan)!important;font-size:clamp(25px,7vw,38px)!important;line-height:1.08!important;margin-bottom:5px!important;padding-right:50px!important}#detail #songArtist{color:#fff!important;opacity:.86!important}#detail .meta{margin-top:7px!important}#detail .hint{opacity:.7!important;font-size:12px!important}#detail .chart{margin-top:5px!important}
 /* La canción muestra solo información. Los controles reales quedan disponibles para la barra, pero ocultos visualmente. */
 #detail>.head>.actions,#detail #readerTools,#detail #hymnTransposeV2{position:absolute!important;left:-10000px!important;top:auto!important;width:1px!important;height:1px!important;overflow:hidden!important;opacity:0!important;pointer-events:auto!important;margin:0!important;padding:0!important}
+/* El layout canónico decide cuándo una canción/himno está abierto y oculta las barras inferiores. */
+body.lg35-song-open>nav,body.lg35-song-open .exact-bottom{display:none!important}
 /* Botón ⋮ superior derecho */
 #lg35SongToolsTab{position:absolute;right:0;top:0;z-index:82;width:42px;height:42px;border:1px solid rgba(142,216,255,.38);border-radius:999px;background:linear-gradient(145deg,#147cb4,#0a4e78);color:#fff;font-weight:900;font-size:28px;line-height:1;box-shadow:0 8px 18px rgba(0,0,0,.28);display:none;align-items:center;justify-content:center;padding:0}
 body.lg35-song-open #lg35SongToolsTab{display:flex}
