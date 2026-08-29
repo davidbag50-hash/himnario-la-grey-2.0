@@ -12,13 +12,6 @@ function ensureBaseStyle(){
  style.textContent=`
  #rootFilters .chip.active{background:#081d31!important;color:#ffd76a!important;border:2px solid #f4bd3d!important;box-shadow:0 0 0 1px rgba(244,189,61,.18),0 0 14px rgba(244,189,61,.18)!important;font-weight:800!important}
  body.lg-song-detail>nav,body.lg-song-detail .exact-bottom{display:none!important}
- html.lg-modal-open,body.lg-modal-open{overflow:hidden!important;overscroll-behavior:none!important}
- body.lg-modal-open{touch-action:none!important}
- body.lg-modal-open>nav,body.lg-modal-open .exact-bottom,body.lg-modal-open #readerTools,body.lg-modal-open .reader-tools,body.lg-modal-open .voice-fab,body.lg-modal-open .voice-fab-menu{display:none!important}
- .modal:not(.hidden){position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important;z-index:5000!important}
- .modal:not(.hidden)>.modal-card{position:relative!important;max-height:calc(100dvh - 28px)!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;z-index:5001!important}
- #chordModal:not(.hidden){position:fixed!important;inset:0!important;transform:none!important;margin:0!important}
- #chordModal:not(.hidden)>.modal-card{position:relative!important;transform:none!important;margin:auto!important}
  #settingsBackBtn{display:none!important}
  #lgExactHome .exact-personal-greeting{box-sizing:border-box;margin:0 3px 14px;padding:13px 16px;border:1px solid #183e5f;border-radius:17px;background:linear-gradient(145deg,#071a2d,#09243c);box-shadow:0 7px 20px rgba(0,0,0,.22);display:flex;align-items:center;gap:12px;color:#eef7ff}
  #lgExactHome .exact-greeting-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto;background:rgba(13,114,216,.15);border:1px solid rgba(103,192,255,.16);font-size:21px}
@@ -30,7 +23,7 @@ function ensureBaseStyle(){
  #lgExactHome .exact-verse-kicker{font-family:'Nunito',system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:1.8px;color:#d8a52d;margin-bottom:7px;padding-right:28px}
  #lgExactHome .exact-verse-text{font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.48;color:#eaf4fc;margin:0 0 8px;font-style:italic}
  #lgExactHome .exact-verse-ref{font-family:'Nunito',system-ui,sans-serif;font-size:12px;font-weight:800;color:#72c4ff}
- @media(max-width:620px){.modal:not(.hidden)>.modal-card{max-height:calc(100dvh - 16px)!important}#lgExactHome .exact-personal-greeting{margin-bottom:12px;padding:12px 14px}#lgExactHome .exact-greeting-icon{width:38px;height:38px;border-radius:12px}#lgExactHome .exact-greeting-copy b{font-size:15px}#lgExactHome .exact-daily-verse{margin-bottom:18px;padding:15px 16px}#lgExactHome .exact-verse-text{font-size:14px}}
+ @media(max-width:620px){#lgExactHome .exact-personal-greeting{margin-bottom:12px;padding:12px 14px}#lgExactHome .exact-greeting-icon{width:38px;height:38px;border-radius:12px}#lgExactHome .exact-greeting-copy b{font-size:15px}#lgExactHome .exact-daily-verse{margin-bottom:18px;padding:15px 16px}#lgExactHome .exact-verse-text{font-size:14px}}
  `;
  document.head.appendChild(style);
 }
