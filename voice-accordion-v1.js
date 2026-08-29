@@ -2,7 +2,9 @@
 'use strict';
 let bodySeq=0;
 const $=s=>document.querySelector(s);
+const lang=()=>localStorage.getItem('lagrey_language')==='en'?'en':'es';
 
+function exerciseWord(){return lang()==='en'?'Exercise':'Ejercicio'}
 function makeToggle(article,index,title){
   const button=document.createElement('button');
   const bodyId=`voiceExerciseBody${++bodySeq}`;
@@ -16,7 +18,7 @@ function makeToggle(article,index,title){
 
   const number=document.createElement('span');
   number.className='voice-exercise-number';
-  number.textContent=`Ejercicio ${index+1}`;
+  number.textContent=`${exerciseWord()} ${index+1}`;
 
   const name=document.createElement('span');
   name.className='voice-exercise-title';
@@ -36,7 +38,7 @@ function enhanceExercise(article,index){
   if(article.dataset.voiceAccordion==='1')return;
 
   const heading=article.querySelector(':scope > h3');
-  const title=(heading?.textContent||`Ejercicio ${index+1}`).trim();
+  const title=(heading?.textContent||`${exerciseWord()} ${index+1}`).trim();
   const {button,bodyId}=makeToggle(article,index,title);
   const body=document.createElement('div');
   body.id=bodyId;
@@ -79,6 +81,7 @@ function enhancePanel(){
   [...list.querySelectorAll(':scope > .voice-exercise')].forEach(enhanceExercise);
 }
 
+function refreshLanguage(){document.querySelectorAll('.voice-exercise-number').forEach((el,i)=>el.textContent=`${exerciseWord()} ${i+1}`)}
 function scheduleEnhance(){
   queueMicrotask(enhancePanel);
   requestAnimationFrame(enhancePanel);
@@ -93,6 +96,7 @@ function boot(){
 document.addEventListener('click',event=>{
   if(event.target.closest('[data-voice-cat]'))setTimeout(scheduleEnhance,0);
 },true);
+new MutationObserver(muts=>{if(muts.some(m=>m.attributeName==='lang'))refreshLanguage()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
