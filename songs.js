@@ -54,5 +54,11 @@ window.LAGREY_SONGS = [
     "type": "cantos",
     "tone": "G",
     "content": "[Intro]\nG - D2/F# - B2/Eb - Em7 - A2/C# - D - G2/B - C2 - Dsus4 - D\n\n[Verso]\n     G2                    C/G\nA EL ALTO Y SUBLIME QUE HABITA EN LA ETERNIDAD\n     Am7                       Dsus4 D\nY SU NOMBRE ES EL SANTA DE ISRAEL.\n         G2                   C/G\nAL QUE HABITA EN LAS ALTURAS Y EN LA SANTIDAD\n         Am7                        Dsus4 D\nY CON EL QUEBRANTADO Y HUMILDE DE ESPÍRITU.\n\nEm7                 C2\nPARA HACER VIVIR EL ESPÍRITU HUMILDE\nEm7      Em/D       C2        Dsus4 D\nY PARA VIVIFICAR EL CORAZÓN QUEBRANTADO.\n\n[Coro]\n       G2       D/G   C/E  C  Dsus4 D\nSEA LA GLORIA, HONOR, ALABANZAS Y PODER\n       G2           D           C2    D     Eb  C#/Eb  Eb\nAL QUE REINA POR LOS SIGLOS Y SU NOMBRE SANTO ES\n\n[Sube medio tono]\n       Ab2        Eb/Ab   C#/F  C#   Ebsus4 Eb\nSEA LA GLORIA, HONOR, ALABANZA Y PODER\n       Ab2            Eb          C#2     Eb    Ab  Fm7 Eb\nAL QUE REINA POR LOS SIGLOS Y SU NOMBRE SANTO ES\n      C#2     Eb    C#/Ab  Eb/Ab Ab2\nY SU NOMBRE SANTO ES"
-  }
-];
+  },
+  {
+    "id": 8,
+    "title": "La Bendición",
+    "artist": "Elevation Worship",
+    "type": "cantos",
+    "tone": "G",
+    "content": "[Intro] Em7 C G D G\n\n[Verso]\nG              C\nDios te guarde y bendiga\nG                  D               G Em\nQue extienda su amor y te muestre favor\n             C          G   D    F# C\nDios te mire con agrado y te de paz\n\nG              C\nDios te guarde y bendiga\nG                  D               G Em\nQue extienda su amor y te muestre favor\n             C          G   D    F# C\nDios te mire con agrado y te de paz\n\n[Coro]\nEm7 C    G     D\nAmén, amén, amén\nEm7 C    G     D\nAmén, amén, amén\n\n[Intro] Em7 C G D\n\n[Puente 1]\n          Em7                      C\n//Que te cubra con su gracia hasta mil generaciones\n        G                       D\nTu familia y tus hijos y
