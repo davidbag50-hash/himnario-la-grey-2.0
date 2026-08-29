@@ -7,6 +7,7 @@ let modalTouchY=0;
 let settingsReturnView=null;
 let settingsReturnNav=null;
 let settingsReturnScroll=0;
+const listReturnScroll={cantos:0,himnos:0,fav:0};
 
 /* La Grey vuelve a un único tema: oscuro. */
 function forceDarkOnly(){
@@ -154,6 +155,35 @@ function wireSettingsGearToggle(){
  },true);
 }
 
+/* Al volver desde un canto/himno, restaura exactamente el punto de la lista. */
+function currentListKey(){
+ const title=(document.getElementById('listTitle')?.textContent||'').toLowerCase();
+ if(title.includes('himno'))return'himnos';
+ if(title.includes('favor'))return'fav';
+ return'cantos';
+}
+function restoreListScroll(key){
+ const y=listReturnScroll[key]||0;
+ requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo(0,y)));
+ setTimeout(()=>window.scrollTo(0,y),30);
+ setTimeout(()=>window.scrollTo(0,y),100);
+}
+function wireListScrollMemory(){
+ if(document.documentElement.dataset.lgListScrollMemory==='1')return;
+ document.documentElement.dataset.lgListScrollMemory='1';
+ document.addEventListener('click',e=>{
+   const song=e.target.closest?.('#songList [data-song]');
+   if(song&&!document.getElementById('listing')?.classList.contains('hidden')){
+     listReturnScroll[currentListKey()]=window.scrollY||window.pageYOffset||0;
+     return;
+   }
+   if(e.target.closest?.('#songBackBtn')){
+     const key=currentListKey();
+     setTimeout(()=>restoreListScroll(key),0);
+   }
+ },true);
+}
+
 const dailyVerses=[
  ['Salmo 23:1','Jehová es mi pastor; nada me faltará.'],
  ['Filipenses 4:13','Todo lo puedo en Cristo que me fortalece.'],
@@ -252,7 +282,7 @@ function restoreCriticalControls(){
  document.querySelectorAll('#calendarGrid .day-cell').forEach(el=>{el.disabled=false;el.style.pointerEvents='auto'});
 }
 
-function refreshUiState(){forceDarkOnly();ensureModalLockCss();buildHeader();restoreCriticalControls();observeModals();wireTouchLock();wireSettingsGearToggle();syncModalLock();injectHomePersonal();updateHomePersonal()}
+function refreshUiState(){forceDarkOnly();ensureModalLockCss();buildHeader();restoreCriticalControls();observeModals();wireTouchLock();wireSettingsGearToggle();wireListScrollMemory();syncModalLock();injectHomePersonal();updateHomePersonal()}
 
 refreshUiState();
 setTimeout(refreshUiState,120);setTimeout(refreshUiState,500);
