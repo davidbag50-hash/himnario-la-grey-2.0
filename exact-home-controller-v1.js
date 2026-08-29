@@ -15,6 +15,7 @@ function syncNotation(){
 
 function updateScreen(){
  const visible=!home.classList.contains('hidden');
+ if(!visible)document.body.classList.add('lg-startup-finished');
  document.body.classList.toggle('exact-home-screen',visible);
  syncNotation();
 }
