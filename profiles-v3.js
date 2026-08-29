@@ -97,7 +97,7 @@ function renderStep(next='choose'){
   p.hero.innerHTML='Miembro de <b>La Grey</b>';
   show(p.label,true);show(p.primary,true);show(other,true);show(p.visitor,false);
   if(p.label)p.label.firstChild.textContent='Tu nombre';
-  p.input.placeholder='Ej. Nicole, Carol, David...';p.input.autocomplete='name';
+  p.input.placeholder='Escribe tu nombre';p.input.autocomplete='name';
   p.primary.textContent='Entrar con mi perfil';other.textContent='← Elegir otra opción';
   if(p.hint)p.hint.textContent='Usaremos el instrumento y los roles que ya tiene configurados tu perfil.';
   setTimeout(()=>p.input.focus(),40);return;
@@ -108,9 +108,9 @@ function renderStep(next='choose'){
   p.hero.innerHTML='🔑 <b>Código de ministerio</b>';
   show(p.label,true);show(p.primary,true);show(other,true);show(p.visitor,false);
   if(p.label)p.label.firstChild.textContent='Código';
-  p.input.placeholder='Ej. GREY-DEMO-15';p.input.autocomplete='off';
+  p.input.placeholder='Escribe el código de tu ministerio';p.input.autocomplete='off';
   p.primary.textContent='Continuar';other.textContent='← Elegir otra opción';
-  if(p.hint)p.hint.textContent='Prueba local: usa GREY-DEMO-15. Más adelante este código se validará en la nube.';
+  if(p.hint)p.hint.textContent='El código identifica a tu grupo. Más adelante esta validación se hará directamente en la nube.';
   setTimeout(()=>p.input.focus(),40);return;
  }
  if(step==='external-name'){
@@ -119,9 +119,9 @@ function renderStep(next='choose'){
   p.hero.innerHTML=`✅ Conectado a <b>${activeMinistry?.name||'tu ministerio'}</b>`;
   show(p.label,true);show(p.primary,true);show(other,true);show(p.visitor,false);
   if(p.label)p.label.firstChild.textContent='Tu nombre';
-  p.input.placeholder='Nombre registrado por tu líder';p.input.autocomplete='name';
+  p.input.placeholder='Escribe tu nombre';p.input.autocomplete='name';
   p.primary.textContent='Entrar a mi ministerio';other.textContent='← Cambiar código';
-  if(p.hint)p.hint.textContent='Prueba demo: Ana, Marcos o Lucía tienen perfiles preconfigurados.';
+  if(p.hint)p.hint.textContent='El nombre debe coincidir con el que tu líder registró en el ministerio.';
   setTimeout(()=>p.input.focus(),40);
  }
 }
