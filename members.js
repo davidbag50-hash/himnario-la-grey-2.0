@@ -8,15 +8,3 @@ window.LAGREY_MEMBERS=[
  {id:'carol',name:'Carol',aliases:['carol'],roles:['Voz'],instrument:'voice',icon:'🎤'},
  {id:'david',name:'David',aliases:['david'],roles:['Voz'],instrument:'voice',icon:'🎤'}
 ];
-
-document.write('<script src="hymns-201-210.js"><\/script>');
-document.write('<script src="hymns-211-220.js"><\/script>');
-document.write('<script src="hymns-221-230.js"><\/script>');
-document.write('<script src="hymns-231-240.js"><\/script>');
-document.write('<script src="hymns-241-250.js"><\/script>');
-document.write('<script src="hymns-251-260.js"><\/script>');
-document.write('<script src="hymns-261-270.js"><\/script>');
-document.write('<script src="hymns-271-280.js"><\/script>');
-document.write('<script src="hymns-281-290.js"><\/script>');
-document.write('<script src="hymns-291-300.js"><\/script>');
-document.write('<script src="hymns-301-310.js"><\/script>');
