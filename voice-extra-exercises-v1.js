@@ -1,6 +1,7 @@
 (()=>{
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const lang=()=>localStorage.getItem('lagrey_language')==='en'?'en':'es',tx=(es,en)=>lang()==='en'?en:es;
 const ex=(name,pattern,syllables,tip,why,example,tempo=90)=>({name,pattern,syllables,tip,why,example,tempo});
 const timed=(name,duration,syllables,tip,why,example)=>({name,timed:true,duration,syllables,tip,why,example});
 
@@ -79,16 +80,93 @@ const extras={
  ]
 };
 
+const extraEN={
+ warm:[
+  ['Gentle rising hum','Keep the volume low and the sensation easy.','Gradually activates the voice without overworking it.','Follow the piano with a comfortable, even hum.'],
+  ['Woo arpeggio','Keep the lips rounded and avoid pushing the high note.','Helps connect areas of the voice with lightness.','Make each leap as if softly calling someone.'],
+  ['Three-note Gee','Use a small onset and keep the jaw relaxed.','Wakes up precision and coordination when you begin singing.','Sing each note clearly without increasing the volume.'],
+  ['Five-note MMM → MA','Open the vowel without losing the ease of the hum.','Connects resonance and vowels before singing the setlist.','Start on MMM and open to the vowel halfway through the pattern.'],
+  ['Descending NOO','Think about releasing as you descend, not darkening the voice.','Warms the middle and lower area without pressure.','Start comfortably higher and let the notes fall gently.'],
+  ['Lip trill arpeggio','Keep the airflow steady and the face relaxed.','Coordinates airflow and sound across a wider path.','Do the full pattern without adding force as you go higher.'],
+  ['Short, light five notes','Keep the notes small and springy; do not strike the throat.','Activates articulation and vocal response before the setlist.','Make each syllable light, like small bounces.']
+ ],
+ breath:[
+  ['Sustained F','Inhale comfortably and let the air out without tightening the abdomen.','Trains a continuous, steady airflow.','Hold “fff” evenly and stop before you run out of air.'],
+  ['Sustained SH','Keep the shoulders still and the airflow even.','Improves control of a long exhalation.','Do “shhh” as if asking for quiet, without pushing.'],
+  ['Inhale 4 · exhale 8','Do not fill to the maximum; take a comfortable breath.','Practices an exhalation that is longer than the inhale.','Inhale for 4 counts and release on “sss” for 8.'],
+  ['Four pulses + hiss','Make the pulses small and then stabilize the airflow.','Combines brief attacks with sustained airflow.','Do 4 “ts” pulses and continue with a long “sss”.'],
+  ['Continuous voiced Z','Keep the lips and jaw free.','Combines airflow with light vocal vibration.','Hold “zzz” steadily without increasing the volume.'],
+  ['Count on one exhale','Speak at normal volume and stop before you feel urgency.','Helps manage breath during spoken or sung phrases.','Inhale comfortably and count slowly while it still feels easy.'],
+  ['S · F · SH in blocks','Use the same airflow level on all three consonants.','Trains changes in resistance without losing stability.','Do a few seconds of S, then F, then SH, with one breath between rounds.']
+ ],
+ resonance:[
+  ['NNN → A','Keep the easy sensation when opening the vowel.','Connects forward vibration with sung vowels.','Start with NNN and open to the vowel without changing volume.'],
+  ['Five-note ZZZ','Find comfortable vibration in the lips and face.','Encourages focused sound production with little effort.','Follow the notes while keeping the consonant buzzing.'],
+  ['Light VEE','Do not clench the teeth; let the vowel flow.','Works on clarity and a gentle forward sensation.','Sing the pattern with a short V and a long vowel.'],
+  ['Short NG siren','Go higher only within a comfortable range.','Helps maintain resonance continuity as pitch changes.','Imagine a small siren moving up and down without pushing.'],
+  ['MEE arpeggio','Keep the sound small and flexible.','Trains focus across wider leaps.','Make each leap clean while keeping the same ease.'],
+  ['Descending MOM','Do not depress the larynx or manufacture darkness.','Explores resonance while descending with natural production.','Let the notes fall while keeping the consonant gentle.'],
+  ['Octave humming','Use low volume and a steady sensation throughout.','Reinforces resonance continuity over a wider range.','Do the whole arpeggio without changing pressure.']
+ ],
+ pitch:[
+  ['Stable repeated note','Do not correct forcefully; listen and center each repetition.','Trains stability on the same pitch.','The piano repeats the note and you reproduce it four times.'],
+  ['Interval 1–3–1','Hear the distance before singing.','Reinforces recognition and accuracy of thirds.','Imitate the root, third and return to the root without sliding.'],
+  ['Interval 1–5–1','Keep the leap clean and light.','Trains fifths, which are common in melodies and harmonies.','Listen to the three notes and repeat them with clear onsets.'],
+  ['Descending arpeggio','Do not drag the notes during the descent.','Works on pitch while descending through separate notes.','Start on a comfortable high note and descend through the arpeggio.'],
+  ['Five-note scale','Keep every degree centered and at the same volume.','Reinforces pitch step by step.','Use one note per syllable and listen for the center of each sound.'],
+  ['Octave echo','Do the octave only if it is within your comfortable range.','Trains recognition of the same note in another register.','Listen to the low note, octave and return; then imitate.'],
+  ['Mixed sequence','Think each note before producing it.','Combines steps and small leaps to challenge accuracy.','Follow the piano without sliding between pitches.']
+ ],
+ range:[
+  ['Progressive fifth','Move the exercise by semitones only while it remains comfortable.','Gradually expands the useful range without chasing extremes.','Do several repetitions and stop at any sign of pressure.'],
+  ['Comfortable octave arpeggio','The top note should feel light, never chased.','Explores extension with a clear octave reference.','Go up and back through the arpeggio without increasing volume.'],
+  ['Short siren by degrees','Use a small path before moving the key.','Works on transitions between areas without holding extremes.','Mentally glide through the path but sing the piano notes.'],
+  ['Gradual descending octave','Let the voice descend naturally.','Explores the lower register from a comfortable position.','Start higher within your range and descend step by step.'],
+  ['1–5–8–5–1','Do not increase pressure to reach the octave.','Trains extension with a few controlled leaps.','Keep the pattern slow and light; lower the key if the octave is not easy.'],
+  ['1–3–5–8–5–3–1','Keep a moderate volume and relaxed jaw.','Covers a full octave with arpeggio support.','Think of climbing steps, not attacking the high note.'],
+  ['Middle-high range sweep','Stop before reaching a note that requires effort.','Helps identify today’s comfortable limit.','Move the pattern up by semitones only while every note stays easy.']
+ ],
+ agility:[
+  ['Fast five-note scale','Accuracy first; speed second.','Trains quick changes between adjacent scale degrees.','Keep the notes small and perfectly rhythmic.'],
+  ['Chained thirds','Do not sacrifice pitch for speed.','Coordinates alternating leaps inside a fast phrase.','Listen to the piano shape and repeat it with minimal attacks.'],
+  ['Fast arpeggio','Stay light on the high note and exact on the way down.','Improves response in quick leaps.','Start at a moderate tempo and increase only if it stays clean.'],
+  ['Turn 1–2–3–2–3–4–3–2–1','Keep the tongue loose and the pulse steady.','Trains quick changes of direction.','Do not accent every note; let the pattern flow.'],
+  ['Fast five-note descent','Do not get ahead of the piano.','Works on clarity while descending quickly.','Make every note recognizable even though the pattern is short.'],
+  ['1–3–2–4–3–5','Start slower than you think you need to.','Builds coordination in less predictable patterns.','Increase the tempo only when every note is clear.'],
+  ['Light five-note staccato','Use tiny onsets; no throat strikes.','Improves speed and response with separated notes.','Think of small bounces, not pushing each syllable.']
+ ],
+ diction:[
+  ['Coordinated P–T–K','Use brief consonants and free vowels.','Trains precision of the lips and tongue.','Speak the pattern first and then sing it.'],
+  ['Voiced B–D–G','Do not clench the jaw while articulating.','Improves clarity of voiced consonants.','Let the vowel carry the note and keep the consonant brief.'],
+  ['R with clear vowels','Use a natural R; do not force it if the tongue becomes tense.','Works on definition of common syllable patterns.','Pronounce each vowel distinctly without changing volume.'],
+  ['Alternating L–N–M','Keep the tongue tip agile and the jaw relaxed.','Coordinates articulators without losing legato.','Make consonants clear while keeping the vowels connected.'],
+  ['Vowel chain','Do not exaggerate the mouth opening.','Trains vowel changes while keeping stable sound production.','Keep the same pitch and energy while changing vowels.'],
+  ['P through each vowel','Use a quick consonant and a long, clear vowel.','Improves intelligibility without hardening the onset.','Use one syllable per note and make sure each one is understandable.'],
+  ['Rhythmic DA–GA–TA–KA','Keep the spoken pattern even as the tempo increases.','Combines diction and rhythm for fast phrases.','Speak it in time first and then sing it with the piano.']
+ ],
+ cool:[
+  ['Three-note descending MMM','Keep it very soft and do not seek volume.','Gradually reduces vocal intensity.','Do three comfortable notes and let the last one end naturally.'],
+  ['Short descending NG','Keep the jaw relaxed and the sensation small.','Helps return to light coordination after singing.','Descend without holding any note too long.'],
+  ['Five-note descending OO','Use less volume than during training.','Encourages a gradual exit from vocal work.','Let the notes fall as if slowly fading the sound.'],
+  ['Descending VVV','Keep the vibration small and comfortable.','Combines airflow and light sound at the end.','Follow the descent with a continuous, gentle V.'],
+  ['Sighing HOO','Do not project; it should feel like a voiced sigh.','Helps reduce pressure and volume after singing.','Start comfortably and let each note fall with less energy.'],
+  ['Gentle descending siren','Do not chase low notes; simply let the voice descend.','Returns the voice toward comfortable conversational production.','Do the path once or twice at low volume.'],
+  ['Calm final exhalation','Breathe normally; do not try to empty all the air.','Closes the session with calm breathing and no intense phonation.','Inhale comfortably and release the air gently; rest between repetitions.']
+ ]
+};
+
 let ctx=null,stopToken=0;
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 function degreeLabel(n){const map={0:'1',2:'2',4:'3',5:'4',7:'5',9:'6',11:'7',12:'8',16:'10'};return map[n]||'•'}
 function midiFreq(m){return 440*Math.pow(2,(m-69)/12)}
 function audio(){if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();return ctx}
 function pianoNote(midi,when,dur=.32){const a=audio(),g=a.createGain(),o1=a.createOscillator(),o2=a.createOscillator();o1.type='triangle';o2.type='sine';o1.frequency.value=midiFreq(midi);o2.frequency.value=midiFreq(midi)*2;g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(.14,when+.015);g.gain.exponentialRampToValueAtTime(.0001,when+dur);o1.connect(g);o2.connect(g);g.connect(a.destination);o1.start(when);o2.start(when);o1.stop(when+dur+.03);o2.stop(when+dur+.03)}
+function translatedExtra(cat,i,e=extras[cat]?.[i]){if(!e||lang()!=='en')return e;const t=extraEN[cat]?.[i];return t?{...e,name:t[0],tip:t[1],why:t[2],example:t[3]}:e}
 
-function exerciseHtml(cat,i,e){
- if(e.timed)return `<article class="voice-exercise voice-extra-exercise"><h3>${e.name}</h3><p><b>Para qué sirve:</b> ${e.why}</p><p><b>Cómo hacerlo:</b> ${e.tip}</p><p><b>Ejemplo:</b> ${e.example}</p><div class="voice-syllable-chip">${e.syllables.join(' · ')}</div><div class="voice-play-row"><button class="btn primary" data-extra-timer="${cat}:${i}">▶ Iniciar ${e.duration||30}s</button><button class="btn" data-extra-stop>■ Detener</button></div><div class="voice-status" id="extra-status-${cat}-${i}">Listo para comenzar.</div></article>`;
- return `<article class="voice-exercise voice-extra-exercise"><h3>${e.name}</h3><div class="voice-pattern">${e.pattern.map(degreeLabel).join(' – ')}</div><p><b>Para qué sirve:</b> ${e.why}</p><p><b>Cómo hacerlo:</b> ${e.tip}</p><p><b>Ejemplo:</b> ${e.example}</p><div class="voice-controls"><label>Sílaba<select data-syllable>${e.syllables.map(s=>`<option>${s}</option>`).join('')}</select></label><label>Nota inicial<select data-start><option value="48">C3 · Do3</option><option value="50">D3 · Re3</option><option value="52">E3 · Mi3</option><option value="53">F3 · Fa3</option><option value="55">G3 · Sol3</option><option value="57">A3 · La3</option><option value="60" selected>C4 · Do4</option></select></label><label>Tempo<input data-tempo type="range" min="55" max="150" value="${e.tempo||90}"><span data-tempo-label>${e.tempo||90} BPM</span></label><label>Repeticiones<select data-repeats><option>1</option><option selected>3</option><option>5</option><option>8</option></select></label><label>Movimiento<select data-shift><option value="0">No mover</option><option value="1" selected>+½ tono</option><option value="-1">−½ tono</option></select></label></div><div class="voice-play-row"><button class="btn primary" data-extra-play="${cat}:${i}">▶ Escuchar y practicar</button><button class="btn" data-extra-demo="${cat}:${i}">🎹 Solo ejemplo</button><button class="btn" data-extra-stop>■ Detener</button></div><div class="voice-status" id="extra-status-${cat}-${i}">Listo. El piano tocará el patrón y luego podrás repetirlo.</div></article>`;
+function exerciseHtml(cat,i,source){
+ const e=translatedExtra(cat,i,source);
+ if(e.timed)return `<article class="voice-exercise voice-extra-exercise"><h3>${e.name}</h3><p><b>${tx('Para qué sirve:','What it does:')}</b> ${e.why}</p><p><b>${tx('Cómo hacerlo:','How to do it:')}</b> ${e.tip}</p><p><b>${tx('Ejemplo:','Example:')}</b> ${e.example}</p><div class="voice-syllable-chip">${e.syllables.join(' · ')}</div><div class="voice-play-row"><button class="btn primary" data-extra-timer="${cat}:${i}">▶ ${tx('Iniciar','Start')} ${e.duration||30}s</button><button class="btn" data-extra-stop>■ ${tx('Detener','Stop')}</button></div><div class="voice-status" id="extra-status-${cat}-${i}">${tx('Listo para comenzar.','Ready to begin.')}</div></article>`;
+ return `<article class="voice-exercise voice-extra-exercise"><h3>${e.name}</h3><div class="voice-pattern">${e.pattern.map(degreeLabel).join(' – ')}</div><p><b>${tx('Para qué sirve:','What it does:')}</b> ${e.why}</p><p><b>${tx('Cómo hacerlo:','How to do it:')}</b> ${e.tip}</p><p><b>${tx('Ejemplo:','Example:')}</b> ${e.example}</p><div class="voice-controls"><label>${tx('Sílaba','Syllable')}<select data-syllable>${e.syllables.map(s=>`<option>${s}</option>`).join('')}</select></label><label>${tx('Nota inicial','Starting note')}<select data-start><option value="48">C3 · Do3</option><option value="50">D3 · Re3</option><option value="52">E3 · Mi3</option><option value="53">F3 · Fa3</option><option value="55">G3 · Sol3</option><option value="57">A3 · La3</option><option value="60" selected>C4 · Do4</option></select></label><label>Tempo<input data-tempo type="range" min="55" max="150" value="${e.tempo||90}"><span data-tempo-label>${e.tempo||90} BPM</span></label><label>${tx('Repeticiones','Repetitions')}<select data-repeats><option>1</option><option selected>3</option><option>5</option><option>8</option></select></label><label>${tx('Movimiento','Movement')}<select data-shift><option value="0">${tx('No mover','Do not move')}</option><option value="1" selected>+½ ${tx('tono','step')}</option><option value="-1">−½ ${tx('tono','step')}</option></select></label></div><div class="voice-play-row"><button class="btn primary" data-extra-play="${cat}:${i}">▶ ${tx('Escuchar y practicar','Listen and practice')}</button><button class="btn" data-extra-demo="${cat}:${i}">🎹 ${tx('Solo ejemplo','Example only')}</button><button class="btn" data-extra-stop>■ ${tx('Detener','Stop')}</button></div><div class="voice-status" id="extra-status-${cat}-${i}">${tx('Listo. El piano tocará el patrón y luego podrás repetirlo.','Ready. The piano will play the pattern and then you can repeat it.')}</div></article>`;
 }
 
 function categoryFromList(list){
@@ -108,16 +186,16 @@ function appendExtras(){
  });
 }
 
-function stop(){stopToken++;$$('.voice-extra-exercise .voice-status').forEach(s=>{if(!s.textContent.startsWith('✅'))s.textContent='Detenido.'})}
+function stop(){stopToken++;$$('.voice-extra-exercise .voice-status').forEach(s=>{if(!s.textContent.startsWith('✅'))s.textContent=tx('Detenido.','Stopped.')})}
 async function play(button,demoOnly){
- stop();const token=++stopToken;const raw=button.dataset[demoOnly?'extraDemo':'extraPlay'];const [cat,idx]=raw.split(':');const e=extras[cat][Number(idx)],box=button.closest('.voice-extra-exercise'),status=$(`#extra-status-${cat}-${idx}`),start=Number(box.querySelector('[data-start]').value),tempo=Number(box.querySelector('[data-tempo]').value),reps=demoOnly?1:Number(box.querySelector('[data-repeats]').value),shift=demoOnly?0:Number(box.querySelector('[data-shift]').value),syllable=box.querySelector('[data-syllable]').value;audio();
+ stop();const token=++stopToken;const raw=button.dataset[demoOnly?'extraDemo':'extraPlay'];const [cat,idx]=raw.split(':'),n=Number(idx),e=extras[cat][n],box=button.closest('.voice-extra-exercise'),status=$(`#extra-status-${cat}-${idx}`),start=Number(box.querySelector('[data-start]').value),tempo=Number(box.querySelector('[data-tempo]').value),reps=demoOnly?1:Number(box.querySelector('[data-repeats]').value),shift=demoOnly?0:Number(box.querySelector('[data-shift]').value),syllable=box.querySelector('[data-syllable]').value;audio();
  for(let r=0;r<reps;r++){
-  if(token!==stopToken)return;const root=start+r*shift,beat=60/tempo;status.textContent=`🎹 Repetición ${r+1}/${reps} · canta “${syllable}”`;let t=ctx.currentTime+.08;e.pattern.forEach(step=>{pianoNote(root+step,t,Math.max(.18,beat*.72));t+=beat});await wait(e.pattern.length*beat*1000+250);if(token!==stopToken)return;if(!demoOnly){status.textContent=`🎤 Ahora repítelo tú con “${syllable}”`;await wait(Math.max(900,e.pattern.length*beat*700));}
+  if(token!==stopToken)return;const root=start+r*shift,beat=60/tempo;status.textContent=`🎹 ${tx('Repetición','Repetition')} ${r+1}/${reps} · ${tx('canta','sing')} “${syllable}”`;let t=ctx.currentTime+.08;e.pattern.forEach(step=>{pianoNote(root+step,t,Math.max(.18,beat*.72));t+=beat});await wait(e.pattern.length*beat*1000+250);if(token!==stopToken)return;if(!demoOnly){status.textContent=`🎤 ${tx('Ahora repítelo tú con','Now repeat it with')} “${syllable}”`;await wait(Math.max(900,e.pattern.length*beat*700));}
  }
- status.textContent=demoOnly?'✅ Ejemplo terminado.':'✅ Ejercicio terminado. Si se sintió cómodo, puedes repetirlo.';
+ status.textContent=demoOnly?tx('✅ Ejemplo terminado.','✅ Example finished.'):tx('✅ Ejercicio terminado. Si se sintió cómodo, puedes repetirlo.','✅ Exercise finished. If it felt comfortable, you can repeat it.');
 }
 function startTimer(button){
- const [cat,idx]=button.dataset.extraTimer.split(':'),e=extras[cat][Number(idx)],status=$(`#extra-status-${cat}-${idx}`);stop();const token=++stopToken;let left=e.duration||30;status.textContent=`⏱️ ${left}s · ${e.example}`;const id=setInterval(()=>{if(token!==stopToken){clearInterval(id);return}left--;status.textContent=left>0?`⏱️ ${left}s · ${e.example}`:'✅ Terminado. Respira normalmente.';if(left<=0)clearInterval(id)},1000);
+ const [cat,idx]=button.dataset.extraTimer.split(':'),n=Number(idx),e=translatedExtra(cat,n),status=$(`#extra-status-${cat}-${idx}`);stop();const token=++stopToken;let left=e.duration||30;status.textContent=`⏱️ ${left}s · ${e.example}`;const id=setInterval(()=>{if(token!==stopToken){clearInterval(id);return}left--;status.textContent=left>0?`⏱️ ${left}s · ${e.example}`:tx('✅ Terminado. Respira normalmente.','✅ Finished. Breathe normally.');if(left<=0)clearInterval(id)},1000);
 }
 
 document.addEventListener('click',event=>{
