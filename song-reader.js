@@ -2,6 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 let running=false,raf=0,last=0,pinchStart=0,pinchFont=0,fitTimer=0;
+let fromList=false,savedY=0,savedId='',savedKey='cantos';
 const pointers=new Map();
 const minFont=8,maxFont=30;
 const speedKey='lagrey_autoscroll_speed';
@@ -33,12 +34,16 @@ function setupTouch(){const wrap=document.querySelector('#detail .chart');const 
  const end=e=>{if(e.pointerType!=='touch')return;pointers.delete(e.pointerId);if(pointers.size<2){pinchStart=0;pinchFont=0}};
  wrap.addEventListener('pointerup',end,{passive:true});wrap.addEventListener('pointercancel',end,{passive:true});wrap.addEventListener('pointerleave',e=>{if(e.pointerType==='touch'&&pointers.has(e.pointerId)&&pointers.size>1)end(e)},{passive:true});
 }
+function listKey(){const t=($('listTitle')?.textContent||'').toLowerCase();return t.includes('himno')?'himnos':t.includes('favor')?'fav':'cantos'}
+function saveListState(button){fromList=true;savedY=window.scrollY||window.pageYOffset||0;savedId=String(button.dataset.song||'');savedKey=listKey()}
+function restoreExistingList(){const detail=$('detail'),listing=$('listing');if(!listing)return;detail?.classList.add('hidden');$('settingsView')?.classList.add('hidden');listing.classList.remove('hidden');document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));if(savedKey==='cantos')document.querySelector('nav button[data-nav="songs"]')?.classList.add('active');const apply=()=>{const safe=(window.CSS&&CSS.escape)?CSS.escape(savedId):savedId.replace(/[^a-zA-Z0-9_-]/g,''),a=savedId?document.querySelector(`#songList [data-song="${safe}"]`):null;if(a){const lt=($('songList')?.getBoundingClientRect().top||0)+(window.scrollY||0),at=a.getBoundingClientRect().top+(window.scrollY||0);window.scrollTo(0,Math.max(0,Math.min(savedY,at-lt+savedY)))}else window.scrollTo(0,savedY)};window.scrollTo(0,savedY);requestAnimationFrame(()=>requestAnimationFrame(apply));setTimeout(apply,40);setTimeout(apply,120);fromList=false}
+function wireListReturn(){if(document.documentElement.dataset.lgSongReaderListReturn==='1')return;document.documentElement.dataset.lgSongReaderListReturn='1';document.addEventListener('click',e=>{const song=e.target.closest?.('#songList [data-song]');if(song&&!$('listing')?.classList.contains('hidden')){saveListState(song);return}if(e.target.closest?.('#songBackBtn')&&fromList){e.preventDefault();e.stopImmediatePropagation();restoreExistingList()}},true)}
 function setImmersive(on){
  document.body.classList.toggle('song-immersive',!!on);
  document.body.classList.toggle('song-detail-open',!!on);
  if(on)scheduleFit();else stop();
 }
 function watchViews(){const detail=$('detail');if(detail){new MutationObserver(()=>setImmersive(!detail.classList.contains('hidden'))).observe(detail,{attributes:true,attributeFilter:['class']});setImmersive(!detail.classList.contains('hidden'))}const chart=$('chart');if(chart)new MutationObserver(()=>{if(!$('detail')?.classList.contains('hidden'))scheduleFit()}).observe(chart,{childList:true,subtree:true});}
-function wire(){inject();setupTouch();watchViews();window.addEventListener('resize',scheduleFit,{passive:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});}
+function wire(){inject();setupTouch();wireListReturn();watchViews();window.addEventListener('resize',scheduleFit,{passive:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();
 })();
