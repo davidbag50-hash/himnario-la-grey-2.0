@@ -4,6 +4,9 @@ const $=s=>document.querySelector(s);
 let modalScrollY=0;
 let modalLocked=false;
 let modalTouchY=0;
+let settingsReturnView=null;
+let settingsReturnNav=null;
+let settingsReturnScroll=0;
 
 /* La Grey vuelve a un único tema: oscuro. */
 function forceDarkOnly(){
@@ -37,6 +40,7 @@ function ensureModalLockCss(){
  .modal:not(.hidden)>.modal-card{position:relative!important;max-height:calc(100dvh - 28px)!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;z-index:5001!important}
  #chordModal:not(.hidden){position:fixed!important;inset:0!important;transform:none!important;margin:0!important}
  #chordModal:not(.hidden)>.modal-card{position:relative!important;transform:none!important;margin:auto!important}
+ #settingsBackBtn{display:none!important}
  @media(max-width:620px){.modal:not(.hidden)>.modal-card{max-height:calc(100dvh - 16px)!important}}
 
  /* Solo dos elementos recuperados del Home anterior: saludo y versículo diario. */
@@ -112,6 +116,42 @@ function observeModals(){
    modal.dataset.lgLockObserved='1';
    new MutationObserver(()=>syncModalLock()).observe(modal,{attributes:true,attributeFilter:['class']});
  });
+}
+
+/* Ajustes se abre y se cierra con el mismo engranaje. */
+function settingsIsOpen(){const v=document.getElementById('settingsView');return !!v&&!v.classList.contains('hidden')}
+function openSettingsFromGear(){
+ const settings=document.getElementById('settingsView');if(!settings)return;
+ const current=[...document.querySelectorAll('.view')].find(v=>v.id!=='settingsView'&&!v.classList.contains('hidden'));
+ settingsReturnView=current?.id||'home';
+ settingsReturnNav=document.querySelector('nav button.active')?.dataset?.nav||null;
+ settingsReturnScroll=window.scrollY||window.pageYOffset||0;
+ document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+ settings.classList.remove('hidden');
+ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+ window.scrollTo(0,0);
+}
+function closeSettingsFromGear(){
+ const settings=document.getElementById('settingsView');if(!settings)return;
+ settings.classList.add('hidden');
+ const target=document.getElementById(settingsReturnView||'home')||document.getElementById('home');
+ target?.classList.remove('hidden');
+ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+ if(settingsReturnNav)document.querySelector(`nav button[data-nav="${settingsReturnNav}"]`)?.classList.add('active');
+ const y=settingsReturnScroll;
+ requestAnimationFrame(()=>setTimeout(()=>window.scrollTo(0,y),0));
+ setTimeout(updateHomePersonal,30);
+}
+function toggleSettingsFromGear(){settingsIsOpen()?closeSettingsFromGear():openSettingsFromGear()}
+function wireSettingsGearToggle(){
+ if(document.documentElement.dataset.lgSettingsGearToggle==='1')return;
+ document.documentElement.dataset.lgSettingsGearToggle='1';
+ document.addEventListener('click',e=>{
+   if(!e.target.closest?.('#settingsBtn'))return;
+   e.preventDefault();
+   e.stopImmediatePropagation();
+   toggleSettingsFromGear();
+ },true);
 }
 
 const dailyVerses=[
@@ -212,7 +252,7 @@ function restoreCriticalControls(){
  document.querySelectorAll('#calendarGrid .day-cell').forEach(el=>{el.disabled=false;el.style.pointerEvents='auto'});
 }
 
-function refreshUiState(){forceDarkOnly();ensureModalLockCss();buildHeader();restoreCriticalControls();observeModals();wireTouchLock();syncModalLock();injectHomePersonal();updateHomePersonal()}
+function refreshUiState(){forceDarkOnly();ensureModalLockCss();buildHeader();restoreCriticalControls();observeModals();wireTouchLock();wireSettingsGearToggle();syncModalLock();injectHomePersonal();updateHomePersonal()}
 
 refreshUiState();
 setTimeout(refreshUiState,120);setTimeout(refreshUiState,500);
