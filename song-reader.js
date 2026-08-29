@@ -33,14 +33,12 @@ function setupTouch(){const wrap=document.querySelector('#detail .chart');const 
  const end=e=>{if(e.pointerType!=='touch')return;pointers.delete(e.pointerId);if(pointers.size<2){pinchStart=0;pinchFont=0}};
  wrap.addEventListener('pointerup',end,{passive:true});wrap.addEventListener('pointercancel',end,{passive:true});wrap.addEventListener('pointerleave',e=>{if(e.pointerType==='touch'&&pointers.has(e.pointerId)&&pointers.size>1)end(e)},{passive:true});
 }
-function setBottomNavHidden(on){
- document.querySelectorAll('.exact-bottom').forEach(nav=>{
-   if(on)nav.style.setProperty('display','none','important');
-   else nav.style.removeProperty('display');
- });
+function setImmersive(on){
+ document.body.classList.toggle('song-immersive',!!on);
+ document.body.classList.toggle('song-detail-open',!!on);
+ if(on)scheduleFit();else stop();
 }
-function setImmersive(on){document.body.classList.toggle('song-immersive',!!on);setBottomNavHidden(!!on);if(on)scheduleFit();else stop()}
 function watchViews(){const detail=$('detail');if(detail){new MutationObserver(()=>setImmersive(!detail.classList.contains('hidden'))).observe(detail,{attributes:true,attributeFilter:['class']});setImmersive(!detail.classList.contains('hidden'))}const chart=$('chart');if(chart)new MutationObserver(()=>{if(!$('detail')?.classList.contains('hidden'))scheduleFit()}).observe(chart,{childList:true,subtree:true});}
-function wire(){inject();setupTouch();watchViews();window.addEventListener('resize',()=>{setBottomNavHidden(!$('detail')?.classList.contains('hidden'));scheduleFit()},{passive:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else setBottomNavHidden(!$('detail')?.classList.contains('hidden'))});}
+function wire(){inject();setupTouch();watchViews();window.addEventListener('resize',scheduleFit,{passive:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();
 })();
