@@ -38,6 +38,19 @@ function ensureModalLockCss(){
  #chordModal:not(.hidden){position:fixed!important;inset:0!important;transform:none!important;margin:0!important}
  #chordModal:not(.hidden)>.modal-card{position:relative!important;transform:none!important;margin:auto!important}
  @media(max-width:620px){.modal:not(.hidden)>.modal-card{max-height:calc(100dvh - 16px)!important}}
+
+ /* Solo dos elementos recuperados del Home anterior: saludo y versículo diario. */
+ #lgExactHome .exact-personal-greeting{box-sizing:border-box;margin:0 3px 14px;padding:13px 16px;border:1px solid #183e5f;border-radius:17px;background:linear-gradient(145deg,#071a2d,#09243c);box-shadow:0 7px 20px rgba(0,0,0,.22);display:flex;align-items:center;gap:12px;color:#eef7ff}
+ #lgExactHome .exact-greeting-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto;background:rgba(13,114,216,.15);border:1px solid rgba(103,192,255,.16);font-size:21px}
+ #lgExactHome .exact-greeting-copy{min-width:0;display:grid;gap:2px}
+ #lgExactHome .exact-greeting-copy b{font-family:'Nunito',system-ui,sans-serif;font-size:17px;line-height:1.25;color:#f5f9fd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ #lgExactHome .exact-greeting-copy span{font-family:'Nunito',system-ui,sans-serif;font-size:12px;line-height:1.3;color:#8fa9bd}
+ #lgExactHome .exact-daily-verse{box-sizing:border-box;margin:0 3px 22px;padding:17px 18px 16px;border:1px solid rgba(216,165,45,.24);border-radius:18px;background:radial-gradient(circle at 100% 0,rgba(216,165,45,.09),transparent 34%),linear-gradient(145deg,#081d31,#061726);box-shadow:0 8px 23px rgba(0,0,0,.24);position:relative;overflow:hidden}
+ #lgExactHome .exact-daily-verse:after{content:'✦';position:absolute;right:15px;top:13px;color:#d8a52d;font-size:17px;opacity:.82}
+ #lgExactHome .exact-verse-kicker{font-family:'Nunito',system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:1.8px;color:#d8a52d;margin-bottom:7px;padding-right:28px}
+ #lgExactHome .exact-verse-text{font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.48;color:#eaf4fc;margin:0 0 8px;font-style:italic}
+ #lgExactHome .exact-verse-ref{font-family:'Nunito',system-ui,sans-serif;font-size:12px;font-weight:800;color:#72c4ff}
+ @media(max-width:620px){#lgExactHome .exact-personal-greeting{margin-bottom:12px;padding:12px 14px}#lgExactHome .exact-greeting-icon{width:38px;height:38px;border-radius:12px}#lgExactHome .exact-greeting-copy b{font-size:15px}#lgExactHome .exact-daily-verse{margin-bottom:18px;padding:15px 16px}#lgExactHome .exact-verse-text{font-size:14px}}
  `;
  document.head.appendChild(style);
 }
@@ -92,13 +105,72 @@ function wireTouchLock(){
  },{passive:false,capture:true});
 }
 
-/* Observa únicamente los modales, no todo el DOM. Así el bloqueo entra exactamente cuando cambia hidden. */
+/* Observa únicamente los modales, no todo el DOM. */
 function observeModals(){
  document.querySelectorAll('.modal').forEach(modal=>{
    if(modal.dataset.lgLockObserved==='1')return;
    modal.dataset.lgLockObserved='1';
    new MutationObserver(()=>syncModalLock()).observe(modal,{attributes:true,attributeFilter:['class']});
  });
+}
+
+const dailyVerses=[
+ ['Salmo 23:1','Jehová es mi pastor; nada me faltará.'],
+ ['Filipenses 4:13','Todo lo puedo en Cristo que me fortalece.'],
+ ['Proverbios 3:5','Fíate de Jehová de todo tu corazón, y no estribes en tu prudencia.'],
+ ['Salmo 46:1','Dios es nuestro amparo y fortaleza, nuestro pronto auxilio en las tribulaciones.'],
+ ['Mateo 11:28','Venid a mí todos los que estáis trabajados y cargados, que yo os haré descansar.'],
+ ['Salmo 119:105','Lámpara es a mis pies tu palabra, y lumbrera a mi camino.'],
+ ['Josué 1:9','Mira que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios será contigo en donde quiera que fueres.'],
+ ['Isaías 41:10','No temas, que yo soy contigo; no desmayes, que yo soy tu Dios que te esfuerzo: siempre te ayudaré, siempre te sustentaré con la diestra de mi justicia.'],
+ ['Salmo 37:5','Encomienda a Jehová tu camino, y espera en él; y él hará.'],
+ ['Juan 14:6','Yo soy el camino, y la verdad, y la vida: nadie viene al Padre, sino por mí.'],
+ ['Romanos 12:12','Gozosos en la esperanza; sufridos en la tribulación; constantes en la oración.'],
+ ['1 Corintios 16:14','Todas vuestras cosas sean hechas con caridad.'],
+ ['Salmo 34:8','Gustad, y ved que es bueno Jehová: dichoso el hombre que confiará en él.'],
+ ['Hebreos 13:8','Jesucristo es el mismo ayer, y hoy, y por los siglos.']
+];
+function greetingText(){const h=new Date().getHours();return h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches'}
+function profileName(){
+ try{
+   const p=JSON.parse(localStorage.getItem('lagrey_member_profile')||'null');
+   if(p?.name)return String(p.name).trim();
+ }catch{}
+ return '';
+}
+function dailyVerse(){
+ const oldText=document.getElementById('dailyVerseText')?.textContent?.trim();
+ const oldRef=document.getElementById('dailyVerseHome')?.textContent?.trim();
+ if(oldText&&oldRef)return {text:oldText.replace(/^“|”$/g,''),ref:oldRef};
+ const d=new Date(),start=new Date(d.getFullYear(),0,0),day=Math.floor((d-start)/86400000);
+ const v=dailyVerses[Math.abs(d.getFullYear()*367+day)%dailyVerses.length];
+ return {ref:v[0],text:v[1]};
+}
+function injectHomePersonal(){
+ const shell=document.getElementById('lgExactHome');if(!shell)return;
+ const divider=shell.querySelector('.exact-divider');
+ const search=shell.querySelector('.exact-search-wrap');
+ if(divider&&!shell.querySelector('.exact-personal-greeting')){
+   const g=document.createElement('div');g.className='exact-personal-greeting';
+   g.innerHTML='<div class="exact-greeting-icon">👋</div><div class="exact-greeting-copy"><b></b><span>Qué alegría tenerte en La Grey</span></div>';
+   divider.insertAdjacentElement('afterend',g);
+ }
+ if(search&&!shell.querySelector('.exact-daily-verse')){
+   const v=document.createElement('div');v.className='exact-daily-verse';
+   v.innerHTML='<div class="exact-verse-kicker">VERSÍCULO DEL DÍA</div><p class="exact-verse-text"></p><div class="exact-verse-ref"></div>';
+   search.insertAdjacentElement('afterend',v);
+ }
+ updateHomePersonal();
+}
+function updateHomePersonal(){
+ const shell=document.getElementById('lgExactHome');if(!shell)return;
+ const name=profileName();
+ const greeting=shell.querySelector('.exact-greeting-copy b');
+ if(greeting)greeting.textContent=name?`${greetingText()}, ${name}`:greetingText();
+ const v=dailyVerse();
+ const text=shell.querySelector('.exact-verse-text'),ref=shell.querySelector('.exact-verse-ref');
+ if(text)text.textContent=`“${v.text}”`;
+ if(ref)ref.textContent=v.ref;
 }
 
 function iconPerson(){return `<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="10" r="6" fill="#0d72d8"/><path d="M5 29c1.1-7.2 4.9-11 11-11s9.9 3.8 11 11" fill="#0d72d8"/></svg>`}
@@ -140,10 +212,12 @@ function restoreCriticalControls(){
  document.querySelectorAll('#calendarGrid .day-cell').forEach(el=>{el.disabled=false;el.style.pointerEvents='auto'});
 }
 
-function refreshUiState(){forceDarkOnly();ensureModalLockCss();buildHeader();restoreCriticalControls();observeModals();wireTouchLock();syncModalLock()}
+function refreshUiState(){forceDarkOnly();ensureModalLockCss();buildHeader();restoreCriticalControls();observeModals();wireTouchLock();syncModalLock();injectHomePersonal();updateHomePersonal()}
 
 refreshUiState();
-document.addEventListener('click',()=>{setTimeout(refreshUiState,0);setTimeout(refreshUiState,60)},true);
+setTimeout(refreshUiState,120);setTimeout(refreshUiState,500);
+document.addEventListener('click',()=>{setTimeout(refreshUiState,0);setTimeout(refreshUiState,60);setTimeout(updateHomePersonal,260)},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')setTimeout(syncModalLock,0)},true);
 window.addEventListener('pageshow',()=>setTimeout(refreshUiState,0));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateHomePersonal()});
 })();
