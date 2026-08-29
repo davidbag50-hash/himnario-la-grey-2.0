@@ -1,19 +1,22 @@
 (()=>{
 'use strict';
 const $=s=>document.querySelector(s);
+const lang=()=>localStorage.getItem('lagrey_language')==='en'?'en':'es';
 let active=false;
 let reopenTimer=0;
 
+function refreshLanguage(){const back=$('[data-voice-category-back]');if(back)back.textContent=lang()==='en'?'← Voice':'← Voz'}
 function ensureScreen(){
   const view=$('#voiceView');
   if(!view)return null;
   let screen=$('#voiceCategoryScreen');
-  if(screen)return screen;
+  if(screen){refreshLanguage();return screen}
   screen=document.createElement('div');
   screen.id='voiceCategoryScreen';
   screen.className='voice-category-screen hidden';
   screen.innerHTML=`<button type="button" class="back voice-category-back" data-voice-category-back>← Voz</button><div id="voiceCategoryHost"></div>`;
   view.appendChild(screen);
+  refreshLanguage();
   return screen;
 }
 
@@ -127,5 +130,6 @@ function boot(){
   loadExtraExercises();
 }
 
+new MutationObserver(muts=>{if(muts.some(m=>m.attributeName==='lang'))refreshLanguage()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
