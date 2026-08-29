@@ -4,6 +4,7 @@
  const fixCss=document.createElement('link');fixCss.rel='stylesheet';fixCss.href='app-fixes-v1.css?v=1';document.head.appendChild(fixCss);
  const fixCss2=document.createElement('link');fixCss2.rel='stylesheet';fixCss2.href='app-fixes-v2.css?v=2';document.head.appendChild(fixCss2);
  const recoveryCss=document.createElement('link');recoveryCss.rel='stylesheet';recoveryCss.href='recovery-v69.css?v=73';document.head.appendChild(recoveryCss);
+ const chordFilterStyle=document.createElement('style');chordFilterStyle.id='lgChordFilterSelectedStyle';chordFilterStyle.textContent=`#rootFilters .chip.active{background:#081d31!important;color:#ffd76a!important;border:2px solid #f4bd3d!important;box-shadow:0 0 0 1px rgba(244,189,61,.18),0 0 14px rgba(244,189,61,.18)!important;font-weight:800!important}`;document.head.appendChild(chordFilterStyle);
  const s=document.createElement('script');s.src='settings-v2.js?v=2';s.async=false;document.head.appendChild(s);
  const d=document.createElement('script');d.src='exact-home-v1.js?v=1';d.async=false;document.head.appendChild(d);
  const f=document.createElement('script');f.src='app-fixes-v1.js?v=1';f.async=false;document.head.appendChild(f);
