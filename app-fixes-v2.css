@@ -1,6 +1,9 @@
 /* La Grey · base interna consolidada (tema oscuro) */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&display=swap');
 
+/* El escudo de arranque no desaparece por tiempo: solo cuando el Home actual ya existe. */
+body:not(:has(#lgExactHome))::after{animation:none!important;visibility:visible!important}
+
 /* Barra inferior interna: una sola versión oscura para todas las vistas. */
 body:not(.exact-home-screen)>nav{position:fixed!important;left:50%!important;right:auto!important;bottom:0!important;transform:translateX(-50%)!important;width:min(760px,100%)!important;height:101px!important;background:rgba(4,18,33,.985)!important;border:0!important;border-top:1px solid #173a58!important;border-radius:0!important;display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:0!important;padding:7px 26px calc(7px + env(safe-area-inset-bottom))!important;box-shadow:0 -10px 30px rgba(0,0,0,.32)!important;backdrop-filter:none!important;z-index:80!important}
 body:not(.exact-home-screen)>nav button{border:0!important;background:transparent!important;color:#8ca4b8!important;min-width:0!important;padding:0!important;border-radius:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif!important;font-size:14px!important;font-weight:600!important;position:relative!important;text-shadow:none!important;box-shadow:none!important}
