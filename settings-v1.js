@@ -11,4 +11,5 @@
  const f2=document.createElement('script');f2.src='app-fixes-v2.js?v=2';f2.async=false;document.head.appendChild(f2);
  const recovery=document.createElement('script');recovery.src='recovery-v69.js?v=73';recovery.async=false;document.head.appendChild(recovery);
  const listFix=document.createElement('script');listFix.src='list-scroll-fix-v81.js?v=82';listFix.async=false;document.head.appendChild(listFix);
+ const homeSearchFix=document.createElement('script');homeSearchFix.src='home-search-results-v84.js?v=84';homeSearchFix.async=false;document.head.appendChild(homeSearchFix);
 })();
