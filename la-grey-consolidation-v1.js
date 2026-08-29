@@ -48,12 +48,11 @@ function iconNote(){return `<svg viewBox="0 0 32 32"><path d="M18 5v17.2a5 5 0 1
 function iconGear(){return `<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M25.2 6.8l-2.8 2.8M9.6 22.4l-2.8 2.8" stroke="currentColor" stroke-width="2.5"/></svg>`}
 function syncNotation(b){if(!b)return;const latin=(localStorage.getItem('lagrey_notation')||'american')==='latin';b.innerHTML=iconNote()+`<span>${latin?'Do Re Mi':'C D E'}</span>`}
 function buildHeader(){const h=$('body>header');if(!h||h.dataset.lgExactInternal==='1')return;const source=$('#lgExactHome .exact-brand'),p=$('#profileBtn'),n=$('#notationBtn'),s=$('#settingsBtn');if(!source||!p||!n||!s){setTimeout(buildHeader,120);return}const shell=document.createElement('div');shell.className='lg-global-shell';const brand=source.cloneNode(true);brand.classList.add('lg-global-brand');const actions=document.createElement('div');actions.className='exact-actions lg-global-actions';p.className='exact-pill';n.className='exact-pill';s.className='exact-pill exact-gear';p.innerHTML=iconPerson()+'<span>Perfil</span>';syncNotation(n);s.innerHTML=iconGear();actions.append(p,n,s);const d=document.createElement('div');d.className='exact-divider';d.innerHTML='<span>❧</span>';shell.append(brand,actions,d);h.replaceChildren(shell);h.dataset.lgExactInternal='1';n.addEventListener('click',()=>setTimeout(()=>syncNotation(n),0))}
-function restoreCriticalControls(){['startTunerBtn','stopTunerBtn','addEventBtn','saveEventBtn','deleteEventBtn'].forEach(id=>{const e=document.getElementById(id);if(e){e.disabled=false;e.style.pointerEvents='auto';e.style.touchAction='manipulation'}});document.querySelectorAll('#calendarGrid .day-cell').forEach(e=>{e.disabled=false;e.style.pointerEvents='auto'})}
 
-function refresh(){forceDarkOnly();refreshLegacyNavIcons();refreshSectionIcons();observeModals();wireTouchLock();syncModalLock();wireSettingsGear();buildHeader();restoreCriticalControls()}
+function refresh(){forceDarkOnly();refreshLegacyNavIcons();refreshSectionIcons();observeModals();wireTouchLock();syncModalLock();wireSettingsGear();buildHeader()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh);else refresh();
 setTimeout(refresh,120);setTimeout(refresh,500);
-document.addEventListener('click',()=>setTimeout(()=>{refreshSectionIcons();refreshLegacyNavIcons();syncModalLock();restoreCriticalControls()},50),true);
+document.addEventListener('click',()=>setTimeout(()=>{refreshSectionIcons();refreshLegacyNavIcons();syncModalLock()},50),true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')setTimeout(syncModalLock,0)},true);
 window.addEventListener('pageshow',()=>setTimeout(refresh,0));
 })();
