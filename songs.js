@@ -1,125 +1,65 @@
+const _cg=`[Refrão]
+
+       G
+
+Cuán grande es Dios
+
+      D/F#       Em
+
+Cántale, cuán grande es Dios
+
+              C
+
+Y todos lo verán
+
+       D         G
+
+Cuán grande es Dios`;
+const _cv=`[Primeira Parte]
+
+   G                   D/F#
+
+El esplendor de un Rey
+
+    Em
+
+Vestido en majestad
+
+                    C
+
+La Tierra alegre está
+
+                    D
+
+La Tierra alegre está
+
+    G                D/F#
+
+Cubierto está de luz
+
+     Em
+
+Venció a la oscuridad
+
+                C
+
+Y tiembla a su voz
+
+              D
+
+Tiembla a su voz`;
 window.LAGREY_SONGS=[
 {id:1,title:"Cuán Grande Es Dios",artist:"En Espíritu y en Verdad",type:"cantos",tone:"G",content:`[Intro] G
 
-[Primeira Parte]
+${_cv}
 
-   G                   D/F#
+${_cg}
 
-El esplendor de un Rey
+${_cv}
 
-    Em
+${_cg}
 
-Vestido en majestad
-
-                    C
-
-La Tierra alegre está
-
-                    D
-
-La Tierra alegre está
-
-    G                D/F#
-
-Cubierto está de luz
-
-     Em
-
-Venció a la oscuridad
-
-                C
-
-Y tiembla a su voz
-
-              D
-
-Tiembla a su voz
-
-[Refrão]
-
-       G
-
-Cuán grande es Dios
-
-      D/F#       Em
-
-Cántale, cuán grande es Dios
-
-              C
-
-Y todos lo verán
-
-       D         G
-
-Cuán grande es Dios
-
-[Primeira Parte]
-
-   G                   D/F#
-
-El esplendor de un Rey
-
-    Em
-
-Vestido en majestad
-
-                    C
-
-La Tierra alegre está
-
-                    D
-
-La Tierra alegre está
-
-    G                D/F#
-
-Cubierto está de luz
-
-     Em
-
-Venció a la oscuridad
-
-                C
-
-Y tiembla a su voz
-
-              D
-
-Tiembla a su voz
-
-[Refrão]
-
-       G
-
-Cuán grande es Dios
-
-      D/F#       Em
-
-Cántale, cuán grande es Dios
-
-              C
-
-Y todos lo verán
-
-       D         G
-
-Cuán grande es Dios
-
-       G
-
-Cuán grande es Dios
-
-      D/F#       Em
-
-Cántale, cuán grande es Dios
-
-              C
-
-Y todos lo verán
-
-       D         G
-
-Cuán grande es Dios
+${_cg}
 
 [Segunda Parte]
 
@@ -155,39 +95,9 @@ Cordero y el León
 
 Cordero y el León
 
-[Refrão]
+${_cg}
 
-       G
-
-Cuán grande es Dios
-
-      D/F#       Em
-
-Cántale, cuán grande es Dios
-
-              C
-
-Y todos lo verán
-
-       D         G
-
-Cuán grande es Dios
-
-       G
-
-Cuán grande es Dios
-
-      D/F#       Em
-
-Cántale, cuán grande es Dios
-
-              C
-
-Y todos lo verán
-
-       D         G
-
-Cuán grande es Dios
+${_cg}
 
 [Terceira Parte]
 
@@ -223,55 +133,11 @@ Y mi ser dirá
 
 Cuan grande es Dios
 
-[Refrão]
+${_cg}
 
-       G
+${_cg}
 
-Cuán grande es Dios
-
-      D/F#       Em
-
-Cántale, cuán grande es Dios
-
-              C
-
-Y todos lo verán
-
-       D         G
-
-Cuán grande es Dios
-
-       G
-
-Cuán grande es Dios
-
-      D/F#       Em
-
-Cántale, cuán grande es Dios
-
-              C
-
-Y todos lo verán
-
-       D         G
-
-Cuán grande es Dios
-
-       G
-
-Cuán grande es Dios
-
-      D/F#       Em
-
-Cántale, cuán grande es Dios
-
-              C
-
-Y todos lo verán
-
-       D         G
-
-Cuán grande es Dios`},
+${_cg}`},
 {id:2,title:"El amor de Cristo",artist:"Adoración La IBI",type:"cantos",tone:"A",content:`Intro: //D - F#m - Esus4 E //
 
 1ºVerso:
@@ -873,4 +739,4 @@ Amén, amén, amén
           Em7                      C
 //Que te cubra con su gracia hasta mil generaciones
         G                       D
-Tu familia y tus hijos y los hijos de tus
+Tu familia y tus hijos
