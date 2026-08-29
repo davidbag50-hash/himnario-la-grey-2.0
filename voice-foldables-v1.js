@@ -61,13 +61,22 @@ function handleClick(event){
 
   const wasOpen=button.getAttribute('aria-expanded')==='true';
 
+  // Si se toca la misma herramienta abierta, este click solo la cierra.
+  // Así evitamos que voice-pro.js la vuelva a mostrar en el mismo evento.
+  if(wasOpen){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    finishToggle(button,true);
+    return;
+  }
+
   // voice-pro.js todavía solicita un scroll suave al mostrar la herramienta.
   // Se suprime únicamente durante este mismo click y se restaura antes del siguiente frame.
   suppressLegacyAutoScrollForClick();
 
   // El contenido se renderiza en el manejador normal del botón. Al terminar el evento,
   // lo colocamos debajo de la tarjeta elegida antes de que el navegador pinte la pantalla.
-  queueMicrotask(()=>finishToggle(button,wasOpen));
+  queueMicrotask(()=>finishToggle(button,false));
 }
 
 function cleanupWhenLeaving(event){
