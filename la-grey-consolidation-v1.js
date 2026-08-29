@@ -1,152 +1,109 @@
 (()=>{
 'use strict';
-const $=s=>document.querySelector(s);
-const $$=s=>[...document.querySelectorAll(s)];
-
-/* La Grey 3: runtime consolidado. Esta capa reemplaza parches pequeños y evita listeners duplicados. */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 document.documentElement.dataset.lgListScrollMemory='1';
+
+let modalScrollY=0,modalLocked=false,modalTouchY=0;
+let settingsReturnView=null,settingsReturnNav=null,settingsReturnScroll=0;
 
 function ensureBaseStyle(){
  if(document.getElementById('lgConsolidatedBaseStyle'))return;
- const style=document.createElement('style');
- style.id='lgConsolidatedBaseStyle';
+ const style=document.createElement('style');style.id='lgConsolidatedBaseStyle';
  style.textContent=`
  #rootFilters .chip.active{background:#081d31!important;color:#ffd76a!important;border:2px solid #f4bd3d!important;box-shadow:0 0 0 1px rgba(244,189,61,.18),0 0 14px rgba(244,189,61,.18)!important;font-weight:800!important}
- body.lg-song-detail>nav,
- body.lg-song-detail .exact-bottom{display:none!important}
+ body.lg-song-detail>nav,body.lg-song-detail .exact-bottom{display:none!important}
+ html.lg-modal-open,body.lg-modal-open{overflow:hidden!important;overscroll-behavior:none!important}
+ body.lg-modal-open{touch-action:none!important}
+ body.lg-modal-open>nav,body.lg-modal-open .exact-bottom,body.lg-modal-open #readerTools,body.lg-modal-open .reader-tools,body.lg-modal-open .voice-fab,body.lg-modal-open .voice-fab-menu{display:none!important}
+ .modal:not(.hidden){position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important;z-index:5000!important}
+ .modal:not(.hidden)>.modal-card{position:relative!important;max-height:calc(100dvh - 28px)!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;z-index:5001!important}
+ #chordModal:not(.hidden){position:fixed!important;inset:0!important;transform:none!important;margin:0!important}
+ #chordModal:not(.hidden)>.modal-card{position:relative!important;transform:none!important;margin:auto!important}
+ #settingsBackBtn{display:none!important}
+ #lgExactHome .exact-personal-greeting{box-sizing:border-box;margin:0 3px 14px;padding:13px 16px;border:1px solid #183e5f;border-radius:17px;background:linear-gradient(145deg,#071a2d,#09243c);box-shadow:0 7px 20px rgba(0,0,0,.22);display:flex;align-items:center;gap:12px;color:#eef7ff}
+ #lgExactHome .exact-greeting-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto;background:rgba(13,114,216,.15);border:1px solid rgba(103,192,255,.16);font-size:21px}
+ #lgExactHome .exact-greeting-copy{min-width:0;display:grid;gap:2px}
+ #lgExactHome .exact-greeting-copy b{font-family:'Nunito',system-ui,sans-serif;font-size:17px;line-height:1.25;color:#f5f9fd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ #lgExactHome .exact-greeting-copy span{font-family:'Nunito',system-ui,sans-serif;font-size:12px;line-height:1.3;color:#8fa9bd}
+ #lgExactHome .exact-daily-verse{box-sizing:border-box;margin:0 3px 22px;padding:17px 18px 16px;border:1px solid rgba(216,165,45,.24);border-radius:18px;background:radial-gradient(circle at 100% 0,rgba(216,165,45,.09),transparent 34%),linear-gradient(145deg,#081d31,#061726);box-shadow:0 8px 23px rgba(0,0,0,.24);position:relative;overflow:hidden}
+ #lgExactHome .exact-daily-verse:after{content:'✦';position:absolute;right:15px;top:13px;color:#d8a52d;font-size:17px;opacity:.82}
+ #lgExactHome .exact-verse-kicker{font-family:'Nunito',system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:1.8px;color:#d8a52d;margin-bottom:7px;padding-right:28px}
+ #lgExactHome .exact-verse-text{font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.48;color:#eaf4fc;margin:0 0 8px;font-style:italic}
+ #lgExactHome .exact-verse-ref{font-family:'Nunito',system-ui,sans-serif;font-size:12px;font-weight:800;color:#72c4ff}
+ @media(max-width:620px){.modal:not(.hidden)>.modal-card{max-height:calc(100dvh - 16px)!important}#lgExactHome .exact-personal-greeting{margin-bottom:12px;padding:12px 14px}#lgExactHome .exact-greeting-icon{width:38px;height:38px;border-radius:12px}#lgExactHome .exact-greeting-copy b{font-size:15px}#lgExactHome .exact-daily-verse{margin-bottom:18px;padding:15px 16px}#lgExactHome .exact-verse-text{font-size:14px}}
  `;
  document.head.appendChild(style);
 }
 
-/* Iconos de navegación y títulos: reemplaza app-fixes-v1.js. */
+function forceDarkOnly(){
+ try{localStorage.setItem('lagrey_theme','dark')}catch{}
+ document.documentElement.dataset.theme='dark';document.documentElement.dataset.themeChoice='dark';
+ const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content='#17324d';
+ const theme=document.getElementById('settingsTheme');if(theme){theme.closest('.settings-row')?.remove()||theme.remove()}
+}
+
 const navIcons={
- home:`<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 15L16 4l13 11v14H20v-9h-8v9H3z" fill="currentColor"/></svg>`,
- songs:`<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M19 5v17.5a5 5 0 1 1-3-4.6V8.5l11-2.6v13.5a5 5 0 1 1-3-4.6V4.2z" fill="currentColor"/></svg>`,
- chords:`<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="4" width="22" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M10 4v24M16 4v24M22 4v24M5 10h22M5 16h22M5 22h22" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="16" r="2.4" fill="currentColor"/><circle cx="16" cy="10" r="2.4" fill="currentColor"/><circle cx="22" cy="22" r="2.4" fill="currentColor"/></svg>`,
- calendar:`<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="6" width="24" height="22" rx="3" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M4 12h24M10 3v6M22 3v6" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><path d="M9 17h3v3H9zm6 0h3v3h-3zm6 0h3v3h-3zM9 22h3v3H9zm6 0h3v3h-3z" fill="currentColor"/></svg>`,
- tuner:`<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 23a11 11 0 0 1 22 0" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M16 23l5-11" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"/><circle cx="16" cy="23" r="2.5" fill="currentColor"/><path d="M7 25h18" stroke="currentColor" stroke-width="2.4"/></svg>`
-};
-const sectionIcons={
- songs:'<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 9c6-3 11-2 14 1v15c-4-2-9-2-14 0z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M26 9c-6-3-11-2-14 1v15c4-2 9-2 14 0z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 10v15" stroke="#d8a52d" stroke-width="2"/></svg>',
- hymns:'<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="7" y="4" width="18" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 9v10M11 14h10" stroke="#d8a52d" stroke-width="2.4" stroke-linecap="round"/></svg>',
- chords:'<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 4h5l-1 24H8z" fill="#9b652f"/><rect x="14" y="8" width="13" height="15" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M18 8v15M22 8v15M14 13h13M14 18h13" stroke="currentColor" stroke-width="1.3"/><circle cx="18" cy="18" r="1.8" fill="#0d72d8"/><circle cx="22" cy="13" r="1.8" fill="#0d72d8"/></svg>',
- tuner:'<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 22a10 10 0 0 1 20 0" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M16 22l5-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="16" cy="22" r="2.5" fill="currentColor"/><path d="M7 25h18" stroke="#d8a52d" stroke-width="2"/></svg>',
- calendar:'<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="7" width="22" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M5 12h22M10 4v6M22 4v6" stroke="currentColor" stroke-width="2.2"/><path d="M20 16l1.5 3 3.5.4-2.6 2.4.7 3.4-3.1-1.6-3.1 1.6.7-3.4-2.6-2.4 3.5-.4z" fill="#d8a52d"/></svg>',
- settings:'<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M25.2 6.8l-2.8 2.8M9.6 22.4l-2.8 2.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
- voice:'<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="11" y="4" width="10" height="16" rx="5" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M8 16a8 8 0 0 0 16 0M16 24v5M11 29h10" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>'
+ home:`<svg viewBox="0 0 32 32"><path d="M3 15L16 4l13 11v14H20v-9h-8v9H3z" fill="currentColor"/></svg>`,
+ songs:`<svg viewBox="0 0 32 32"><path d="M19 5v17.5a5 5 0 1 1-3-4.6V8.5l11-2.6v13.5a5 5 0 1 1-3-4.6V4.2z" fill="currentColor"/></svg>`,
+ chords:`<svg viewBox="0 0 32 32"><rect x="5" y="4" width="22" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M10 4v24M16 4v24M22 4v24M5 10h22M5 16h22M5 22h22" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="16" r="2.4" fill="currentColor"/><circle cx="16" cy="10" r="2.4" fill="currentColor"/><circle cx="22" cy="22" r="2.4" fill="currentColor"/></svg>`,
+ calendar:`<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="22" rx="3" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M4 12h24M10 3v6M22 3v6" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><path d="M9 17h3v3H9zm6 0h3v3h-3zm6 0h3v3h-3zM9 22h3v3H9zm6 0h3v3h-3z" fill="currentColor"/></svg>`,
+ tuner:`<svg viewBox="0 0 32 32"><path d="M5 23a11 11 0 0 1 22 0" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M16 23l5-11" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"/><circle cx="16" cy="23" r="2.5" fill="currentColor"/><path d="M7 25h18" stroke="currentColor" stroke-width="2.4"/></svg>`
 };
 const navLabels={home:'Inicio',songs:'Cantos',chords:'Acordes',calendar:'Calendario',tuner:'Afinador'};
-function refreshLegacyNavIcons(){
- const nav=document.querySelector('body>nav');if(!nav)return;
- nav.querySelectorAll('button[data-nav]').forEach(b=>{
-   const k=b.dataset.nav;if(!navIcons[k])return;
-   const text=b.querySelector('span')?.textContent?.trim()||navLabels[k];
-   if(!b.querySelector('svg'))b.innerHTML=navIcons[k]+`<span>${text}</span>`;
- });
-}
-function cleanTitle(h){
- if(!h)return'';
- const clone=h.cloneNode(true);clone.querySelectorAll('.lg-section-icon').forEach(n=>n.remove());
- return clone.textContent.replace(/[🎵🎼🎤🎸🎹📅⚙️⭐✨]/g,'').trim();
-}
-function decorateTitle(h,type){
- if(!h||h.querySelector('.lg-section-icon'))return;
- const text=cleanTitle(h);h.textContent='';
- const icon=document.createElement('span');icon.className='lg-section-icon';icon.innerHTML=sectionIcons[type]||sectionIcons.songs;
- const label=document.createElement('span');label.textContent=text;
- h.append(icon,label);
-}
-function refreshSectionIcons(){
- const list=document.querySelector('#listing>h1');
- if(list){const t=cleanTitle(list).toLowerCase();decorateTitle(list,t.includes('himno')?'hymns':'songs')}
- decorateTitle(document.querySelector('#chordsView .section-title-row h1'),'chords');
- decorateTitle(document.querySelector('#tunerView .head h1'),'tuner');
- decorateTitle(document.querySelector('#calendarView .calendar-head h1'),'calendar');
- decorateTitle(document.querySelector('#settingsView .settings-title h1'),'settings');
- decorateTitle(document.querySelector('#voiceView h1'),'voice');
-}
+const sectionIcons={
+ songs:'<svg viewBox="0 0 32 32"><path d="M6 9c6-3 11-2 14 1v15c-4-2-9-2-14 0zM26 9c-6-3-11-2-14 1v15c4-2 9-2 14 0z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 10v15" stroke="#d8a52d" stroke-width="2"/></svg>',
+ hymns:'<svg viewBox="0 0 32 32"><rect x="7" y="4" width="18" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 9v10M11 14h10" stroke="#d8a52d" stroke-width="2.4" stroke-linecap="round"/></svg>',
+ chords:'<svg viewBox="0 0 32 32"><path d="M7 4h5l-1 24H8z" fill="#9b652f"/><rect x="14" y="8" width="13" height="15" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M18 8v15M22 8v15M14 13h13M14 18h13" stroke="currentColor" stroke-width="1.3"/><circle cx="18" cy="18" r="1.8" fill="#0d72d8"/><circle cx="22" cy="13" r="1.8" fill="#0d72d8"/></svg>',
+ tuner:'<svg viewBox="0 0 32 32"><path d="M6 22a10 10 0 0 1 20 0" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M16 22l5-11" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="22" r="2.5" fill="currentColor"/><path d="M7 25h18" stroke="#d8a52d" stroke-width="2"/></svg>',
+ calendar:'<svg viewBox="0 0 32 32"><rect x="5" y="7" width="22" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M5 12h22M10 4v6M22 4v6" stroke="currentColor" stroke-width="2.2"/><path d="M20 16l1.5 3 3.5.4-2.6 2.4.7 3.4-3.1-1.6-3.1 1.6.7-3.4-2.6-2.4 3.5-.4z" fill="#d8a52d"/></svg>',
+ settings:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M25.2 6.8l-2.8 2.8M9.6 22.4l-2.8 2.8" stroke="currentColor" stroke-width="2.4"/></svg>',
+ voice:'<svg viewBox="0 0 32 32"><rect x="11" y="4" width="10" height="16" rx="5" fill="none" stroke="currentColor" stroke-width="2.3"/><path d="M8 16a8 8 0 0 0 16 0M16 24v5M11 29h10" stroke="currentColor" stroke-width="2.3"/></svg>'
+};
+function refreshLegacyNavIcons(){const nav=$('body>nav');if(!nav)return;nav.querySelectorAll('[data-nav]').forEach(b=>{const k=b.dataset.nav;if(!navIcons[k]||b.querySelector('svg'))return;const t=b.querySelector('span')?.textContent?.trim()||navLabels[k];b.innerHTML=navIcons[k]+`<span>${t}</span>`})}
+function cleanTitle(h){if(!h)return'';const c=h.cloneNode(true);c.querySelectorAll('.lg-section-icon').forEach(n=>n.remove());return c.textContent.replace(/[🎵🎼🎤🎸🎹📅⚙️⭐✨]/g,'').trim()}
+function decorateTitle(h,type){if(!h||h.querySelector('.lg-section-icon'))return;const t=cleanTitle(h);h.textContent='';const i=document.createElement('span');i.className='lg-section-icon';i.innerHTML=sectionIcons[type]||sectionIcons.songs;const l=document.createElement('span');l.textContent=t;h.append(i,l)}
+function refreshSectionIcons(){const list=$('#listing>h1');if(list){const t=cleanTitle(list).toLowerCase();decorateTitle(list,t.includes('himno')?'hymns':'songs')}decorateTitle($('#chordsView .section-title-row h1'),'chords');decorateTitle($('#tunerView .head h1'),'tuner');decorateTitle($('#calendarView .calendar-head h1'),'calendar');decorateTitle($('#settingsView .settings-title h1'),'settings');decorateTitle($('#voiceView h1'),'voice')}
 
-/* Resultados del buscador siempre debajo de la barra visual actual. */
-function placeHomeResults(){
- const shell=document.getElementById('lgExactHome');
- const results=document.getElementById('results');
- const search=shell?.querySelector('.exact-search-wrap');
- if(!shell||!results||!search)return;
- if(results.previousElementSibling!==search)search.insertAdjacentElement('afterend',results);
- results.classList.add('exact-search-results');
-}
-function wireHomeSearch(){
- const q=document.getElementById('q');
- if(!q||q.dataset.lgConsolidatedSearch==='1')return;
- q.dataset.lgConsolidatedSearch='1';
- q.addEventListener('input',()=>{
-   placeHomeResults();
-   requestAnimationFrame(()=>{
-     const search=document.querySelector('#lgExactHome .exact-search-wrap');
-     if(!search)return;
-     const top=(search.getBoundingClientRect().top+window.scrollY)-12;
-     if(window.scrollY>top)window.scrollTo(0,Math.max(0,top));
-   });
- });
-}
+function placeHomeResults(){const shell=document.getElementById('lgExactHome'),results=document.getElementById('results'),search=shell?.querySelector('.exact-search-wrap');if(!shell||!results||!search)return;if(results.previousElementSibling!==search)search.insertAdjacentElement('afterend',results);results.classList.add('exact-search-results')}
+function wireHomeSearch(){const q=document.getElementById('q');if(!q||q.dataset.lgConsolidatedSearch==='1')return;q.dataset.lgConsolidatedSearch='1';q.addEventListener('input',()=>{placeHomeResults();requestAnimationFrame(()=>{const s=$('#lgExactHome .exact-search-wrap');if(!s)return;const top=s.getBoundingClientRect().top+window.scrollY-12;if(window.scrollY>top)window.scrollTo(0,Math.max(0,top))})})}
 
-/* Regreso desde una canción/himno sin reconstruir la lista. */
-let fromList=false;
-let savedY=0;
-let savedId='';
-let savedKey='cantos';
-function listKey(){
- const t=(document.getElementById('listTitle')?.textContent||'').toLowerCase();
- if(t.includes('himno'))return'himnos';
- if(t.includes('favor'))return'fav';
- return'cantos';
-}
-function saveListState(btn){fromList=true;savedY=window.scrollY||window.pageYOffset||0;savedId=String(btn.dataset.song||'');savedKey=listKey()}
-function restoreExistingList(){
- const detail=document.getElementById('detail'),listing=document.getElementById('listing');if(!listing)return;
- detail?.classList.add('hidden');document.getElementById('settingsView')?.classList.add('hidden');listing.classList.remove('hidden');
- document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
- if(savedKey==='cantos')document.querySelector('nav button[data-nav="songs"]')?.classList.add('active');
- const apply=()=>{
-   const safeId=(window.CSS&&CSS.escape)?CSS.escape(savedId):savedId.replace(/[^a-zA-Z0-9_-]/g,'');
-   const anchor=savedId?document.querySelector(`#songList [data-song="${safeId}"]`):null;
-   if(anchor){
-     const listTop=(document.getElementById('songList')?.getBoundingClientRect().top||0)+(window.scrollY||0);
-     const anchorTop=anchor.getBoundingClientRect().top+(window.scrollY||0);
-     window.scrollTo(0,Math.max(0,Math.min(savedY,anchorTop-listTop+savedY)));
-   }else window.scrollTo(0,savedY);
- };
- window.scrollTo(0,savedY);requestAnimationFrame(()=>requestAnimationFrame(apply));setTimeout(apply,40);setTimeout(apply,120);fromList=false;syncSongDetailMode();
-}
-function wireListReturn(){
- if(document.documentElement.dataset.lgConsolidatedListReturn==='1')return;
- document.documentElement.dataset.lgConsolidatedListReturn='1';
- document.addEventListener('click',e=>{
-   const song=e.target.closest?.('#songList [data-song]');
-   if(song&&!document.getElementById('listing')?.classList.contains('hidden')){saveListState(song);return}
-   if(e.target.closest?.('#songBackBtn')&&fromList){e.preventDefault();e.stopImmediatePropagation();restoreExistingList()}
- },true);
-}
+let fromList=false,savedY=0,savedId='',savedKey='cantos';
+function listKey(){const t=(document.getElementById('listTitle')?.textContent||'').toLowerCase();return t.includes('himno')?'himnos':t.includes('favor')?'fav':'cantos'}
+function saveListState(b){fromList=true;savedY=window.scrollY||window.pageYOffset||0;savedId=String(b.dataset.song||'');savedKey=listKey()}
+function restoreExistingList(){const detail=document.getElementById('detail'),listing=document.getElementById('listing');if(!listing)return;detail?.classList.add('hidden');document.getElementById('settingsView')?.classList.add('hidden');listing.classList.remove('hidden');$$('nav button').forEach(b=>b.classList.remove('active'));if(savedKey==='cantos')$('nav button[data-nav="songs"]')?.classList.add('active');const apply=()=>{const safe=(window.CSS&&CSS.escape)?CSS.escape(savedId):savedId.replace(/[^a-zA-Z0-9_-]/g,''),a=savedId?document.querySelector(`#songList [data-song="${safe}"]`):null;if(a){const lt=(document.getElementById('songList')?.getBoundingClientRect().top||0)+(window.scrollY||0),at=a.getBoundingClientRect().top+(window.scrollY||0);window.scrollTo(0,Math.max(0,Math.min(savedY,at-lt+savedY)))}else window.scrollTo(0,savedY)};window.scrollTo(0,savedY);requestAnimationFrame(()=>requestAnimationFrame(apply));setTimeout(apply,40);setTimeout(apply,120);fromList=false;syncSongDetailMode()}
+function wireListReturn(){if(document.documentElement.dataset.lgConsolidatedListReturn==='1')return;document.documentElement.dataset.lgConsolidatedListReturn='1';document.addEventListener('click',e=>{const song=e.target.closest?.('#songList [data-song]');if(song&&!document.getElementById('listing')?.classList.contains('hidden')){saveListState(song);return}if(e.target.closest?.('#songBackBtn')&&fromList){e.preventDefault();e.stopImmediatePropagation();restoreExistingList()}},true)}
 
-/* La vista de letra es inmersiva: ninguna barra inferior mientras #detail esté abierto. */
-function syncSongDetailMode(){
- const detail=document.getElementById('detail');const on=!!detail&&!detail.classList.contains('hidden');
- document.body.classList.toggle('lg-song-detail',on);
- document.querySelectorAll('body>nav,.exact-bottom').forEach(bar=>{if(on)bar.style.setProperty('display','none','important');else bar.style.removeProperty('display')});
-}
-function observeSongDetail(){
- const detail=document.getElementById('detail');if(!detail||detail.dataset.lgConsolidatedObserved==='1')return;
- detail.dataset.lgConsolidatedObserved='1';
- new MutationObserver(syncSongDetailMode).observe(detail,{attributes:true,attributeFilter:['class']});
- window.addEventListener('resize',syncSongDetailMode,{passive:true});
- window.addEventListener('orientationchange',()=>setTimeout(syncSongDetailMode,30),{passive:true});
-}
+function syncSongDetailMode(){const d=document.getElementById('detail'),on=!!d&&!d.classList.contains('hidden');document.body.classList.toggle('lg-song-detail',on);document.querySelectorAll('body>nav,.exact-bottom').forEach(bar=>{if(on)bar.style.setProperty('display','none','important');else bar.style.removeProperty('display')})}
+function observeSongDetail(){const d=document.getElementById('detail');if(!d||d.dataset.lgConsolidatedObserved==='1')return;d.dataset.lgConsolidatedObserved='1';new MutationObserver(syncSongDetailMode).observe(d,{attributes:true,attributeFilter:['class']});window.addEventListener('resize',syncSongDetailMode,{passive:true});window.addEventListener('orientationchange',()=>setTimeout(syncSongDetailMode,30),{passive:true})}
 
-function refresh(){
- ensureBaseStyle();refreshLegacyNavIcons();refreshSectionIcons();placeHomeResults();wireHomeSearch();wireListReturn();observeSongDetail();syncSongDetailMode();
-}
+function syncModalLock(){const open=document.querySelector('.modal:not(.hidden)');if(open&&!modalLocked){modalScrollY=window.scrollY||window.pageYOffset||0;document.documentElement.classList.add('lg-modal-open');document.body.classList.add('lg-modal-open');Object.assign(document.body.style,{position:'fixed',top:`-${modalScrollY}px`,left:'0',right:'0',width:'100%',overflow:'hidden'});modalLocked=true}else if(!open&&modalLocked){document.documentElement.classList.remove('lg-modal-open');document.body.classList.remove('lg-modal-open');['position','top','left','right','width','overflow'].forEach(k=>document.body.style[k]='');modalLocked=false;window.scrollTo(0,modalScrollY)}}
+function observeModals(){document.querySelectorAll('.modal').forEach(m=>{if(m.dataset.lgLockObserved==='1')return;m.dataset.lgLockObserved='1';new MutationObserver(syncModalLock).observe(m,{attributes:true,attributeFilter:['class']})})}
+function wireTouchLock(){if(document.documentElement.dataset.lgTouchLock==='1')return;document.documentElement.dataset.lgTouchLock='1';document.addEventListener('touchstart',e=>{if(modalLocked&&e.touches?.length)modalTouchY=e.touches[0].clientY},{passive:true,capture:true});document.addEventListener('touchmove',e=>{if(!modalLocked||!e.touches?.length)return;const card=e.target.closest?.('.modal:not(.hidden)>.modal-card');if(!card){e.preventDefault();return}const y=e.touches[0].clientY,d=y-modalTouchY;modalTouchY=y;const top=card.scrollTop<=0,bottom=card.scrollTop+card.clientHeight>=card.scrollHeight-1,no=card.scrollHeight<=card.clientHeight+1;if(no||(top&&d>0)||(bottom&&d<0))e.preventDefault()},{passive:false,capture:true})}
+
+function settingsIsOpen(){const v=document.getElementById('settingsView');return !!v&&!v.classList.contains('hidden')}
+function openSettings(){const s=document.getElementById('settingsView');if(!s)return;const current=[...document.querySelectorAll('.view')].find(v=>v.id!=='settingsView'&&!v.classList.contains('hidden'));settingsReturnView=current?.id||'home';settingsReturnNav=$('nav button.active')?.dataset?.nav||null;settingsReturnScroll=window.scrollY||window.pageYOffset||0;$$('.view').forEach(v=>v.classList.add('hidden'));s.classList.remove('hidden');$$('nav button').forEach(b=>b.classList.remove('active'));window.scrollTo(0,0)}
+function closeSettings(){const s=document.getElementById('settingsView');if(!s)return;s.classList.add('hidden');(document.getElementById(settingsReturnView||'home')||document.getElementById('home'))?.classList.remove('hidden');$$('nav button').forEach(b=>b.classList.remove('active'));if(settingsReturnNav)$(`nav button[data-nav="${settingsReturnNav}"]`)?.classList.add('active');const y=settingsReturnScroll;requestAnimationFrame(()=>setTimeout(()=>window.scrollTo(0,y),0));setTimeout(updateHomePersonal,30)}
+function wireSettingsGear(){if(document.documentElement.dataset.lgSettingsGearToggle==='1')return;document.documentElement.dataset.lgSettingsGearToggle='1';document.addEventListener('click',e=>{if(!e.target.closest?.('#settingsBtn'))return;e.preventDefault();e.stopImmediatePropagation();settingsIsOpen()?closeSettings():openSettings()},true)}
+
+const dailyVerses=[['Salmo 23:1','Jehová es mi pastor; nada me faltará.'],['Filipenses 4:13','Todo lo puedo en Cristo que me fortalece.'],['Proverbios 3:5','Fíate de Jehová de todo tu corazón, y no estribes en tu prudencia.'],['Salmo 46:1','Dios es nuestro amparo y fortaleza, nuestro pronto auxilio en las tribulaciones.'],['Mateo 11:28','Venid a mí todos los que estáis trabajados y cargados, que yo os haré descansar.'],['Salmo 119:105','Lámpara es a mis pies tu palabra, y lumbrera a mi camino.'],['Josué 1:9','Mira que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios será contigo en donde quiera que fueres.'],['Isaías 41:10','No temas, que yo soy contigo; no desmayes, que yo soy tu Dios que te esfuerzo: siempre te ayudaré, siempre te sustentaré con la diestra de mi justicia.'],['Salmo 37:5','Encomienda a Jehová tu camino, y espera en él; y él hará.'],['Juan 14:6','Yo soy el camino, y la verdad, y la vida: nadie viene al Padre, sino por mí.'],['Romanos 12:12','Gozosos en la esperanza; sufridos en la tribulación; constantes en la oración.'],['1 Corintios 16:14','Todas vuestras cosas sean hechas con caridad.'],['Salmo 34:8','Gustad, y ved que es bueno Jehová: dichoso el hombre que confiará en él.'],['Hebreos 13:8','Jesucristo es el mismo ayer, y hoy, y por los siglos.']];
+function greetingText(){const h=new Date().getHours();return h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches'}
+function profileName(){try{return String(JSON.parse(localStorage.getItem('lagrey_member_profile')||'null')?.name||'').trim()}catch{return''}}
+function dailyVerse(){const d=new Date(),start=new Date(d.getFullYear(),0,0),day=Math.floor((d-start)/86400000),v=dailyVerses[Math.abs(d.getFullYear()*367+day)%dailyVerses.length];return{ref:v[0],text:v[1]}}
+function injectHomePersonal(){const shell=document.getElementById('lgExactHome');if(!shell)return;const div=shell.querySelector('.exact-divider'),search=shell.querySelector('.exact-search-wrap');if(div&&!shell.querySelector('.exact-personal-greeting')){const g=document.createElement('div');g.className='exact-personal-greeting';g.innerHTML='<div class="exact-greeting-icon">👋</div><div class="exact-greeting-copy"><b></b><span>Qué alegría tenerte en La Grey</span></div>';div.insertAdjacentElement('afterend',g)}if(search&&!shell.querySelector('.exact-daily-verse')){const v=document.createElement('div');v.className='exact-daily-verse';v.innerHTML='<div class="exact-verse-kicker">VERSÍCULO DEL DÍA</div><p class="exact-verse-text"></p><div class="exact-verse-ref"></div>';search.insertAdjacentElement('afterend',v)}updateHomePersonal()}
+function updateHomePersonal(){const shell=document.getElementById('lgExactHome');if(!shell)return;const name=profileName(),g=shell.querySelector('.exact-greeting-copy b'),v=dailyVerse();if(g)g.textContent=name?`${greetingText()}, ${name}`:greetingText();const t=shell.querySelector('.exact-verse-text'),r=shell.querySelector('.exact-verse-ref');if(t)t.textContent=`“${v.text}”`;if(r)r.textContent=v.ref}
+
+function iconPerson(){return `<svg viewBox="0 0 32 32"><circle cx="16" cy="10" r="6" fill="#0d72d8"/><path d="M5 29c1.1-7.2 4.9-11 11-11s9.9 3.8 11 11" fill="#0d72d8"/></svg>`}
+function iconNote(){return `<svg viewBox="0 0 32 32"><path d="M18 5v17.2a5 5 0 1 1-3-4.6V8.4l12-2.6v13.4a5 5 0 1 1-3-4.6V4z" fill="#0d72d8"/></svg>`}
+function iconGear(){return `<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M25.2 6.8l-2.8 2.8M9.6 22.4l-2.8 2.8" stroke="currentColor" stroke-width="2.5"/></svg>`}
+function syncNotation(b){if(!b)return;const latin=(localStorage.getItem('lagrey_notation')||'american')==='latin';b.innerHTML=iconNote()+`<span>${latin?'Do Re Mi':'C D E'}</span>`}
+function buildHeader(){const h=$('body>header');if(!h||h.dataset.lgExactInternal==='1')return;const source=$('#lgExactHome .exact-brand'),p=$('#profileBtn'),n=$('#notationBtn'),s=$('#settingsBtn');if(!source||!p||!n||!s){setTimeout(buildHeader,120);return}const shell=document.createElement('div');shell.className='lg-global-shell';const brand=source.cloneNode(true);brand.classList.add('lg-global-brand');const actions=document.createElement('div');actions.className='exact-actions lg-global-actions';p.className='exact-pill';n.className='exact-pill';s.className='exact-pill exact-gear';p.innerHTML=iconPerson()+'<span>Perfil</span>';syncNotation(n);s.innerHTML=iconGear();actions.append(p,n,s);const d=document.createElement('div');d.className='exact-divider';d.innerHTML='<span>❧</span>';shell.append(brand,actions,d);h.replaceChildren(shell);h.dataset.lgExactInternal='1';n.addEventListener('click',()=>setTimeout(()=>syncNotation(n),0))}
+function restoreCriticalControls(){['startTunerBtn','stopTunerBtn','addEventBtn','saveEventBtn','deleteEventBtn'].forEach(id=>{const e=document.getElementById(id);if(e){e.disabled=false;e.style.pointerEvents='auto';e.style.touchAction='manipulation'}});document.querySelectorAll('#calendarGrid .day-cell').forEach(e=>{e.disabled=false;e.style.pointerEvents='auto'})}
+
+function refresh(){forceDarkOnly();ensureBaseStyle();refreshLegacyNavIcons();refreshSectionIcons();placeHomeResults();wireHomeSearch();wireListReturn();observeSongDetail();syncSongDetailMode();observeModals();wireTouchLock();syncModalLock();wireSettingsGear();injectHomePersonal();updateHomePersonal();buildHeader();restoreCriticalControls()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh);else refresh();
-setTimeout(refresh,100);setTimeout(refresh,500);
-document.addEventListener('click',()=>setTimeout(()=>{refreshSectionIcons();refreshLegacyNavIcons();syncSongDetailMode()},40),true);
+setTimeout(refresh,120);setTimeout(refresh,500);
+document.addEventListener('click',()=>setTimeout(()=>{refreshSectionIcons();refreshLegacyNavIcons();syncSongDetailMode();syncModalLock();restoreCriticalControls();updateHomePersonal()},50),true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setTimeout(syncModalLock,0)},true);
 window.addEventListener('pageshow',()=>setTimeout(refresh,0));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateHomePersonal()});
 })();
