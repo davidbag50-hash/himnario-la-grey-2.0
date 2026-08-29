@@ -6,25 +6,6 @@ document.documentElement.dataset.lgListScrollMemory='1';
 let modalScrollY=0,modalLocked=false,modalTouchY=0;
 let settingsReturnView=null,settingsReturnNav=null,settingsReturnScroll=0;
 
-function ensureBaseStyle(){
- if(document.getElementById('lgConsolidatedBaseStyle'))return;
- const style=document.createElement('style');style.id='lgConsolidatedBaseStyle';
- style.textContent=`
- #lgExactHome .exact-personal-greeting{box-sizing:border-box;margin:0 3px 14px;padding:13px 16px;border:1px solid #183e5f;border-radius:17px;background:linear-gradient(145deg,#071a2d,#09243c);box-shadow:0 7px 20px rgba(0,0,0,.22);display:flex;align-items:center;gap:12px;color:#eef7ff}
- #lgExactHome .exact-greeting-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto;background:rgba(13,114,216,.15);border:1px solid rgba(103,192,255,.16);font-size:21px}
- #lgExactHome .exact-greeting-copy{min-width:0;display:grid;gap:2px}
- #lgExactHome .exact-greeting-copy b{font-family:'Nunito',system-ui,sans-serif;font-size:17px;line-height:1.25;color:#f5f9fd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- #lgExactHome .exact-greeting-copy span{font-family:'Nunito',system-ui,sans-serif;font-size:12px;line-height:1.3;color:#8fa9bd}
- #lgExactHome .exact-daily-verse{box-sizing:border-box;margin:0 3px 22px;padding:17px 18px 16px;border:1px solid rgba(216,165,45,.24);border-radius:18px;background:radial-gradient(circle at 100% 0,rgba(216,165,45,.09),transparent 34%),linear-gradient(145deg,#081d31,#061726);box-shadow:0 8px 23px rgba(0,0,0,.24);position:relative;overflow:hidden}
- #lgExactHome .exact-daily-verse:after{content:'✦';position:absolute;right:15px;top:13px;color:#d8a52d;font-size:17px;opacity:.82}
- #lgExactHome .exact-verse-kicker{font-family:'Nunito',system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:1.8px;color:#d8a52d;margin-bottom:7px;padding-right:28px}
- #lgExactHome .exact-verse-text{font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.48;color:#eaf4fc;margin:0 0 8px;font-style:italic}
- #lgExactHome .exact-verse-ref{font-family:'Nunito',system-ui,sans-serif;font-size:12px;font-weight:800;color:#72c4ff}
- @media(max-width:620px){#lgExactHome .exact-personal-greeting{margin-bottom:12px;padding:12px 14px}#lgExactHome .exact-greeting-icon{width:38px;height:38px;border-radius:12px}#lgExactHome .exact-greeting-copy b{font-size:15px}#lgExactHome .exact-daily-verse{margin-bottom:18px;padding:15px 16px}#lgExactHome .exact-verse-text{font-size:14px}}
- `;
- document.head.appendChild(style);
-}
-
 function forceDarkOnly(){
  try{localStorage.setItem('lagrey_theme','dark')}catch{}
  document.documentElement.dataset.theme='dark';document.documentElement.dataset.themeChoice='dark';
@@ -86,7 +67,7 @@ function syncNotation(b){if(!b)return;const latin=(localStorage.getItem('lagrey_
 function buildHeader(){const h=$('body>header');if(!h||h.dataset.lgExactInternal==='1')return;const source=$('#lgExactHome .exact-brand'),p=$('#profileBtn'),n=$('#notationBtn'),s=$('#settingsBtn');if(!source||!p||!n||!s){setTimeout(buildHeader,120);return}const shell=document.createElement('div');shell.className='lg-global-shell';const brand=source.cloneNode(true);brand.classList.add('lg-global-brand');const actions=document.createElement('div');actions.className='exact-actions lg-global-actions';p.className='exact-pill';n.className='exact-pill';s.className='exact-pill exact-gear';p.innerHTML=iconPerson()+'<span>Perfil</span>';syncNotation(n);s.innerHTML=iconGear();actions.append(p,n,s);const d=document.createElement('div');d.className='exact-divider';d.innerHTML='<span>❧</span>';shell.append(brand,actions,d);h.replaceChildren(shell);h.dataset.lgExactInternal='1';n.addEventListener('click',()=>setTimeout(()=>syncNotation(n),0))}
 function restoreCriticalControls(){['startTunerBtn','stopTunerBtn','addEventBtn','saveEventBtn','deleteEventBtn'].forEach(id=>{const e=document.getElementById(id);if(e){e.disabled=false;e.style.pointerEvents='auto';e.style.touchAction='manipulation'}});document.querySelectorAll('#calendarGrid .day-cell').forEach(e=>{e.disabled=false;e.style.pointerEvents='auto'})}
 
-function refresh(){forceDarkOnly();ensureBaseStyle();refreshLegacyNavIcons();refreshSectionIcons();placeHomeResults();wireHomeSearch();wireListReturn();observeModals();wireTouchLock();syncModalLock();wireSettingsGear();injectHomePersonal();updateHomePersonal();buildHeader();restoreCriticalControls()}
+function refresh(){forceDarkOnly();refreshLegacyNavIcons();refreshSectionIcons();placeHomeResults();wireHomeSearch();wireListReturn();observeModals();wireTouchLock();syncModalLock();wireSettingsGear();injectHomePersonal();updateHomePersonal();buildHeader();restoreCriticalControls()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh);else refresh();
 setTimeout(refresh,120);setTimeout(refresh,500);
 document.addEventListener('click',()=>setTimeout(()=>{refreshSectionIcons();refreshLegacyNavIcons();syncModalLock();restoreCriticalControls();updateHomePersonal()},50),true);
