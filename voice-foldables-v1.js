@@ -3,10 +3,7 @@
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 const config={name:'pro',selector:'.voice-pro-card',panel:'#voiceProPanel'};
-let restoreTimer=0;
 let savedScrollIntoView=null;
-let savedScrollTo=null;
-let savedScroll=null;
 
 function markButtons(){
   $$(config.selector).forEach(button=>{
@@ -28,74 +25,49 @@ function stopInside(){
   $('#groupStop')?.click();
 }
 
-function suppressLegacyAutoScroll(){
-  clearTimeout(restoreTimer);
-  document.documentElement.classList.add('voice-foldable-lock');
-  if(!savedScrollIntoView){savedScrollIntoView=Element.prototype.scrollIntoView;Element.prototype.scrollIntoView=function(){};}
-  if(!savedScrollTo){savedScrollTo=window.scrollTo;window.scrollTo=function(){};}
-  if(!savedScroll){savedScroll=window.scroll;window.scroll=function(){};}
-  restoreTimer=setTimeout(()=>{
-    if(savedScrollIntoView){Element.prototype.scrollIntoView=savedScrollIntoView;savedScrollIntoView=null;}
-    if(savedScrollTo){window.scrollTo=savedScrollTo;savedScrollTo=null;}
-    if(savedScroll){window.scroll=savedScroll;savedScroll=null;}
-    document.documentElement.classList.remove('voice-foldable-lock');
-  },850);
+function suppressLegacyAutoScrollForClick(){
+  if(savedScrollIntoView)return;
+  savedScrollIntoView=Element.prototype.scrollIntoView;
+  Element.prototype.scrollIntoView=function(){};
+  queueMicrotask(()=>{
+    if(savedScrollIntoView){
+      Element.prototype.scrollIntoView=savedScrollIntoView;
+      savedScrollIntoView=null;
+    }
+  });
 }
 
-function stabilizeNow(button,anchorTop){
-  if(!button||!button.isConnected||!Number.isFinite(anchorTop))return;
-  const now=button.getBoundingClientRect().top;
-  const delta=now-anchorTop;
-  if(Math.abs(delta)>0.5)window.scrollBy(0,delta);
-}
-
-function holdAnchor(button,anchorTop,duration=760){
-  if(!button||!Number.isFinite(anchorTop))return;
-  const start=performance.now();
-  const keep=()=>{
-    if(!button.isConnected)return;
-    stabilizeNow(button,anchorTop);
-    if(performance.now()-start<duration)requestAnimationFrame(keep);
-  };
-  requestAnimationFrame(keep);
-}
-
-function finishToggle(button,wasOpen,topBefore){
+function finishToggle(button,wasOpen){
   const panel=$(config.panel);
   if(!panel)return;
+
   if(wasOpen){
     stopInside();
     panel.classList.add('hidden');
     panel.classList.remove('voice-foldable-panel');
     setExpanded(null);
-    stabilizeNow(button,topBefore);
-    holdAnchor(button,topBefore,420);
     return;
   }
+
   setExpanded(button);
   panel.classList.remove('hidden');
   panel.classList.add('voice-foldable-panel');
   button.insertAdjacentElement('afterend',panel);
-  stabilizeNow(button,topBefore);
-  holdAnchor(button,topBefore);
 }
 
 function handleClick(event){
   const button=event.target.closest('.voice-pro-card');
   if(!button)return;
+
   const wasOpen=button.getAttribute('aria-expanded')==='true';
-  const topBefore=button.getBoundingClientRect().top;
-  suppressLegacyAutoScroll();
-  holdAnchor(button,topBefore,900);
-  setTimeout(()=>finishToggle(button,wasOpen,topBefore),45);
-  setTimeout(()=>{
-    if(!wasOpen&&button.getAttribute('aria-expanded')==='true'){
-      const panel=$(config.panel);
-      if(panel&&button.nextElementSibling!==panel)button.insertAdjacentElement('afterend',panel);
-      stabilizeNow(button,topBefore);
-      holdAnchor(button,topBefore,500);
-    }
-  },130);
+
+  // voice-pro.js todavía solicita un scroll suave al mostrar la herramienta.
+  // Se suprime únicamente durante este mismo click y se restaura antes del siguiente frame.
+  suppressLegacyAutoScrollForClick();
+
+  // El contenido se renderiza en el manejador normal del botón. Al terminar el evento,
+  // lo colocamos debajo de la tarjeta elegida antes de que el navegador pinte la pantalla.
+  queueMicrotask(()=>finishToggle(button,wasOpen));
 }
 
 function cleanupWhenLeaving(event){
