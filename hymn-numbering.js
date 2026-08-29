@@ -12,10 +12,20 @@ function decorate(root=document){
  else $('hymnNumberBadge')?.classList.add('hidden');
 }
 function numericSearch(){
- const q=$('q')?.value.trim();if(!q)return;const m=q.match(/^(?:himno\s*)?#?\s*(\d{1,3})$/i);if(!m)return;const num=Number(m[1]);const found=songs().filter(s=>s.type==='himnos'&&Number(s.bookNumber)===num);const r=$('results');if(!r)return;r.classList.toggle('hidden',!found.length);r.innerHTML=found.map(s=>`<button class="song" data-search-song="${s.id}"><span><b>${s.bookNumber}. ${s.title}</b><br><small class="muted">${s.artist}</small></span><span class="tone">${s.tone}</span></button>`).join('');r.querySelectorAll('[data-search-song]').forEach(b=>{const id=Number(b.dataset.searchSong);b.onclick=()=>{const original=document.querySelector(`[data-song="${id}"]`);if(original)original.click();else{const s=byId(id);if(!s)return;document.querySelector('[data-open="hymns"]')?.click();setTimeout(()=>document.querySelector(`[data-song="${id}"]`)?.click(),30)}}});
+ const q=$('q')?.value.trim();if(!q)return;const m=q.match(/^(?:himno\s*)?#?\s*(\d{1,3})$/i);if(!m)return;const num=Number(m[1]);const found=songs().filter(s=>s.type==='himnos'&&Number(s.bookNumber)===num);const r=$('results');if(!r)return;r.classList.toggle('hidden',!found.length);r.innerHTML=found.map(s=>`<button class="song" data-search-song="${s.id}"><span><b>${s.bookNumber}. ${s.title}</b><br><small class="muted">${s.artist}</small></span><span class="tone">${s.tone}</span></button>`).join('');r.querySelectorAll('[data-search-song]').forEach(b=>{const id=Number(b.dataset.searchSong);b.onclick=()=>{
+   /* La lista se prepara y el himno se abre en el mismo ciclo, antes de que el navegador pinte la vista intermedia. */
+   document.querySelector('[data-open="hymns"]')?.click();
+   const item=document.querySelector(`#songList [data-song="${id}"]`);
+   if(item)item.click();
+ }});
 }
 function schedule(){setTimeout(()=>{decorate();numericSearch()},0);setTimeout(()=>decorate(),80)}
-function wire(){document.addEventListener('click',schedule);$('q')?.addEventListener('input',()=>setTimeout(()=>{numericSearch();decorate()},0));new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});schedule()}
+function wire(){
+ document.addEventListener('click',schedule);
+ $('q')?.addEventListener('input',()=>setTimeout(()=>{numericSearch();decorate()},0));
+ /* Evitamos observar todo el body: las listas y búsquedas ya se actualizan por sus eventos reales. */
+ schedule();
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();
 })();
 
