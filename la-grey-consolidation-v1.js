@@ -10,8 +10,6 @@ function ensureBaseStyle(){
  if(document.getElementById('lgConsolidatedBaseStyle'))return;
  const style=document.createElement('style');style.id='lgConsolidatedBaseStyle';
  style.textContent=`
- #rootFilters .chip.active{background:#081d31!important;color:#ffd76a!important;border:2px solid #f4bd3d!important;box-shadow:0 0 0 1px rgba(244,189,61,.18),0 0 14px rgba(244,189,61,.18)!important;font-weight:800!important}
- #settingsBackBtn{display:none!important}
  #lgExactHome .exact-personal-greeting{box-sizing:border-box;margin:0 3px 14px;padding:13px 16px;border:1px solid #183e5f;border-radius:17px;background:linear-gradient(145deg,#071a2d,#09243c);box-shadow:0 7px 20px rgba(0,0,0,.22);display:flex;align-items:center;gap:12px;color:#eef7ff}
  #lgExactHome .exact-greeting-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto;background:rgba(13,114,216,.15);border:1px solid rgba(103,192,255,.16);font-size:21px}
  #lgExactHome .exact-greeting-copy{min-width:0;display:grid;gap:2px}
