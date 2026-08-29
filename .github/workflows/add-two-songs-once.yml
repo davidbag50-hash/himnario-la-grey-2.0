@@ -1,0 +1,59 @@
+name: Add two songs once
+on:
+  push:
+    paths:
+      - '.github/workflows/add-two-songs-once.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add songs and bump cache
+        shell: python
+        run: |
+          import json, pathlib, re
+          p = pathlib.Path('songs.js')
+          text = p.read_text(encoding='utf-8')
+          prefix = 'window.LAGREY_SONGS = '
+          data = json.loads(text[len(prefix):].strip().removesuffix(';'))
+          existing = {s.get('title') for s in data}
+          songs = [
+            {
+              'id': 8,
+              'title': 'La Bendición',
+              'artist': 'Elevation Worship',
+              'type': 'cantos',
+              'tone': 'G',
+              'content': '''INTRO: Em7 C G D G
+
+VERSO
+
+G              C
+ Dios te guarde y bendiga
+G                  D               G Em
+ Que extienda su amor y te muestre favor
+             C          G   D    F# C
+ Dios te mire con agrado y te de paz
+G              C
+ Dios te guarde y bendiga
+G                  D               G Em
+ Que extienda su amor y te muestre favor
+             C          G   D    F# C
+ Dios te mire con agrado y te de paz
+
+CORO:
+
+Em7 C    G     D
+  Amén, amén, amén
+Em7 C    G     D
+  Amén, amén, amén
+
+INTRO: Em7 C G D
+
+PUENTE 1
+          Em7                      C
+//Que te cubra con su gracia hasta mil generaciones
+        G                       D
+  Tu familia y tus hijos y los hijos
