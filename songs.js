@@ -46,5 +46,11 @@ window.LAGREY_SONGS = [
     "type": "cantos",
     "tone": "C",
     "content": "[Intro] C   Am   F - G\n\nC\n\nMi esperanza esta en jesus\n\nF                  G\n\nEn su justicia y en la cruz\n\nAm                 Am/G\n\nDe nadie mas dependere\n\nF          G          C\n\nSolo en su nombre confiare\n\n      F\n\nEn jesús\n\nAm       G\n\nFuerte soy\n\nC/E   F\n\nSolo el\n\nAm       G\n\nMi roca es\n\nC/E    F     Am\n\nSobre la tempestad\n\nG     C\n\nEl es rey\n\nC\n\nCuando no puedo ver su faz\n\nF               G\n\nSe que su gracia es siempre igual\n\nAm                Am/G\n\nA la tormenta vencere\n\nF         G            C\n\nMi ancla firme esta en el\n\nF         G            C\n\nMi ancla firme esta en el\n\n[Solo] F  Am  G  C/E\n\nC\n\nUn dia el regresara\n\nF                G\n\nEn su presencia voy a estar\n\nAm                      Am/G\n\nSin mancha ante el vendre\n\nF          G            C\n\nJustificado por la fe"
-  }
-];
+  },
+  {
+    "id": 7,
+    "title": "La Bendición",
+    "artist": "Elevation Worship",
+    "type": "cantos",
+    "tone": "G",
+    "content": "INTRO: Em7 C G D G\n\nVERSO\n\nG              C\nDios te guarde y bendiga\nG                  D               G Em\nQue extienda su amor y te muestre favor\n             C          G   D    F# C\nDios te mire con agrado y te de paz\nG              C\nDios te guarde y bendiga\nG                  D               G Em\nQue extienda su amor y te muestre favor\n             C          G   D    F# C\nDios te mire con agrado y te de paz\n\nCORO:\n\nEm7 C    G     D\nAmén, amén, amén\nEm7 C    G     D\nAmén, amén, amén\n\nINTRO: Em7 C G D\n\nPUENTE 1\n          Em7                      C\n//Que te cubra con su gracia hasta mil generaciones\n        G                       D\nTu familia y tus hijos y los hijos de
