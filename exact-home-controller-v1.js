@@ -13,6 +13,9 @@ function dailyVerse(){const d=new Date(),start=new Date(d.getFullYear(),0,0),day
 function injectHomePersonal(){const div=shell.querySelector('.exact-divider'),search=shell.querySelector('.exact-search-wrap');if(div&&!shell.querySelector('.exact-personal-greeting')){const g=document.createElement('div');g.className='exact-personal-greeting';g.innerHTML='<div class="exact-greeting-icon">👋</div><div class="exact-greeting-copy"><b></b><span>Qué alegría tenerte en La Grey</span></div>';div.insertAdjacentElement('afterend',g)}if(search&&!shell.querySelector('.exact-daily-verse')){const v=document.createElement('div');v.className='exact-daily-verse';v.innerHTML='<div class="exact-verse-kicker">VERSÍCULO DEL DÍA</div><p class="exact-verse-text"></p><div class="exact-verse-ref"></div>';search.insertAdjacentElement('afterend',v)}updateHomePersonal()}
 function updateHomePersonal(){const name=profileName(),g=shell.querySelector('.exact-greeting-copy b'),v=dailyVerse();if(g)g.textContent=name?`${greetingText()}, ${name}`:greetingText();const t=shell.querySelector('.exact-verse-text'),r=shell.querySelector('.exact-verse-ref');if(t)t.textContent=`“${v.text}”`;if(r)r.textContent=v.ref}
 
+function placeHomeResults(){const results=$('#results'),search=shell.querySelector('.exact-search-wrap');if(!results||!search)return;if(results.previousElementSibling!==search)search.insertAdjacentElement('afterend',results);results.classList.add('exact-search-results')}
+function wireHomeSearch(){const q=$('#q');if(!q||q.dataset.lgExactHomeSearch==='1')return;q.dataset.lgExactHomeSearch='1';q.addEventListener('input',()=>{placeHomeResults();requestAnimationFrame(()=>{const search=shell.querySelector('.exact-search-wrap');if(!search)return;const top=search.getBoundingClientRect().top+window.scrollY-12;if(window.scrollY>top)window.scrollTo(0,Math.max(0,top))})})}
+
 function syncNotation(){
  const label=$('.exact-notation-label');
  if(!label)return;
@@ -25,7 +28,11 @@ function updateScreen(){
  if(!visible)document.body.classList.add('lg-startup-finished');
  document.body.classList.toggle('exact-home-screen',visible);
  syncNotation();
- if(visible)injectHomePersonal();
+ if(visible){
+  injectHomePersonal();
+  placeHomeResults();
+  wireHomeSearch();
+ }
 }
 
 new MutationObserver(updateScreen).observe(home,{attributes:true,attributeFilter:['class']});
