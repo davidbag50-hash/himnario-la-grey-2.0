@@ -32,11 +32,14 @@ try{
  else profile=byId(saved?.id);
 }catch{}
 
+/* Único dueño de la vista inicial de acordes.
+   Piano/Guitarra siguen el perfil; "all" recuerda la última vista usada;
+   Voz, invitado o perfil sin instrumento usan guitarra por defecto. */
 function preferredInstrument(){
- if(!profile||profile.id==='visitor')return null;
+ if(!profile||profile.id==='visitor')return'guitar';
  if(profile.instrument==='piano'||profile.instrument==='guitar')return profile.instrument;
- if(profile.instrument==='all')return localStorage.getItem(instrumentKey)||'guitar';
- return null;
+ if(profile.instrument==='all')return localStorage.getItem(instrumentKey)==='piano'?'piano':'guitar';
+ return'guitar';
 }
 function roleLabel(role){
  const map={
@@ -158,7 +161,7 @@ function saveProfile(p){
  profile=p;localStorage.setItem(key,JSON.stringify(p));closeProfileModal();updateUI();
  if(p.id!=='visitor'){
   const pref=preferredInstrument();
-  const msg=pref==='piano'?tx('Piano será tu vista predeterminada de acordes.','Piano will be your default chord view.'):pref==='guitar'?tx('Guitarra será tu vista predeterminada de acordes.','Guitar will be your default chord view.'):tx('Tu perfil quedó listo.','Your profile is ready.');
+  const msg=pref==='piano'?tx('Piano será tu vista predeterminada de acordes.','Piano will be your default chord view.'):tx('Guitarra será tu vista predeterminada de acordes.','Guitar will be your default chord view.');
   showToast(lang()==='en'?`Welcome, ${p.name}! ${msg}`:`¡Bienvenido, ${p.name}! ${msg}`);
  }else showToast(tx('Entraste como invitado.','You entered as a guest.'));
  document.dispatchEvent(new CustomEvent('lagrey:profile-changed',{detail:{profile:p}}));
@@ -194,17 +197,8 @@ function otherAction(){
  renderStep('choose');
 }
 function visitor(){saveProfile({id:'visitor',name:'Visitante',roles:[],instrument:'none',ministryId:null,ministryName:null})}
-function applyPreferredInstrument(){
- const modal=$('chordModal');if(!modal||modal.classList.contains('hidden'))return;
- const pref=preferredInstrument();
- if(pref==='piano')$('pianoTab')?.click();else if(pref==='guitar')$('guitarTab')?.click();
-}
-function observeChordModal(){
- const modal=$('chordModal');if(!modal)return;
- new MutationObserver(muts=>{if(muts.some(x=>x.attributeName==='class')&&!modal.classList.contains('hidden'))requestAnimationFrame(applyPreferredInstrument)}).observe(modal,{attributes:true,attributeFilter:['class']});
- $('guitarTab')?.addEventListener('click',()=>{if(profile?.instrument==='all')localStorage.setItem(instrumentKey,'guitar')});
- $('pianoTab')?.addEventListener('click',()=>{if(profile?.instrument==='all')localStorage.setItem(instrumentKey,'piano')});
-}
+function rememberMultiInstrument(k){if(profile?.instrument==='all'&&(k==='guitar'||k==='piano'))localStorage.setItem(instrumentKey,k)}
+window.LAGREY_GET_PREFERRED_CHORD_INSTRUMENT=()=>preferredInstrument();
 window.LAGREY_REFRESH_PROFILE_I18N=()=>updateUI();
 function wire(){
  const other=ensureOtherButton();
@@ -215,7 +209,9 @@ function wire(){
  $('profileCloseBtn')?.addEventListener('click',()=>{if(profile)closeProfileModal();else visitor()});
  $('profileName')?.addEventListener('keydown',e=>{if(e.key==='Enter')primaryAction()});
  $('profileModal')?.addEventListener('click',e=>{if(e.target.id==='profileModal'&&profile)closeProfileModal()});
- observeChordModal();updateUI();if(!profile)openProfileModal();
+ $('guitarTab')?.addEventListener('click',()=>rememberMultiInstrument('guitar'));
+ $('pianoTab')?.addEventListener('click',()=>rememberMultiInstrument('piano'));
+ updateUI();if(!profile)openProfileModal();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();
 })();
