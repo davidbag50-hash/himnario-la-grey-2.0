@@ -25,7 +25,7 @@ function styleGuitar(){
  const light=isLight(),rects=[...svg.querySelectorAll('rect')];
  rects.forEach((r,i)=>{if(i===0)r.setAttribute('fill',light?'#fbfdff':'#061523')});
  svg.querySelectorAll('line').forEach(l=>{l.setAttribute('stroke',light?'#477899':'#6cc5ff');l.setAttribute('stroke-opacity',light?'.72':'.72')});
- svg.querySelectorAll('text').forEach(t=>{const txt=(t.textContent||'').trim();t.setAttribute('fill',/^[1-6]$|fr|cuerda/.test(txt)?(light?'#647b8e':'#8da9bf'):(light?'#173a5d':'#dff4ff'))});
+ svg.querySelectorAll('text').forEach(t=>{const txt=(t.textContent||'').trim();t.setAttribute('fill',/^[1-6]$|fr|cuerda|string/.test(txt)?(light?'#647b8e':'#8da9bf'):(light?'#173a5d':'#dff4ff'))});
  svg.querySelectorAll('circle').forEach(c=>{
    const fill=c.getAttribute('fill');
    if(fill==='none'){c.setAttribute('stroke',light?'#d8a52d':'#f4bd3d');c.setAttribute('stroke-width','2.5')}
