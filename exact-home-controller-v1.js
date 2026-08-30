@@ -25,9 +25,10 @@ function syncNotation(){
  label.textContent=/Do|Re|Mi/i.test(txt)?'Do Re Mi':'C D E';
 }
 
+function finishStartup(){document.body.classList.add('lg-startup-finished')}
 function updateScreen(){
  const visible=!home.classList.contains('hidden');
- if(!visible)document.body.classList.add('lg-startup-finished');
+ if(!visible)finishStartup();
  document.body.classList.toggle('exact-home-screen',visible);
  syncNotation();
  if(visible){
@@ -39,6 +40,7 @@ function updateScreen(){
 
 new MutationObserver(updateScreen).observe(home,{attributes:true,attributeFilter:['class']});
 new MutationObserver(muts=>{if(muts.some(m=>m.attributeName==='lang'))updateHomePersonal()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+document.body.addEventListener('animationend',e=>{if(e.animationName==='lgStartupCollage')finishStartup()});
 updateScreen();
 
 /* Perfil, notación y Ajustes conservan sus controladores canónicos. */
