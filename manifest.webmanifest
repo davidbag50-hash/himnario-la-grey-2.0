@@ -1,7 +1,7 @@
 {
-  "name": "Himnario-Cancionero La Grey",
+  "name": "La Grey",
   "short_name": "La Grey",
-  "description": "Himnario y cancionero del Grupo de Alabanza La Grey",
+  "description": "Himnos, cantos y herramientas de alabanza · Hymns, songs and worship tools",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
