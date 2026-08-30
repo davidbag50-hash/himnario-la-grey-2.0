@@ -8,11 +8,13 @@ function decorate(root=document){
   const title=b.querySelector('b');if(title&&!title.dataset.numbered){title.textContent=`${s.bookNumber}. ${s.title}`;title.dataset.numbered='1'}
  });
  const badge=$('songTypeBadge'),title=$('songTitle');
- if(badge?.textContent?.trim()==='Himno'&&title){const s=songs().find(x=>x.type==='himnos'&&x.title===title.textContent.trim());let n=$('hymnNumberBadge');if(s?.bookNumber){if(!n){n=document.createElement('span');n.id='hymnNumberBadge';n.className='badge';badge.insertAdjacentElement('afterend',n)}n.textContent=`N.º ${s.bookNumber}`;n.classList.remove('hidden')}else n?.classList.add('hidden')}
- else $('hymnNumberBadge')?.classList.add('hidden');
+ const s=title?songs().find(x=>x.type==='himnos'&&x.title===title.textContent.trim()):null;
+ let n=$('hymnNumberBadge');
+ if(s?.bookNumber){if(!n){n=document.createElement('span');n.id='hymnNumberBadge';n.className='badge';badge?.insertAdjacentElement('afterend',n)}if(n){n.textContent=`N.º ${s.bookNumber}`;n.classList.remove('hidden')}}
+ else n?.classList.add('hidden');
 }
 function numericSearch(){
- const q=$('q')?.value.trim();if(!q)return;const m=q.match(/^(?:himno\s*)?#?\s*(\d{1,3})$/i);if(!m)return;const num=Number(m[1]);const found=songs().filter(s=>s.type==='himnos'&&Number(s.bookNumber)===num);const r=$('results');if(!r)return;r.classList.toggle('hidden',!found.length);r.innerHTML=found.map(s=>`<button class="song" data-search-song="${s.id}"><span><b>${s.bookNumber}. ${s.title}</b><br><small class="muted">${s.artist}</small></span><span class="tone">${s.tone}</span></button>`).join('');r.querySelectorAll('[data-search-song]').forEach(b=>{const id=Number(b.dataset.searchSong);b.onclick=()=>{
+ const q=$('q')?.value.trim();if(!q)return;const m=q.match(/^(?:(?:himno|hymn)\s*)?#?\s*(\d{1,3})$/i);if(!m)return;const num=Number(m[1]);const found=songs().filter(s=>s.type==='himnos'&&Number(s.bookNumber)===num);const r=$('results');if(!r)return;r.classList.toggle('hidden',!found.length);r.innerHTML=found.map(s=>`<button class="song" data-search-song="${s.id}"><span><b>${s.bookNumber}. ${s.title}</b><br><small class="muted">${s.artist}</small></span><span class="tone">${s.tone}</span></button>`).join('');r.querySelectorAll('[data-search-song]').forEach(b=>{const id=Number(b.dataset.searchSong);b.onclick=()=>{
    /* La lista se prepara y el himno se abre en el mismo ciclo, antes de que el navegador pinte la vista intermedia. */
    document.querySelector('[data-open="hymns"]')?.click();
    const item=document.querySelector(`#songList [data-song="${id}"]`);
