@@ -42,14 +42,6 @@ function loadFoldables(){
   }
 }
 
-function loadExtraExercises(){
-  if(document.getElementById('voiceExtraExercisesJs'))return;
-  const script=document.createElement('script');
-  script.id='voiceExtraExercisesJs';
-  script.src='voice-extra-exercises-v1.js?v=50';
-  document.body.appendChild(script);
-}
-
 function panelReady(mode,panel){
   if(!panel)return false;
   if(mode==='category')return !!panel.querySelector('.voice-exercise-list');
@@ -137,7 +129,6 @@ document.addEventListener('click',event=>{
 function boot(){
   ensureScreen();
   loadFoldables();
-  loadExtraExercises();
 }
 
 new MutationObserver(muts=>{if(muts.some(m=>m.attributeName==='lang'))refreshLanguage()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
