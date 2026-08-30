@@ -1,6 +1,7 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id),songs=()=>window.LAGREY_SONGS||[];
+const lang=()=>localStorage.getItem('lagrey_language')==='en'?'en':'es';
 const byId=id=>songs().find(s=>Number(s.id)===Number(id));
 function decorate(root=document){
  root.querySelectorAll('[data-song],[data-search-song]').forEach(b=>{
@@ -10,7 +11,7 @@ function decorate(root=document){
  const badge=$('songTypeBadge'),title=$('songTitle');
  const s=title?songs().find(x=>x.type==='himnos'&&x.title===title.textContent.trim()):null;
  let n=$('hymnNumberBadge');
- if(s?.bookNumber){if(!n){n=document.createElement('span');n.id='hymnNumberBadge';n.className='badge';badge?.insertAdjacentElement('afterend',n)}if(n){n.textContent=`N.º ${s.bookNumber}`;n.classList.remove('hidden')}}
+ if(s?.bookNumber){if(!n){n=document.createElement('span');n.id='hymnNumberBadge';n.className='badge';badge?.insertAdjacentElement('afterend',n)}if(n){n.textContent=`${lang()==='en'?'No.':'N.º'} ${s.bookNumber}`;n.classList.remove('hidden')}}
  else n?.classList.add('hidden');
 }
 function numericSearch(){
@@ -25,6 +26,7 @@ function schedule(){setTimeout(()=>{decorate();numericSearch()},0);setTimeout(()
 function wire(){
  document.addEventListener('click',schedule);
  $('q')?.addEventListener('input',()=>setTimeout(()=>{numericSearch();decorate()},0));
+ new MutationObserver(muts=>{if(muts.some(m=>m.attributeName==='lang'))decorate()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
  /* Evitamos observar todo el body: las listas y búsquedas ya se actualizan por sus eventos reales. */
  schedule();
 }
