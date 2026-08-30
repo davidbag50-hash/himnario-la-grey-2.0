@@ -5,13 +5,6 @@ const lang=()=>localStorage.getItem('lagrey_language')==='en'?'en':'es',tx=(es,e
 
 let modalScrollY=0,modalLocked=false,modalTouchY=0;
 
-function forceDarkOnly(){
- try{localStorage.setItem('lagrey_theme','dark')}catch{}
- document.documentElement.dataset.theme='dark';document.documentElement.dataset.themeChoice='dark';
- const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content='#17324d';
- const theme=document.getElementById('settingsTheme');if(theme){theme.closest('.settings-row')?.remove()||theme.remove()}
-}
-
 function syncModalLock(){const open=document.querySelector('.modal:not(.hidden)');if(open&&!modalLocked){modalScrollY=window.scrollY||window.pageYOffset||0;document.documentElement.classList.add('lg-modal-open');document.body.classList.add('lg-modal-open');Object.assign(document.body.style,{position:'fixed',top:`-${modalScrollY}px`,left:'0',right:'0',width:'100%',overflow:'hidden'});modalLocked=true}else if(!open&&modalLocked){document.documentElement.classList.remove('lg-modal-open');document.body.classList.remove('lg-modal-open');['position','top','left','right','width','overflow'].forEach(k=>document.body.style[k]='');modalLocked=false;window.scrollTo(0,modalScrollY)}}
 function observeModals(){document.querySelectorAll('.modal').forEach(m=>{if(m.dataset.lgLockObserved==='1')return;m.dataset.lgLockObserved='1';new MutationObserver(syncModalLock).observe(m,{attributes:true,attributeFilter:['class']})})}
 function wireTouchLock(){if(document.documentElement.dataset.lgTouchLock==='1')return;document.documentElement.dataset.lgTouchLock='1';document.addEventListener('touchstart',e=>{if(modalLocked&&e.touches?.length)modalTouchY=e.touches[0].clientY},{passive:true,capture:true});document.addEventListener('touchmove',e=>{if(!modalLocked||!e.touches?.length)return;const card=e.target.closest?.('.modal:not(.hidden)>.modal-card');if(!card){e.preventDefault();return}const y=e.touches[0].clientY,d=y-modalTouchY;modalTouchY=y;const top=card.scrollTop<=0,bottom=card.scrollTop+card.clientHeight>=card.scrollHeight-1,no=card.scrollHeight<=card.clientHeight+1;if(no||(top&&d>0)||(bottom&&d<0))e.preventDefault()},{passive:false,capture:true})}
@@ -23,7 +16,7 @@ function syncNotation(b){if(!b)return;const latin=(localStorage.getItem('lagrey_
 function syncHeaderLanguage(){const p=$('#profileBtn span'),s=$('#settingsBtn');if(p)p.textContent=tx('Perfil','Profile');if(s){const label=tx('Ajustes','Settings');s.setAttribute('aria-label',label);s.setAttribute('title',label)}}
 function buildHeader(){const h=$('body>header');if(!h||h.dataset.lgExactInternal==='1')return;const source=$('#lgExactHome .exact-brand'),p=$('#profileBtn'),n=$('#notationBtn'),s=$('#settingsBtn');if(!source||!p||!n||!s){setTimeout(buildHeader,120);return}const shell=document.createElement('div');shell.className='lg-global-shell';const brand=source.cloneNode(true);brand.classList.add('lg-global-brand');const actions=document.createElement('div');actions.className='exact-actions lg-global-actions';p.className='exact-pill';n.className='exact-pill';s.className='exact-pill exact-gear';const profileLabel=$('[data-exact-action="profile"] span')?.textContent?.trim()||tx('Perfil','Profile');p.innerHTML=iconPerson()+`<span>${profileLabel}</span>`;syncNotation(n);s.innerHTML=iconGear();actions.append(p,n,s);const d=document.createElement('div');d.className='exact-divider';d.innerHTML='<span>❧</span>';shell.append(brand,actions,d);h.replaceChildren(shell);h.dataset.lgExactInternal='1';syncHeaderLanguage();n.addEventListener('click',()=>setTimeout(()=>syncNotation(n),0))}
 
-function refresh(){forceDarkOnly();observeModals();wireTouchLock();syncModalLock();buildHeader();syncHeaderLanguage()}
+function refresh(){observeModals();wireTouchLock();syncModalLock();buildHeader();syncHeaderLanguage()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh);else refresh();
 setTimeout(refresh,120);setTimeout(refresh,500);
 document.addEventListener('click',()=>setTimeout(syncModalLock,50),true);
