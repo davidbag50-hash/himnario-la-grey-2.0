@@ -9,7 +9,7 @@ const get=(k,f)=>localStorage.getItem(k)??f;
 const set=(k,v)=>localStorage.setItem(k,String(v));
 function toast(msg){const e=$('toast');if(!e)return;e.textContent=msg;e.classList.remove('hidden');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.add('hidden'),2200)}
 function lang(){return get(K.lang,'es')==='en'?'en':'es'}
-function enforceDarkOnly(){set(K.theme,'dark');document.documentElement.dataset.theme='dark';document.documentElement.dataset.themeChoice='dark';const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content='#17324d';const theme=$('settingsTheme');if(theme){const row=theme.closest('.settings-row');row?.remove()}}
+function enforceDarkOnly(){set(K.theme,'dark');document.documentElement.dataset.theme='dark';document.documentElement.dataset.themeChoice='dark';const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content='#17324d';const theme=$('settingsTheme');if(theme)theme.closest('.settings-row')?.remove();const instrument=$('settingsInstrument');if(instrument)instrument.closest('.settings-row')?.remove()}
 function text(el,value){if(el&&el.textContent!==value)el.textContent=value}
 function placeholder(el,value){if(el&&el.placeholder!==value)el.placeholder=value}
 function labelText(id,value){const label=$(id)?.closest('label');if(!label)return;const node=[...label.childNodes].find(n=>n.nodeType===3);if(node)node.nodeValue=value;else label.insertBefore(document.createTextNode(value),label.firstChild)}
