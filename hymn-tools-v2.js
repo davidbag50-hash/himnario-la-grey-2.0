@@ -32,6 +32,3 @@ function schedule(){setTimeout(activate,0);setTimeout(activate,80);setTimeout(ac
 function wire(){ensureStyle();document.addEventListener('click',e=>{if(e.target.closest('[data-song],[data-search-song]'))schedule();if(e.target.closest('#notationBtn'))setTimeout(render,80)});const detail=$('detail');if(detail)new MutationObserver(()=>schedule()).observe(detail,{attributes:true,attributeFilter:['class']});new MutationObserver(muts=>{if(muts.some(m=>m.attributeName==='lang'))refreshLanguage()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});schedule()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();
 })();
-
-/* Lotes del Himnario Bautista + numeración/búsqueda por número */
-(()=>{const load=(src,done)=>{if(document.querySelector(`script[data-lagrey-src="${src}"]`)){done?.();return}const s=document.createElement('script');s.src=src+'?v=22';s.dataset.lagreySrc=src;s.onload=()=>done?.();document.head.appendChild(s)};load('hymns-006-013.js',()=>load('hymn-numbering.js'))})();
