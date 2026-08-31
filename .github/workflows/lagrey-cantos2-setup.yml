@@ -23,12 +23,12 @@ jobs:
           set -euo pipefail
           git rev-parse HEAD > "$RUNNER_TEMP/base.txt"
           node <<'NODE'
-          const fs=require('fs'),vm=require('vm'),cp=require('child_process'),path=require('path');
+          const fs=require('fs'),vm=require('vm'),cp=require('child_process');
           const fail=m=>{throw new Error(m)};
           const replaceOnce=(src,a,b,label)=>{const i=src.indexOf(a);if(i<0)fail(`No se encontró ${label}`);if(src.indexOf(a,i+a.length)>=0)fail(`Patrón duplicado ${label}`);return src.slice(0,i)+b+src.slice(i+a.length)};
           const parse=(src,key)=>{const s={window:{}};vm.createContext(s);new vm.Script(src).runInContext(s,{timeout:1000});const a=s.window[key];if(!Array.isArray(a))fail(`${key} inválido`);return a};
 
-          // Copia EXACTA de los 8 cantos originales desde el commit inmediatamente anterior al canto 9.
+          // Duplicar EXACTAMENTE los 8 cantos originales desde el último estado con IDs 1-8.
           const source=cp.execFileSync('git',['show','43b6b9c7cae1ff5363270ee87a0abe92eee669d2:songs.js'],{encoding:'utf8'});
           const old8=parse(source,'LAGREY_SONGS');
           if(old8.length!==8||old8.map(x=>x.id).join(',')!=='1,2,3,4,5,6,7,8')fail('La fuente histórica no contiene exactamente IDs 1-8');
@@ -37,7 +37,7 @@ jobs:
           if(JSON.stringify(check8)!==JSON.stringify(old8))fail('La copia V2 no coincide con los 8 cantos originales');
           fs.writeFileSync('songs-v2.js',v2,'utf8');
 
-          // index.html: cargar nueva base y añadir dos accesos visibles (Home + navegación interna).
+          // Cargar la nueva fuente y añadir Cantos 2 junto a Cantos, sin borrar nada viejo.
           let html=fs.readFileSync('index.html','utf8');
           html=replaceOnce(html,'<script src="songs.js"></script>','<script src="songs.js"></script><script src="songs-v2.js"></script>','script songs.js');
           const homeRe=/<button class="exact-nav-btn" data-exact-nav="songs" data-nav="songs">[\s\S]*?<\/button>/;
@@ -45,11 +45,10 @@ jobs:
           const h2=hm[0].replace(/data-exact-nav="songs"/,'data-exact-nav="songs2"').replace(/data-nav="songs"/,'data-nav="songs2"').replace('<span>Cantos</span>','<span>Cantos 2</span>');
           html=html.replace(hm[0],hm[0]+h2);
           const oldInternal='<button data-nav="songs">🎵<span>Cantos</span></button>';
-          const newInternal=oldInternal+'<button data-nav="songs2">🎵<span>Cantos 2</span></button>';
-          html=replaceOnce(html,oldInternal,newInternal,'nav interno Cantos');
+          html=replaceOnce(html,oldInternal,oldInternal+'<button data-nav="songs2">🎵<span>Cantos 2</span></button>','nav interno Cantos');
           fs.writeFileSync('index.html',html,'utf8');
 
-          // app.js: Cantos 2 usa su propia colección, pero reutiliza listado y detalle canónicos.
+          // Reutilizar la vista de listado/detalle, pero con una fuente de datos independiente.
           let app=fs.readFileSync('app.js','utf8');
           app=replaceOnce(app,'const songs=window.LAGREY_SONGS||[],CH=','const songs=window.LAGREY_SONGS||[],songs2=window.LAGREY_SONGS_V2||[],CH=','colección principal');
           app=replaceOnce(app,"let currentSong=null,lastSongList='cantos',","let currentSong=null,currentSongSource='main',lastSongList='cantos',",'estado currentSong');
@@ -62,34 +61,26 @@ jobs:
           app=replaceOnce(app,"else if(d==='songs')showSongList('cantos');else if(d==='hymns')","else if(d==='songs')showSongList('cantos');else if(d==='songs2')showSongList('cantos2');else if(d==='hymns')",'navigate songs2');
           fs.writeFileSync('app.js',app,'utf8');
 
-          // Home: seis botones en la barra inferior.
+          // Seis botones en la navegación inferior del Home durante esta fase de prueba.
           let css=fs.readFileSync('exact-home-v1.css','utf8');
           css=replaceOnce(css,'grid-template-columns:repeat(5,1fr)','grid-template-columns:repeat(6,1fr)','grid nav Home');
           fs.writeFileSync('exact-home-v1.css',css,'utf8');
 
-          // Cache: precargar la nueva fuente y subir versión partiendo de la actual.
+          // Precargar la nueva fuente y subir cache partiendo del valor ACTUAL.
           let sw=fs.readFileSync('sw.js','utf8');
           sw=replaceOnce(sw,"'./songs.js','./hymns.js'","'./songs.js','./songs-v2.js','./hymns.js'",'ASSETS songs-v2');
           const cm=sw.match(/const CACHE='la-grey-v3-(\d+)[^']*';/);if(!cm)fail('CACHE actual no reconocido');
-          const next=Number(cm[1])+1;
-          sw=sw.replace(/const CACHE='[^']+';/,`const CACHE='la-grey-v3-${next}-cantos-2';`);
+          sw=sw.replace(/const CACHE='[^']+';/,`const CACHE='la-grey-v3-${Number(cm[1])+1}-cantos-2';`);
           fs.writeFileSync('sw.js',sw,'utf8');
 
-          // Los dos mecanismos de ingreso pasan a escribir SOLO songs-v2.js.
-          for(const f of ['.github/workflows/lagrey-song-ingest.yml','.github/workflows/lagrey-song-ingest-v2.yml','.github/scripts/lagrey-song-ingest.js']){
-            let t=fs.readFileSync(f,'utf8');
-            t=t.replaceAll('songs.js','songs-v2.js').replaceAll('LAGREY_SONGS','LAGREY_SONGS_V2');
-            fs.writeFileSync(f,t,'utf8');
-          }
-
-          // Validaciones finales.
-          for(const f of ['songs-v2.js','app.js','sw.js','.github/scripts/lagrey-song-ingest.js']){
+          // Validaciones antes del commit.
+          for(const f of ['songs-v2.js','app.js','sw.js']){
             const r=cp.spawnSync('node',['--check',f],{encoding:'utf8'});if(r.status!==0)fail(`${f} no compila: ${r.stderr}`);
           }
           const final8=parse(fs.readFileSync('songs-v2.js','utf8'),'LAGREY_SONGS_V2');
-          if(final8.length!==8||final8.some((x,i)=>x.id!==i+1))fail('songs-v2.js no terminó con los 8 IDs esperados');
-          if(!fs.readFileSync('index.html','utf8').includes('data-nav="songs2"'))fail('La pestaña Cantos 2 no quedó en index');
-          console.log('Cantos 2 listo: 8 cantos originales duplicados y fuente independiente.');
+          if(final8.length!==8||final8.some((x,i)=>x.id!==i+1))fail('songs-v2.js no terminó con exactamente IDs 1-8');
+          if(!fs.readFileSync('index.html','utf8').includes('data-nav="songs2"'))fail('Cantos 2 no quedó conectado');
+          console.log('Cantos 2 validado: copia independiente exacta de los 8 originales.');
           NODE
 
       - name: Commit and push
@@ -100,7 +91,7 @@ jobs:
           test "$(git rev-parse origin/main)" = "$BASE" || { echo 'main cambió; abortando'; exit 1; }
           git config user.name "La Grey Maintenance"
           git config user.email "actions@users.noreply.github.com"
-          git add songs-v2.js index.html app.js exact-home-v1.css sw.js .github/workflows/lagrey-song-ingest.yml .github/workflows/lagrey-song-ingest-v2.yml .github/scripts/lagrey-song-ingest.js
+          git add songs-v2.js index.html app.js exact-home-v1.css sw.js
           git diff --cached --check
           git commit -m "Crear nueva pestaña Cantos 2 con 8 cantos originales"
           git push origin HEAD:main
@@ -111,7 +102,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          gh issue comment "$ISSUE_NUMBER" --body "✅ Cantos 2 creado con los 8 cantos originales. La pestaña vieja permanece intacta y los ingresos futuros apuntan a songs-v2.js."
+          gh issue comment "$ISSUE_NUMBER" --body "✅ Cantos 2 creado con los 8 cantos originales. La pestaña vieja permanece intacta."
           gh issue close "$ISSUE_NUMBER" --reason completed
 
       - name: Report failure
@@ -119,4 +110,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: gh issue comment "$ISSUE_NUMBER" --body "❌ La migración a Cantos 2 se abortó; revisar antes de continuar."
+        run: gh issue comment "$ISSUE_NUMBER" --body "❌ La migración a Cantos 2 se abortó; no se publicó una migración parcial."
