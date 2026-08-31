@@ -1,0 +1,95 @@
+name: La Grey Tone Repair
+
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: lagrey-library-ingest-main
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[La Grey Tone Repair]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Read mode
+        env:
+          ISSUE_BODY: '${{ github.event.issue.body }}'
+        run: |
+          if printf '%s\n' "$ISSUE_BODY" | grep -Eiq '^dry_run:[[:space:]]*true[[:space:]]*$'; then
+            echo 'LAGREY_DRY_RUN=true' >> "$GITHUB_ENV"
+          else
+            echo 'LAGREY_DRY_RUN=false' >> "$GITHUB_ENV"
+          fi
+
+      - name: Repair tones from verified L.A.M source
+        run: |
+          python3 -m py_compile .github/scripts/lagrey-tone-repair.py
+          python3 .github/scripts/lagrey-tone-repair.py
+
+      - name: Validate candidate
+        run: |
+          node .github/scripts/lagrey-library-validate.js
+          git diff --check
+          CHANGED="$(git diff --name-only | sort)"
+          EXPECTED="$(printf 'songs.js\nsw.js')"
+          test "$CHANGED" = "$EXPECTED" || { echo "Archivos inesperados: $CHANGED"; exit 1; }
+          printf '%s\n' songs.js sw.js > "$RUNNER_TEMP/lagrey-expected-files.txt"
+          : > "$RUNNER_TEMP/lagrey-hashes.txt"
+          while IFS= read -r FILE; do printf '%s\t%s\n' "$(git hash-object "$FILE")" "$FILE" >> "$RUNNER_TEMP/lagrey-hashes.txt"; done < "$RUNNER_TEMP/lagrey-expected-files.txt"
+
+      - name: Commit and push
+        if: env.LAGREY_DRY_RUN != 'true'
+        run: |
+          set -euo pipefail
+          BASE="$(cat "$RUNNER_TEMP/lagrey-base.txt")"
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$BASE" || { echo 'main cambió durante la reparación; abortando.'; exit 1; }
+          git config user.name "La Grey Maintenance"
+          git config user.email "actions@users.noreply.github.com"
+          git add songs.js sw.js
+          git diff --cached --check
+          test "$(git diff --cached --name-only | sort)" = "$(printf 'songs.js\nsw.js')"
+          while IFS=$'\t' read -r HASH FILE; do test "$(git hash-object "$FILE")" = "$HASH"; done < "$RUNNER_TEMP/lagrey-hashes.txt"
+          git commit -F "$RUNNER_TEMP/lagrey-message.txt"
+          git push origin HEAD:main
+
+      - name: Verify published commit
+        if: env.LAGREY_DRY_RUN != 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          HEAD_SHA="$(git rev-parse HEAD)"
+          test "$(git rev-parse origin/main)" = "$HEAD_SHA"
+          while IFS=$'\t' read -r HASH FILE; do test "$(git rev-parse "HEAD:$FILE")" = "$HASH"; done < "$RUNNER_TEMP/lagrey-hashes.txt"
+          node .github/scripts/lagrey-library-validate.js
+
+      - name: Report success
+        if: success()
+        env:
+          GH_TOKEN: '${{ github.token }}'
+          ISSUE_NUMBER: '${{ github.event.issue.number }}'
+        run: |
+          RESULT="$(cat "$RUNNER_TEMP/lagrey-result.txt")"
+          if [ "$LAGREY_DRY_RUN" = "true" ]; then MSG="✅ Dry-run de tonos correcto. No se publicó el candidato. $RESULT"; else MSG="✅ Tonos de cantos publicados y verificados. $RESULT"; fi
+          gh issue comment "$ISSUE_NUMBER" --body "$MSG"
+          gh issue close "$ISSUE_NUMBER" --reason completed
+
+      - name: Report failure
+        if: failure()
+        env:
+          GH_TOKEN: '${{ github.token }}'
+          ISSUE_NUMBER: '${{ github.event.issue.number }}'
+        run: gh issue comment "$ISSUE_NUMBER" --body "❌ Reparación de tonos abortada de forma segura. No considerar publicado ningún cambio hasta verificar main."
