@@ -1,0 +1,199 @@
+name: La Grey Song Ingest
+
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  ingest:
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[La Grey Song]')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Validate request and build candidates
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const vm = require('vm');
+          const cp = require('child_process');
+          const path = require('path');
+
+          const fail = (msg) => { throw new Error(msg); };
+          const body = String(process.env.ISSUE_BODY || '').replace(/\r\n/g, '\n');
+          if (!body.startsWith('LAGREY_SONG_V1\n')) fail('Formato de solicitud inválido.');
+
+          const contentMarker = '\n---CONTENT---\n';
+          const endMarker = '\n---END---';
+          const p1 = body.indexOf(contentMarker);
+          const p2 = body.lastIndexOf(endMarker);
+          if (p1 < 0 || p2 < 0 || p2 <= p1) fail('Faltan marcadores CONTENT/END.');
+
+          const header = body.slice('LAGREY_SONG_V1\n'.length, p1);
+          const content = body.slice(p1 + contentMarker.length, p2);
+          const meta = {};
+          for (const raw of header.split('\n')) {
+            if (!raw.trim()) continue;
+            const i = raw.indexOf(':');
+            if (i < 1) fail(`Cabecera inválida: ${raw}`);
+            meta[raw.slice(0, i).trim()] = raw.slice(i + 1).trim();
+          }
+
+          const title = meta.title || '';
+          const artist = meta.artist || '';
+          const tone = meta.tone || '';
+          const dryRun = String(meta.dry_run || 'false').toLowerCase() === 'true';
+          if (!title || !artist || !tone || !content) fail('title, artist, tone y content son obligatorios.');
+          if (title.includes('\n') || artist.includes('\n') || tone.includes('\n')) fail('Metadatos inválidos.');
+
+          let bpm = null;
+          if (meta.bpm !== undefined && meta.bpm !== '') {
+            bpm = Number(meta.bpm);
+            if (!Number.isInteger(bpm) || bpm <= 0 || bpm > 400) fail('BPM inválido.');
+          }
+
+          const parseSongs = (src) => {
+            const sandbox = { window: {} };
+            vm.createContext(sandbox);
+            new vm.Script(src, { filename: 'songs.js' }).runInContext(sandbox, { timeout: 1000 });
+            const songs = sandbox.window.LAGREY_SONGS;
+            if (!Array.isArray(songs)) fail('window.LAGREY_SONGS no es un array.');
+            return songs;
+          };
+
+          const oldSongsText = fs.readFileSync('songs.js', 'utf8');
+          if (!oldSongsText.startsWith('window.LAGREY_SONGS = [')) fail('songs.js no inicia con la estructura canónica.');
+          if (!oldSongsText.trimEnd().endsWith('];')) fail('songs.js no termina en ];');
+
+          const oldSongs = parseSongs(oldSongsText);
+          if (oldSongs.some(s => s && s.title === title && s.artist === artist)) fail('El canto ya existe con el mismo título y artista.');
+          const oldIds = oldSongs.map(s => Number(s.id));
+          if (oldIds.some(id => !Number.isInteger(id))) fail('Hay IDs inválidos en songs.js.');
+          const newId = Math.max(...oldIds, 0) + 1;
+
+          const obj = [
+            '  {',
+            `    "id": ${newId},`,
+            `    "title": ${JSON.stringify(title)},`,
+            `    "artist": ${JSON.stringify(artist)},`,
+            '    "type": "cantos",',
+            `    "tone": ${JSON.stringify(tone)},`,
+            ...(bpm === null ? [] : [`    "bpm": ${bpm},`]),
+            `    "content": ${JSON.stringify(content)}`,
+            '  }'
+          ].join('\n');
+
+          const closeMatch = /\n\];\s*$/.exec(oldSongsText);
+          if (!closeMatch) fail('No se encontró el cierre final canónico de songs.js.');
+          const cut = closeMatch.index;
+          const newSongsText = oldSongsText.slice(0, cut) + ',\n' + obj + oldSongsText.slice(cut);
+
+          const newSongs = parseSongs(newSongsText);
+          if (newSongs.length !== oldSongs.length + 1) fail('El conteo de cantos no aumentó exactamente en uno.');
+          const newIds = newSongs.map(s => Number(s.id));
+          for (const id of oldIds) if (!newIds.includes(id)) fail(`Desapareció el ID ${id}.`);
+          if (newIds.filter(id => id === newId).length !== 1) fail('El nuevo ID no es único.');
+          const inserted = newSongs.find(s => Number(s.id) === newId);
+          if (!inserted || inserted.title !== title || inserted.artist !== artist || inserted.tone !== tone || inserted.content !== content) fail('El canto insertado no coincide exactamente con la solicitud.');
+          if (bpm !== null && inserted.bpm !== bpm) fail('El BPM insertado no coincide.');
+
+          const oldSize = Buffer.byteLength(oldSongsText, 'utf8');
+          const newSize = Buffer.byteLength(newSongsText, 'utf8');
+          if (newSize <= oldSize) fail('El nuevo songs.js no es mayor que el anterior.');
+
+          const tmpSongs = path.join(process.env.RUNNER_TEMP, 'songs.candidate.js');
+          fs.writeFileSync(tmpSongs, newSongsText, 'utf8');
+          const syntax = cp.spawnSync('node', ['--check', tmpSongs], { encoding: 'utf8' });
+          if (syntax.status !== 0) fail(`songs.js candidato no compila: ${syntax.stderr}`);
+
+          const oldSw = fs.readFileSync('sw.js', 'utf8');
+          const cacheRe = /const CACHE\s*=\s*(['"])([^'"]+)\1\s*;/;
+          const cacheMatch = oldSw.match(cacheRe);
+          if (!cacheMatch) fail('No se encontró const CACHE en sw.js.');
+          const versionMatch = cacheMatch[2].match(/^la-grey-v3-(\d+)(?:-|$)/);
+          if (!versionMatch) fail('El CACHE actual no sigue el formato la-grey-v3-N.');
+          const nextVersion = Number(versionMatch[1]) + 1;
+          const slug = title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || `song-${newId}`;
+          const newCache = `la-grey-v3-${nextVersion}-song-${slug}`;
+          const newSw = oldSw.replace(cacheRe, `const CACHE='${newCache}';`);
+          if (newSw === oldSw) fail('No se pudo construir el nuevo CACHE.');
+
+          const tmpSw = path.join(process.env.RUNNER_TEMP, 'sw.candidate.js');
+          fs.writeFileSync(tmpSw, newSw, 'utf8');
+          const swSyntax = cp.spawnSync('node', ['--check', tmpSw], { encoding: 'utf8' });
+          if (swSyntax.status !== 0) fail(`sw.js candidato no compila: ${swSyntax.stderr}`);
+
+          const baseSha = cp.execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+          fs.writeFileSync(path.join(process.env.RUNNER_TEMP, 'lagrey-base-sha.txt'), baseSha + '\n');
+          fs.writeFileSync(path.join(process.env.RUNNER_TEMP, 'lagrey-commit-message.txt'), `Agregar canto ${title} de ${artist}\n`);
+          fs.writeFileSync(path.join(process.env.RUNNER_TEMP, 'lagrey-result.txt'), `ID ${newId} | ${title} — ${artist} | ${oldSize} -> ${newSize} bytes | CACHE ${cacheMatch[2]} -> ${newCache}\n`);
+
+          if (!dryRun) {
+            fs.writeFileSync('songs.js', newSongsText, 'utf8');
+            fs.writeFileSync('sw.js', newSw, 'utf8');
+          }
+
+          fs.appendFileSync(process.env.GITHUB_ENV, `LAGREY_DRY_RUN=${dryRun ? 'true' : 'false'}\n`);
+          console.log(`Validación correcta. dry_run=${dryRun}. ${oldSongs.length} -> ${newSongs.length} cantos.`);
+          NODE
+
+      - name: Commit and push
+        if: env.LAGREY_DRY_RUN != 'true'
+        run: |
+          set -euo pipefail
+          BASE_SHA="$(cat "$RUNNER_TEMP/lagrey-base-sha.txt")"
+          git fetch origin main
+          REMOTE_SHA="$(git rev-parse origin/main)"
+          if [ "$REMOTE_SHA" != "$BASE_SHA" ]; then
+            echo "main cambió durante la operación; se aborta sin force."
+            exit 1
+          fi
+
+          git config user.name "La Grey Maintenance"
+          git config user.email "actions@users.noreply.github.com"
+          git add songs.js sw.js
+          git diff --cached --check
+
+          CHANGED="$(git diff --cached --name-only | sort)"
+          EXPECTED="$(printf 'songs.js\nsw.js')"
+          if [ "$CHANGED" != "$EXPECTED" ]; then
+            echo "Cambios inesperados:"
+            printf '%s\n' "$CHANGED"
+            exit 1
+          fi
+
+          git commit -F "$RUNNER_TEMP/lagrey-commit-message.txt"
+          git push origin HEAD:main
+
+      - name: Report success
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          RESULT="$(cat "$RUNNER_TEMP/lagrey-result.txt")"
+          if [ "$LAGREY_DRY_RUN" = "true" ]; then
+            gh issue comment "$ISSUE_NUMBER" --body "✅ Dry-run correcto. No se modificaron songs.js ni sw.js. $RESULT"
+          else
+            gh issue comment "$ISSUE_NUMBER" --body "✅ Canto integrado y validado. $RESULT"
+          fi
+          gh issue close "$ISSUE_NUMBER" --reason completed
+
+      - name: Report failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body "❌ La operación se abortó. No debe considerarse publicado ningún canto hasta revisar este workflow."
