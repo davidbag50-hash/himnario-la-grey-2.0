@@ -1,4 +1,4 @@
-name: La Grey Song Ingest
+name: La Grey Hymn Ingest
 
 on:
   issues:
@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   ingest:
-    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[La Grey Song]')
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[La Grey Hymn]')
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -25,17 +25,11 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Validate current library
-        run: node .github/scripts/lagrey-library-validate.js
-
-      - name: Build and validate
+      - name: Build and validate hymn
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: node .github/scripts/lagrey-song-ingest.js
-
-      - name: Validate candidate library
-        run: node .github/scripts/lagrey-library-validate.js
+        run: node .github/scripts/lagrey-hymn-ingest.js
 
       - name: Commit and push
         if: env.LAGREY_DRY_RUN != 'true'
@@ -45,16 +39,18 @@ jobs:
           git fetch origin main
           test "$(git rev-parse origin/main)" = "$BASE" || { echo 'main cambió durante la operación; abortando.'; exit 1; }
 
+          mapfile -t FILES < "$RUNNER_TEMP/lagrey-expected-files.txt"
           git config user.name "La Grey Maintenance"
           git config user.email "actions@users.noreply.github.com"
-          git add songs.js sw.js
+          git add -- "${FILES[@]}"
           git diff --cached --check
 
           CHANGED="$(git diff --cached --name-only | sort)"
-          EXPECTED="$(printf 'songs.js\nsw.js')"
+          EXPECTED="$(sort "$RUNNER_TEMP/lagrey-expected-files.txt")"
           test "$CHANGED" = "$EXPECTED" || { echo "Archivos inesperados: $CHANGED"; exit 1; }
-          test "$(git hash-object songs.js)" = "$(cat "$RUNNER_TEMP/songs-blob.txt")"
-          test "$(git hash-object sw.js)" = "$(cat "$RUNNER_TEMP/sw-blob.txt")"
+          while IFS=$'\t' read -r HASH FILE; do
+            test "$(git hash-object "$FILE")" = "$HASH" || { echo "Hash inesperado: $FILE"; exit 1; }
+          done < "$RUNNER_TEMP/lagrey-hashes.txt"
 
           git commit -F "$RUNNER_TEMP/lagrey-message.txt"
           git push origin HEAD:main
@@ -66,11 +62,12 @@ jobs:
           git fetch origin main
           HEAD_SHA="$(git rev-parse HEAD)"
           test "$(git rev-parse origin/main)" = "$HEAD_SHA"
-          test "$(git rev-parse HEAD:songs.js)" = "$(cat "$RUNNER_TEMP/songs-blob.txt")"
-          test "$(git rev-parse HEAD:sw.js)" = "$(cat "$RUNNER_TEMP/sw-blob.txt")"
+          while IFS=$'\t' read -r HASH FILE; do
+            test "$(git rev-parse "HEAD:$FILE")" = "$HASH" || { echo "Blob publicado inesperado: $FILE"; exit 1; }
+          done < "$RUNNER_TEMP/lagrey-hashes.txt"
           BASE="$(cat "$RUNNER_TEMP/lagrey-base.txt")"
           CHANGED="$(git diff --name-only "$BASE" "$HEAD_SHA" | sort)"
-          EXPECTED="$(printf 'songs.js\nsw.js')"
+          EXPECTED="$(sort "$RUNNER_TEMP/lagrey-expected-files.txt")"
           test "$CHANGED" = "$EXPECTED" || { echo "El commit publicado contiene archivos inesperados: $CHANGED"; exit 1; }
           node .github/scripts/lagrey-library-validate.js
 
@@ -82,9 +79,9 @@ jobs:
         run: |
           RESULT="$(cat "$RUNNER_TEMP/lagrey-result.txt")"
           if [ "$LAGREY_DRY_RUN" = "true" ]; then
-            gh issue comment "$ISSUE_NUMBER" --body "✅ Dry-run correcto. No se modificaron songs.js ni sw.js. $RESULT"
+            gh issue comment "$ISSUE_NUMBER" --body "✅ Dry-run de himno correcto. No se modificó la biblioteca. $RESULT"
           else
-            gh issue comment "$ISSUE_NUMBER" --body "✅ Canto integrado, publicado y verificado. $RESULT"
+            gh issue comment "$ISSUE_NUMBER" --body "✅ Himno integrado, publicado y verificado. $RESULT"
           fi
           gh issue close "$ISSUE_NUMBER" --reason completed
 
@@ -94,4 +91,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          gh issue comment "$ISSUE_NUMBER" --body "❌ Operación abortada de forma segura. No considerar publicado el canto; la biblioteca debe verificarse antes de reintentar."
+          gh issue comment "$ISSUE_NUMBER" --body "❌ Operación de himno abortada de forma segura. No considerar publicado ningún cambio hasta verificar la biblioteca."
