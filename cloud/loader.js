@@ -2,7 +2,7 @@
 'use strict';
 
 const BASE='./cloud/';
-const FILES=['config.js','data-service.js','supabase-client.js','auth-service.js','ministry-service.js','bootstrap.js'];
+const FILES=['config.js','data-service.js','supabase-client.js','auth-service.js','ministry-service.js','bootstrap.js','diagnostics.js'];
 
 function load(src){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=BASE+src;s.defer=true;s.dataset.lagreyCloudModule=src;s.onload=resolve;s.onerror=()=>reject(new Error(`No se pudo cargar ${src}`));document.head.appendChild(s)})}
 
