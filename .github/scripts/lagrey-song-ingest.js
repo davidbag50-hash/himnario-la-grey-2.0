@@ -1,52 +1,46 @@
-const fs=require('fs'),vm=require('vm'),cp=require('child_process'),path=require('path');
-const fail=m=>{throw new Error(m)}, sh=(cmd,args)=>cp.execFileSync(cmd,args,{encoding:'utf8'});
-const repo=process.env.GITHUB_REPOSITORY, owner=repo.split('/')[0], num=process.env.ISSUE_NUMBER;
-if(!repo||!num) fail('Falta contexto de GitHub.');
+const fs=require('fs'),vm=require('vm'),cp=require('child_process'),path=require('path'),crypto=require('crypto');
+const fail=m=>{throw new Error(m)},sh=(cmd,args)=>cp.execFileSync(cmd,args,{encoding:'utf8'}).trim();
+const repo=process.env.GITHUB_REPOSITORY,num=process.env.ISSUE_NUMBER,owner=String(repo||'').split('/')[0];
+if(!repo||!num)fail('Falta contexto de GitHub.');
 const issue=JSON.parse(sh('gh',['api',`repos/${repo}/issues/${num}`]));
-if(issue.user.login!==owner) fail('Solo el dueño del repo puede solicitar cantos.');
-const meta={}; for(const line of String(issue.body||'').replace(/\r\n/g,'\n').split('\n')){
-  if(!line.trim()||line==='LAGREY_SONG_V2') continue;
-  const i=line.indexOf(':'); if(i<1) fail(`Cabecera inválida: ${line}`);
-  meta[line.slice(0,i).trim()]=line.slice(i+1).trim();
-}
-const title=meta.title||'', artist=meta.artist||'', tone=meta.tone||'';
-const total=Number(meta.chunks), dry=String(meta.dry_run||'false').toLowerCase()==='true';
-if(!title||!artist||!tone||!Number.isInteger(total)||total<1||total>100) fail('Metadatos inválidos.');
-let bpm=null; if(meta.bpm){bpm=Number(meta.bpm); if(!Number.isInteger(bpm)||bpm<1||bpm>400) fail('BPM inválido.');}
-const comments=JSON.parse(sh('gh',['api','--paginate',`repos/${repo}/issues/${num}/comments`]));
-const parts=new Map();
-for(const c of comments){
-  if(c.user?.login!==owner) continue;
-  const m=String(c.body||'').replace(/\r\n/g,'\n').match(/^LAGREY_CHUNK\s+(\d+)\/(\d+)\n([\s\S]*)$/);
-  if(!m) continue;
-  const i=Number(m[1]), n=Number(m[2]); if(n!==total||i<1||i>total) fail('Numeración de chunks inválida.');
-  if(parts.has(i)) fail(`Chunk duplicado: ${i}`); parts.set(i,m[3]);
-}
-if(parts.size!==total) fail(`Chunks incompletos: ${parts.size}/${total}.`);
-let content=''; for(let i=1;i<=total;i++){ if(!parts.has(i)) fail(`Falta chunk ${i}.`); content+=parts.get(i); }
-if(!content) fail('Contenido vacío.');
-const parse=src=>{const s={window:{}};vm.createContext(s);new vm.Script(src).runInContext(s,{timeout:1000});if(!Array.isArray(s.window.LAGREY_SONGS))fail('songs.js inválido.');return s.window.LAGREY_SONGS};
-const old=fs.readFileSync('songs.js','utf8');
-if(!old.startsWith('window.LAGREY_SONGS = [')||!old.trimEnd().endsWith('];')) fail('songs.js no es canónico.');
-const before=parse(old); if(before.some(x=>x?.title===title&&x?.artist===artist)) fail('Canto duplicado.');
-const ids=before.map(x=>Number(x.id)); if(ids.some(x=>!Number.isInteger(x))) fail('IDs inválidos.');
+if(issue.user?.login!==owner)fail('Solo el dueño del repositorio puede solicitar cantos.');
+let body=String(issue.body||'').replace(/\r\n/g,'\n');
+if(!body.startsWith('LAGREY_SONG_V3\n'))fail('Formato inválido: se requiere LAGREY_SONG_V3.');
+const cm='\n---CONTENT---\n',em='\n---END---',p1=body.indexOf(cm),p2=body.lastIndexOf(em);
+if(p1<0||p2<0||p2<=p1)fail('Solicitud incompleta: faltan CONTENT/END.');
+if(body.slice(p2+em.length).trim())fail('Hay datos inesperados después de END.');
+const header=body.slice('LAGREY_SONG_V3\n'.length,p1),content=body.slice(p1+cm.length,p2);
+const meta={};for(const raw of header.split('\n')){if(!raw.trim())continue;const i=raw.indexOf(':');if(i<1)fail(`Cabecera inválida: ${raw}`);const k=raw.slice(0,i).trim(),v=raw.slice(i+1).trim();if(k in meta)fail(`Campo duplicado: ${k}`);meta[k]=v}
+const allowed=new Set(['title','artist','tone','bpm','content_sha256','dry_run']);for(const k of Object.keys(meta))if(!allowed.has(k))fail(`Campo no permitido: ${k}`);
+const title=meta.title||'',artist=meta.artist||'',tone=meta.tone||'',dry=String(meta.dry_run||'false').toLowerCase()==='true';
+if(!title||!artist||!tone||!content)fail('title, artist, tone y content son obligatorios.');
+if(title.length>200||artist.length>200||tone.length>40)fail('Metadatos demasiado largos.');
+if(content.length>50000)fail('Contenido demasiado largo para una solicitud segura.');
+let bpm=null;if(meta.bpm){bpm=Number(meta.bpm);if(!Number.isInteger(bpm)||bpm<1||bpm>400)fail('BPM inválido.');}
+const reqHash=String(meta.content_sha256||'').toLowerCase();if(!/^[a-f0-9]{64}$/.test(reqHash))fail('content_sha256 es obligatorio y debe ser SHA-256 hexadecimal.');
+const gotHash=crypto.createHash('sha256').update(content,'utf8').digest('hex');if(gotHash!==reqHash)fail('Checksum de contenido no coincide: la solicitud pudo truncarse o alterarse.');
+const parse=src=>{const s={window:{}};vm.createContext(s);new vm.Script(src,{filename:'songs.js'}).runInContext(s,{timeout:1500});if(!Array.isArray(s.window.LAGREY_SONGS))fail('window.LAGREY_SONGS no es un array.');return s.window.LAGREY_SONGS};
+const old=fs.readFileSync('songs.js','utf8');if(!old.startsWith('window.LAGREY_SONGS = [')||!old.trimEnd().endsWith('];'))fail('songs.js no es canónico.');
+if(cp.spawnSync('node',['--check','songs.js'],{encoding:'utf8'}).status!==0)fail('songs.js actual no compila.');
+const before=parse(old),ids=before.map(x=>Number(x?.id));if(ids.some(x=>!Number.isInteger(x))||new Set(ids).size!==ids.length)fail('songs.js contiene IDs inválidos o duplicados.');
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const nt=norm(title);if(before.some(x=>norm(x?.title)===nt))fail('Ya existe un canto con el mismo título normalizado; revisar antes de duplicar.');
 const id=Math.max(...ids,0)+1;
-const lines=['  {',`    "id": ${id},`,`    "title": ${JSON.stringify(title)},`,`    "artist": ${JSON.stringify(artist)},`,'    "type": "cantos",',`    "tone": ${JSON.stringify(tone)},`,...(bpm===null?[]:[`    "bpm": ${bpm},`]),`    "content": ${JSON.stringify(content)}`,'  }'];
-const m=/\n\];\s*$/.exec(old); if(!m) fail('No se encontró cierre final.');
-const next=old.slice(0,m.index)+',\n'+lines.join('\n')+old.slice(m.index);
-const after=parse(next); if(after.length!==before.length+1) fail('Conteo incorrecto.');
-for(const x of ids) if(!after.some(s=>Number(s.id)===x)) fail(`Desapareció ID ${x}.`);
-const ins=after.find(s=>Number(s.id)===id);
-if(!ins||ins.title!==title||ins.artist!==artist||ins.tone!==tone||ins.content!==content||(bpm!==null&&ins.bpm!==bpm)) fail('Inserción no coincide.');
-const oldSize=Buffer.byteLength(old), newSize=Buffer.byteLength(next); if(newSize<=oldSize) fail('Tamaño inválido.');
-const tmp=path.join(process.env.RUNNER_TEMP,'songs.candidate.js');fs.writeFileSync(tmp,next);if(cp.spawnSync('node',['--check',tmp]).status!==0)fail('songs.js candidato no compila.');
-const sw=fs.readFileSync('sw.js','utf8'), re=/const CACHE\s*=\s*(['"])([^'"]+)\1\s*;/, cm=sw.match(re); if(!cm) fail('CACHE no encontrado.');
-const vmch=cm[2].match(/^la-grey-v3-(\d+)(?:-|$)/); if(!vmch) fail('CACHE fuera de formato.');
-const slug=title.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48)||`song-${id}`;
-const cache=`la-grey-v3-${Number(vmch[1])+1}-song-${slug}`, sw2=sw.replace(re,`const CACHE='${cache}';`);
-const tmp2=path.join(process.env.RUNNER_TEMP,'sw.candidate.js');fs.writeFileSync(tmp2,sw2);if(cp.spawnSync('node',['--check',tmp2]).status!==0)fail('sw.js candidato no compila.');
-fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'lagrey-result.txt'),`ID ${id} | ${title} — ${artist} | ${oldSize} -> ${newSize} bytes | CACHE ${cm[2]} -> ${cache}\n`);
-fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'lagrey-message.txt'),`Agregar canto ${title} de ${artist}\n`);
-if(!dry){fs.writeFileSync('songs.js',next);fs.writeFileSync('sw.js',sw2);}
-fs.appendFileSync(process.env.GITHUB_ENV,`LAGREY_DRY_RUN=${dry?'true':'false'}\n`);
-console.log(`OK ${before.length}->${after.length} dry_run=${dry}`);
+const obj=['  {',`    "id": ${id},`,`    "title": ${JSON.stringify(title)},`,`    "artist": ${JSON.stringify(artist)},`,'    "type": "cantos",',`    "tone": ${JSON.stringify(tone)},`,...(bpm===null?[]:[`    "bpm": ${bpm},`]),`    "content": ${JSON.stringify(content)}`,'  }'].join('\n');
+const close=/\n\];\s*$/.exec(old);if(!close)fail('No se encontró cierre final de songs.js.');
+const next=old.slice(0,close.index)+',\n'+obj+old.slice(close.index),after=parse(next);
+if(after.length!==before.length+1)fail('El conteo no aumentó exactamente en uno.');
+if(JSON.stringify(after.slice(0,before.length))!==JSON.stringify(before))fail('Algún canto existente cambió durante la inserción.');
+const ins=after[after.length-1];if(Number(ins?.id)!==id||ins.title!==title||ins.artist!==artist||ins.type!=='cantos'||ins.tone!==tone||ins.content!==content||(bpm!==null&&ins.bpm!==bpm))fail('El canto insertado no coincide exactamente con la solicitud.');
+const tmp=path.join(process.env.RUNNER_TEMP,'songs.candidate.js');fs.writeFileSync(tmp,next);if(cp.spawnSync('node',['--check',tmp],{encoding:'utf8'}).status!==0)fail('songs.js candidato no compila.');
+const oldSize=Buffer.byteLength(old),newSize=Buffer.byteLength(next);if(newSize<=oldSize)fail('Tamaño de songs.js inválido.');
+const sw=fs.readFileSync('sw.js','utf8'),re=/const CACHE\s*=\s*(['"])([^'"]+)\1\s*;/g,matches=[...sw.matchAll(re)];if(matches.length!==1)fail('sw.js debe contener exactamente un const CACHE.');
+const m=matches[0],ver=m[2].match(/^la-grey-v3-(\d+)(?:-|$)/);if(!ver)fail('CACHE fuera de formato.');if(!sw.includes("'./songs.js'"))fail('songs.js no está en el precache.');
+const slug=norm(title).replace(/ /g,'-').slice(0,48)||`song-${id}`,newCache=`la-grey-v3-${Number(ver[1])+1}-song-${slug}`;
+const valueStart=m.index+m[0].indexOf(m[2]),sw2=sw.slice(0,valueStart)+newCache+sw.slice(valueStart+m[2].length);
+if(sw2.slice(0,valueStart)!==sw.slice(0,valueStart)||sw2.slice(valueStart+newCache.length)!==sw.slice(valueStart+m[2].length))fail('sw.js cambió fuera del CACHE.');
+const tmpSw=path.join(process.env.RUNNER_TEMP,'sw.candidate.js');fs.writeFileSync(tmpSw,sw2);if(cp.spawnSync('node',['--check',tmpSw],{encoding:'utf8'}).status!==0)fail('sw.js candidato no compila.');
+const base=sh('git',['rev-parse','HEAD']);fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'lagrey-base.txt'),base+'\n');
+fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'lagrey-message.txt'),`Agregar canto ${title} de ${artist}\n`);fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'lagrey-result.txt'),`ID ${id} | ${title} — ${artist} | ${oldSize} -> ${newSize} bytes | CACHE ${m[2]} -> ${newCache} | SHA256 ${gotHash}\n`);
+if(!dry){fs.writeFileSync('songs.js',next);fs.writeFileSync('sw.js',sw2);const disk=parse(fs.readFileSync('songs.js','utf8'));if(JSON.stringify(disk)!==JSON.stringify(after))fail('La escritura local de songs.js no coincide con el candidato.');fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'songs-blob.txt'),sh('git',['hash-object','songs.js'])+'\n');fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'sw-blob.txt'),sh('git',['hash-object','sw.js'])+'\n');}
+fs.appendFileSync(process.env.GITHUB_ENV,`LAGREY_DRY_RUN=${dry?'true':'false'}\n`);console.log(`OK ${before.length}->${after.length} dry_run=${dry}`);
