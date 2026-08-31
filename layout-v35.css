@@ -43,3 +43,11 @@ body.lg35-song-open #lg35SongToolsTab{display:flex}
 #listing .song-actions,#artistSongsView .song-actions{width:76px!important;justify-content:center!important;justify-self:end!important}
 #listing .tone,#artistSongsView .tone,#home #results .tone{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:64px!important;max-width:76px!important;text-align:center!important;padding-left:8px!important;padding-right:8px!important;justify-self:end!important}
 @media(max-width:420px){#listing .list .song,#artistSongsView .list .song,#home #results .song{grid-template-columns:minmax(0,1fr) 66px!important;column-gap:10px!important;padding:14px 13px!important}#listing .song-actions,#artistSongsView .song-actions{width:66px!important}#listing .tone,#artistSongsView .tone,#home #results .tone{min-width:58px!important;max-width:66px!important;padding:5px 7px!important}}
+
+/* Lista de Artistas: nombre, conteo e indicador alineados */
+#artistsView #artistList .song{display:grid!important;grid-template-columns:minmax(0,1fr) 38px!important;align-items:center!important;column-gap:14px!important;min-height:70px!important;padding:16px 17px!important;text-align:left!important}
+#artistsView #artistList .song-main{min-width:0!important;display:block!important}
+#artistsView #artistList .song-main b{display:block!important;line-height:1.25!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+#artistsView #artistList .song-main small{display:block!important;margin-top:4px!important;line-height:1.2!important;white-space:nowrap!important}
+#artistsView #artistList .exact-chevron{width:38px!important;display:flex!important;align-items:center!important;justify-content:center!important;justify-self:end!important;font-size:26px!important;line-height:1!important;color:var(--lg35-cyan)!important;opacity:.85!important}
+@media(max-width:420px){#artistsView #artistList .song{grid-template-columns:minmax(0,1fr) 32px!important;column-gap:10px!important;padding:14px 13px!important}#artistsView #artistList .exact-chevron{width:32px!important;font-size:24px!important}}
