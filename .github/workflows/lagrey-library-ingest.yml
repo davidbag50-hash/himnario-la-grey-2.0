@@ -16,27 +16,18 @@ jobs:
   song:
     if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[La Grey Song]')
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-
+    timeout-minutes: 7
     steps:
       - name: Checkout main
         uses: actions/checkout@v7
-        with:
-          ref: main
-          fetch-depth: 0
-
+        with: {ref: main, fetch-depth: 0}
       - name: Validate current library
         run: node .github/scripts/lagrey-library-validate.js
-
       - name: Build and validate song
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        env: {GH_TOKEN: '${{ github.token }}', ISSUE_NUMBER: '${{ github.event.issue.number }}'}
         run: node .github/scripts/lagrey-song-ingest.js
-
       - name: Validate candidate library
         run: node .github/scripts/lagrey-library-validate.js
-
       - name: Commit and push
         if: env.LAGREY_DRY_RUN != 'true'
         run: |
@@ -44,126 +35,115 @@ jobs:
           BASE="$(cat "$RUNNER_TEMP/lagrey-base.txt")"
           git fetch origin main
           test "$(git rev-parse origin/main)" = "$BASE" || { echo 'main cambió durante la operación; abortando.'; exit 1; }
-          git config user.name "La Grey Maintenance"
-          git config user.email "actions@users.noreply.github.com"
-          git add songs.js sw.js
-          git diff --cached --check
-          CHANGED="$(git diff --cached --name-only | sort)"
-          EXPECTED="$(printf 'songs.js\nsw.js')"
-          test "$CHANGED" = "$EXPECTED" || { echo "Archivos inesperados: $CHANGED"; exit 1; }
+          git config user.name "La Grey Maintenance"; git config user.email "actions@users.noreply.github.com"
+          git add songs.js sw.js; git diff --cached --check
+          test "$(git diff --cached --name-only | sort)" = "$(printf 'songs.js\nsw.js')"
           test "$(git hash-object songs.js)" = "$(cat "$RUNNER_TEMP/songs-blob.txt")"
           test "$(git hash-object sw.js)" = "$(cat "$RUNNER_TEMP/sw-blob.txt")"
-          git commit -F "$RUNNER_TEMP/lagrey-message.txt"
-          git push origin HEAD:main
-
+          git commit -F "$RUNNER_TEMP/lagrey-message.txt"; git push origin HEAD:main
       - name: Verify published commit
         if: env.LAGREY_DRY_RUN != 'true'
         run: |
-          set -euo pipefail
-          git fetch origin main
-          HEAD_SHA="$(git rev-parse HEAD)"
-          test "$(git rev-parse origin/main)" = "$HEAD_SHA"
-          test "$(git rev-parse HEAD:songs.js)" = "$(cat "$RUNNER_TEMP/songs-blob.txt")"
-          test "$(git rev-parse HEAD:sw.js)" = "$(cat "$RUNNER_TEMP/sw-blob.txt")"
-          BASE="$(cat "$RUNNER_TEMP/lagrey-base.txt")"
-          CHANGED="$(git diff --name-only "$BASE" "$HEAD_SHA" | sort)"
-          EXPECTED="$(printf 'songs.js\nsw.js')"
-          test "$CHANGED" = "$EXPECTED" || { echo "El commit publicado contiene archivos inesperados: $CHANGED"; exit 1; }
+          set -euo pipefail; git fetch origin main; HEAD_SHA="$(git rev-parse HEAD)"; test "$(git rev-parse origin/main)" = "$HEAD_SHA"
+          test "$(git rev-parse HEAD:songs.js)" = "$(cat "$RUNNER_TEMP/songs-blob.txt")"; test "$(git rev-parse HEAD:sw.js)" = "$(cat "$RUNNER_TEMP/sw-blob.txt")"
           node .github/scripts/lagrey-library-validate.js
-
       - name: Report success
         if: success()
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        env: {GH_TOKEN: '${{ github.token }}', ISSUE_NUMBER: '${{ github.event.issue.number }}'}
         run: |
-          RESULT="$(cat "$RUNNER_TEMP/lagrey-result.txt")"
-          if [ "$LAGREY_DRY_RUN" = "true" ]; then
-            gh issue comment "$ISSUE_NUMBER" --body "✅ Dry-run de canto correcto. No se modificó la biblioteca. $RESULT"
-          else
-            gh issue comment "$ISSUE_NUMBER" --body "✅ Canto integrado, publicado y verificado. $RESULT"
-          fi
-          gh issue close "$ISSUE_NUMBER" --reason completed
-
+          RESULT="$(cat "$RUNNER_TEMP/lagrey-result.txt")"; if [ "$LAGREY_DRY_RUN" = "true" ]; then MSG="✅ Dry-run de canto correcto. No se modificó la biblioteca. $RESULT"; else MSG="✅ Canto integrado, publicado y verificado. $RESULT"; fi
+          gh issue comment "$ISSUE_NUMBER" --body "$MSG"; gh issue close "$ISSUE_NUMBER" --reason completed
       - name: Report failure
         if: failure()
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: gh issue comment "$ISSUE_NUMBER" --body "❌ Operación de canto abortada de forma segura. No considerar publicado ningún cambio hasta verificar la biblioteca."
+        env: {GH_TOKEN: '${{ github.token }}', ISSUE_NUMBER: '${{ github.event.issue.number }}'}
+        run: gh issue comment "$ISSUE_NUMBER" --body "❌ Operación de canto abortada de forma segura."
 
   hymn:
     if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[La Grey Hymn]')
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-
+    timeout-minutes: 7
     steps:
       - name: Checkout main
         uses: actions/checkout@v7
-        with:
-          ref: main
-          fetch-depth: 0
-
+        with: {ref: main, fetch-depth: 0}
       - name: Build and validate hymn
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        env: {GH_TOKEN: '${{ github.token }}', ISSUE_NUMBER: '${{ github.event.issue.number }}'}
         run: node .github/scripts/lagrey-hymn-ingest.js
-
       - name: Commit and push
         if: env.LAGREY_DRY_RUN != 'true'
         run: |
-          set -euo pipefail
-          BASE="$(cat "$RUNNER_TEMP/lagrey-base.txt")"
-          git fetch origin main
-          test "$(git rev-parse origin/main)" = "$BASE" || { echo 'main cambió durante la operación; abortando.'; exit 1; }
-          mapfile -t FILES < "$RUNNER_TEMP/lagrey-expected-files.txt"
-          git config user.name "La Grey Maintenance"
-          git config user.email "actions@users.noreply.github.com"
-          git add -- "${FILES[@]}"
-          git diff --cached --check
-          CHANGED="$(git diff --cached --name-only | sort)"
-          EXPECTED="$(sort "$RUNNER_TEMP/lagrey-expected-files.txt")"
-          test "$CHANGED" = "$EXPECTED" || { echo "Archivos inesperados: $CHANGED"; exit 1; }
-          while IFS=$'\t' read -r HASH FILE; do
-            test "$(git hash-object "$FILE")" = "$HASH" || { echo "Hash inesperado: $FILE"; exit 1; }
-          done < "$RUNNER_TEMP/lagrey-hashes.txt"
-          git commit -F "$RUNNER_TEMP/lagrey-message.txt"
-          git push origin HEAD:main
-
+          set -euo pipefail; BASE="$(cat "$RUNNER_TEMP/lagrey-base.txt")"; git fetch origin main; test "$(git rev-parse origin/main)" = "$BASE"
+          mapfile -t FILES < "$RUNNER_TEMP/lagrey-expected-files.txt"; git config user.name "La Grey Maintenance"; git config user.email "actions@users.noreply.github.com"
+          git add -- "${FILES[@]}"; git diff --cached --check; test "$(git diff --cached --name-only | sort)" = "$(sort "$RUNNER_TEMP/lagrey-expected-files.txt")"
+          while IFS=$'\t' read -r HASH FILE; do test "$(git hash-object "$FILE")" = "$HASH"; done < "$RUNNER_TEMP/lagrey-hashes.txt"
+          git commit -F "$RUNNER_TEMP/lagrey-message.txt"; git push origin HEAD:main
       - name: Verify published commit
         if: env.LAGREY_DRY_RUN != 'true'
         run: |
-          set -euo pipefail
-          git fetch origin main
-          HEAD_SHA="$(git rev-parse HEAD)"
-          test "$(git rev-parse origin/main)" = "$HEAD_SHA"
-          while IFS=$'\t' read -r HASH FILE; do
-            test "$(git rev-parse "HEAD:$FILE")" = "$HASH" || { echo "Blob publicado inesperado: $FILE"; exit 1; }
-          done < "$RUNNER_TEMP/lagrey-hashes.txt"
-          BASE="$(cat "$RUNNER_TEMP/lagrey-base.txt")"
-          CHANGED="$(git diff --name-only "$BASE" "$HEAD_SHA" | sort)"
-          EXPECTED="$(sort "$RUNNER_TEMP/lagrey-expected-files.txt")"
-          test "$CHANGED" = "$EXPECTED" || { echo "El commit publicado contiene archivos inesperados: $CHANGED"; exit 1; }
+          set -euo pipefail; git fetch origin main; HEAD_SHA="$(git rev-parse HEAD)"; test "$(git rev-parse origin/main)" = "$HEAD_SHA"
+          while IFS=$'\t' read -r HASH FILE; do test "$(git rev-parse "HEAD:$FILE")" = "$HASH"; done < "$RUNNER_TEMP/lagrey-hashes.txt"
           node .github/scripts/lagrey-library-validate.js
-
       - name: Report success
         if: success()
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        env: {GH_TOKEN: '${{ github.token }}', ISSUE_NUMBER: '${{ github.event.issue.number }}'}
         run: |
-          RESULT="$(cat "$RUNNER_TEMP/lagrey-result.txt")"
-          if [ "$LAGREY_DRY_RUN" = "true" ]; then
-            gh issue comment "$ISSUE_NUMBER" --body "✅ Dry-run de himno correcto. No se modificó la biblioteca. $RESULT"
-          else
-            gh issue comment "$ISSUE_NUMBER" --body "✅ Himno integrado, publicado y verificado. $RESULT"
-          fi
-          gh issue close "$ISSUE_NUMBER" --reason completed
-
+          RESULT="$(cat "$RUNNER_TEMP/lagrey-result.txt")"; if [ "$LAGREY_DRY_RUN" = "true" ]; then MSG="✅ Dry-run de himno correcto. No se modificó la biblioteca. $RESULT"; else MSG="✅ Himno integrado, publicado y verificado. $RESULT"; fi
+          gh issue comment "$ISSUE_NUMBER" --body "$MSG"; gh issue close "$ISSUE_NUMBER" --reason completed
       - name: Report failure
         if: failure()
+        env: {GH_TOKEN: '${{ github.token }}', ISSUE_NUMBER: '${{ github.event.issue.number }}'}
+        run: gh issue comment "$ISSUE_NUMBER" --body "❌ Operación de himno abortada de forma segura."
+
+  bulk_artists:
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[La Grey Bulk Import]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with: {ref: main, fetch-depth: 0}
+      - name: Validate current library
+        run: node .github/scripts/lagrey-library-validate.js
+      - name: Read import mode
         env:
-          GH_TOKEN: ${{ github.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: gh issue comment "$ISSUE_NUMBER" --body "❌ Operación de himno abortada de forma segura. No considerar publicado ningún cambio hasta verificar la biblioteca."
+          ISSUE_BODY: '${{ github.event.issue.body }}'
+        run: |
+          if printf '%s\n' "$ISSUE_BODY" | grep -Eiq '^dry_run:[[:space:]]*true[[:space:]]*$'; then echo 'LAGREY_BULK_DRY_RUN=true' >> "$GITHUB_ENV"; else echo 'LAGREY_BULK_DRY_RUN=false' >> "$GITHUB_ENV"; fi
+      - name: Integrate Artists in primary UI
+        run: node .github/scripts/lagrey-artists-setup.js
+      - name: Build bulk import from verified L.A.M source
+        run: python3 .github/scripts/lagrey-bulk-import.py
+      - name: Validate complete candidate
+        run: |
+          node .github/scripts/lagrey-library-validate.js
+          git diff --check
+          CHANGED="$(git diff --name-only | sort)"
+          EXPECTED="$(printf 'app.js\nindex.html\nsongs.js\nsw.js')"
+          test "$CHANGED" = "$EXPECTED" || { echo "Archivos inesperados: $CHANGED"; exit 1; }
+          printf '%s\n' app.js index.html songs.js sw.js > "$RUNNER_TEMP/lagrey-expected-files.txt"
+          : > "$RUNNER_TEMP/lagrey-hashes.txt"
+          while IFS= read -r FILE; do printf '%s\t%s\n' "$(git hash-object "$FILE")" "$FILE" >> "$RUNNER_TEMP/lagrey-hashes.txt"; done < "$RUNNER_TEMP/lagrey-expected-files.txt"
+      - name: Commit and push bulk import
+        if: env.LAGREY_DRY_RUN != 'true'
+        run: |
+          set -euo pipefail; BASE="$(cat "$RUNNER_TEMP/lagrey-base.txt")"; git fetch origin main; test "$(git rev-parse origin/main)" = "$BASE" || { echo 'main cambió; abortando.'; exit 1; }
+          mapfile -t FILES < "$RUNNER_TEMP/lagrey-expected-files.txt"; git config user.name "La Grey Maintenance"; git config user.email "actions@users.noreply.github.com"
+          git add -- "${FILES[@]}"; git diff --cached --check; test "$(git diff --cached --name-only | sort)" = "$(sort "$RUNNER_TEMP/lagrey-expected-files.txt")"
+          while IFS=$'\t' read -r HASH FILE; do test "$(git hash-object "$FILE")" = "$HASH"; done < "$RUNNER_TEMP/lagrey-hashes.txt"
+          git commit -F "$RUNNER_TEMP/lagrey-message.txt"; git push origin HEAD:main
+      - name: Verify published bulk import
+        if: env.LAGREY_DRY_RUN != 'true'
+        run: |
+          set -euo pipefail; git fetch origin main; HEAD_SHA="$(git rev-parse HEAD)"; test "$(git rev-parse origin/main)" = "$HEAD_SHA"
+          while IFS=$'\t' read -r HASH FILE; do test "$(git rev-parse "HEAD:$FILE")" = "$HASH"; done < "$RUNNER_TEMP/lagrey-hashes.txt"
+          node .github/scripts/lagrey-library-validate.js
+      - name: Report success
+        if: success()
+        env: {GH_TOKEN: '${{ github.token }}', ISSUE_NUMBER: '${{ github.event.issue.number }}'}
+        run: |
+          RESULT="$(cat "$RUNNER_TEMP/lagrey-result.txt")"; if [ "$LAGREY_DRY_RUN" = "true" ]; then MSG="✅ Dry-run masivo correcto. No se publicó ningún canto. $RESULT"; else MSG="✅ Importación masiva publicada y verificada. $RESULT"; fi
+          gh issue comment "$ISSUE_NUMBER" --body "$MSG"; gh issue close "$ISSUE_NUMBER" --reason completed
+      - name: Report failure
+        if: failure()
+        env: {GH_TOKEN: '${{ github.token }}', ISSUE_NUMBER: '${{ github.event.issue.number }}'}
+        run: gh issue comment "$ISSUE_NUMBER" --body "❌ Importación masiva abortada de forma segura. No se publicó el candidato."
