@@ -20,7 +20,7 @@ const ids=catalog.map(x=>Number(x?.id));if(ids.some(x=>!Number.isInteger(x)||x<=
 for(const x of catalog){
  if(!x||!['cantos','himnos'].includes(x.type))fail(`Tipo inválido en ID ${x?.id}.`);
  for(const k of ['title','artist','content'])if(typeof x[k]!=='string'||!x[k].trim())fail(`Campo ${k} vacío/inválido en ID ${x.id}.`);
- if(typeof x.tone!=='string')fail(`Campo tone inválido en ID ${x.id}.`);
+ if(typeof x.tone!=='string'||!x.tone.trim())fail(`Campo tone vacío/inválido en ID ${x.id}.`);
 }
 const hymns=catalog.filter(x=>x.type==='himnos'),hreg=sandbox.window.LAGREY_HYMNS;if(!Array.isArray(hreg))fail('window.LAGREY_HYMNS no es un array.');
 const nums=hymns.map(x=>Number(x.bookNumber)).sort((a,b)=>a-b);if(nums.some(x=>!Number.isInteger(x)||x<=0)||new Set(nums).size!==nums.length)fail('Hay números de himno inválidos o duplicados.');
