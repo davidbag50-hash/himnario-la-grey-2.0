@@ -51,3 +51,12 @@ body.lg35-song-open #lg35SongToolsTab{display:flex}
 #artistsView #artistList .song-main small{display:block!important;margin-top:1px!important;line-height:1.2!important;white-space:nowrap!important}
 #artistsView #artistList .exact-chevron{width:38px!important;display:flex!important;align-items:center!important;justify-content:center!important;justify-self:end!important;font-size:26px!important;line-height:1!important;color:var(--lg35-cyan)!important;opacity:.85!important}
 @media(max-width:420px){#artistsView #artistList .song{grid-template-columns:minmax(0,1fr) 32px!important;column-gap:10px!important;padding:14px 13px!important}#artistsView #artistList .exact-chevron{width:32px!important;font-size:24px!important}}
+
+/* Compactación real del bloque título/subtítulo */
+#listing .song-main,#artistSongsView .song-main,#home #results .song>span:first-child,#artistsView #artistList .song-main{display:flex!important;flex-direction:column!important;justify-content:center!important;gap:2px!important}
+#listing .song-main br,#artistSongsView .song-main br,#home #results .song>span:first-child br,#artistsView #artistList .song-main br{display:none!important}
+#listing .song-main b,#artistSongsView .song-main b,#home #results .song>span:first-child b,#artistsView #artistList .song-main b{line-height:1.12!important;margin:0!important}
+#listing .song-main small,#artistSongsView .song-main small,#home #results .song>span:first-child small,#artistsView #artistList .song-main small{line-height:1.08!important;margin:0!important}
+#listing .list .song,#artistSongsView .list .song,#home #results .song{min-height:62px!important;padding-top:11px!important;padding-bottom:11px!important}
+#artistsView #artistList .song{min-height:62px!important;padding-top:11px!important;padding-bottom:11px!important}
+@media(max-width:420px){#listing .list .song,#artistSongsView .list .song,#home #results .song,#artistsView #artistList .song{padding-top:10px!important;padding-bottom:10px!important}}
