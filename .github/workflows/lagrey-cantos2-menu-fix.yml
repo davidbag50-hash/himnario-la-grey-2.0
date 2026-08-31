@@ -1,0 +1,89 @@
+name: La Grey Cantos 2 Menu Fix
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  fix:
+    if: github.event.issue.user.login == github.repository_owner && github.event.issue.title == '[La Grey Fix] Cantos 2 al menu'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Move Cantos 2 into main menu
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const fail=m=>{throw new Error(m)};
+          const once=(src,a,b,label)=>{const i=src.indexOf(a);if(i<0)fail(`No se encontró ${label}`);if(src.indexOf(a,i+a.length)>=0)fail(`Patrón duplicado ${label}`);return src.slice(0,i)+b+src.slice(i+a.length)};
+
+          let html=fs.readFileSync('index.html','utf8');
+
+          // Copiar la tarjeta canónica de Cantos y convertir la copia en Cantos 2.
+          const cardRe=/<button class="exact-card" data-exact-open="songs" data-open="songs">[\s\S]*?<\/button>/;
+          const m=html.match(cardRe);if(!m)fail('No se encontró tarjeta Cantos del menú');
+          if(html.includes('data-exact-open="songs2"'))fail('Ya existe una tarjeta Cantos 2 en el menú');
+          const card2=m[0]
+            .replace('data-exact-open="songs"','data-exact-open="songs2"')
+            .replace('data-open="songs"','data-open="songs2"')
+            .replace('<h2>Cantos</h2>','<h2>Cantos 2</h2>')
+            .replace('Cantemos al Señor<br>un cántico nuevo','Nueva colección de<br>cantos de La Grey');
+          html=html.replace(m[0],m[0]+card2);
+
+          // Quitar Cantos 2 de la barra inferior del Home.
+          const bottomRe=/<button class="exact-nav-btn" data-exact-nav="songs2" data-nav="songs2">[\s\S]*?<\/button>/;
+          const bm=html.match(bottomRe);if(!bm)fail('No se encontró Cantos 2 en barra inferior');
+          html=html.replace(bm[0],'');
+
+          // Quitar Cantos 2 de la navegación interna; el acceso queda solo en el menú principal.
+          const internal='<button data-nav="songs2">🎵<span>Cantos 2</span></button>';
+          html=once(html,internal,'','Cantos 2 nav interna');
+
+          fs.writeFileSync('index.html',html,'utf8');
+
+          let css=fs.readFileSync('exact-home-v1.css','utf8');
+          css=once(css,'grid-template-columns:repeat(6,1fr)','grid-template-columns:repeat(5,1fr)','columnas barra inferior');
+          fs.writeFileSync('exact-home-v1.css',css,'utf8');
+
+          let sw=fs.readFileSync('sw.js','utf8');
+          const cm=sw.match(/const CACHE='la-grey-v3-(\d+)[^']*';/);if(!cm)fail('CACHE no reconocido');
+          const next=Number(cm[1])+1;
+          sw=sw.replace(/const CACHE='[^']+';/,`const CACHE='la-grey-v3-${next}-cantos-2-menu';`);
+          fs.writeFileSync('sw.js',sw,'utf8');
+
+          // Validaciones.
+          const finalHtml=fs.readFileSync('index.html','utf8');
+          if(!finalHtml.includes('data-exact-open="songs2" data-open="songs2"'))fail('Tarjeta Cantos 2 no quedó creada');
+          if(finalHtml.includes('data-exact-nav="songs2"'))fail('Cantos 2 sigue en barra inferior');
+          if(finalHtml.includes('<button data-nav="songs2">'))fail('Cantos 2 sigue en nav interna');
+          if(!fs.readFileSync('exact-home-v1.css','utf8').includes('grid-template-columns:repeat(5,1fr)'))fail('Barra inferior no volvió a 5 columnas');
+          console.log('Cantos 2 movido al menú principal correctamente.');
+          NODE
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "La Grey Maintenance"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html exact-home-v1.css sw.js
+          git diff --cached --check
+          git commit -m "Mover Cantos 2 al menú principal"
+          git push origin HEAD:main
+
+      - name: Close issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body "✅ Cantos 2 movido al menú principal y retirado de las barras de navegación."
+          gh issue close "$ISSUE_NUMBER" --reason completed
