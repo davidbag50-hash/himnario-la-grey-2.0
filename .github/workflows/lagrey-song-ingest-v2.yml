@@ -24,7 +24,7 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           git rev-parse HEAD > "$RUNNER_TEMP/lagrey-base.txt"
-          node .github/scripts/lagrey-song-ingest.js
+          node .github/scripts/lagrey-song-ingest-v2.js
 
       - name: Commit and push
         if: env.LAGREY_DRY_RUN != 'true'
@@ -35,9 +35,9 @@ jobs:
           test "$(git rev-parse origin/main)" = "$BASE" || { echo "main cambió; abortando"; exit 1; }
           git config user.name "La Grey Maintenance"
           git config user.email "actions@users.noreply.github.com"
-          git add songs.js sw.js
+          git add songs-v2.js sw.js
           git diff --cached --check
-          test "$(git diff --cached --name-only | sort)" = "$(printf 'songs.js\nsw.js')" || exit 1
+          test "$(git diff --cached --name-only | sort)" = "$(printf 'songs-v2.js\nsw.js')" || exit 1
           git commit -F "$RUNNER_TEMP/lagrey-message.txt"
           git push origin HEAD:main
 
@@ -48,7 +48,7 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           R="$(cat "$RUNNER_TEMP/lagrey-result.txt")"
-          if [ "$LAGREY_DRY_RUN" = "true" ]; then M="✅ Dry-run correcto. No se modificaron songs.js ni sw.js. $R"; else M="✅ Canto integrado y validado. $R"; fi
+          if [ "$LAGREY_DRY_RUN" = "true" ]; then M="✅ Dry-run correcto. No se modificaron songs-v2.js ni sw.js. $R"; else M="✅ Canto integrado y validado en Cantos 2. $R"; fi
           gh issue comment "$ISSUE_NUMBER" --body "$M"
           gh issue close "$ISSUE_NUMBER" --reason completed
 
