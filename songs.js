@@ -71,13 +71,5 @@ window.LAGREY_SONGS = [
     "type": "cantos",
     "tone": "G",
     "content": "INTRO: G  D   Em  C  G  D\n\nEstrofa 1:\n   G                            D\nEl Dios que hizo los cielos y la tierra\n                     Em\nCon el poder de su Palabra\n                C\nReina con autoridad\n\n    G                            D\nEl Dios que aún los vientos le obedecen\n                    Em\nUna palabra es suficiente\n                      C\nPara los muertos levantar\n\n\nPre coro:\n          C\nNadie es como Él\n    D\nOh gran Yo Soy\n\n\nCORO:\n           G\nTú eres el Dios que adoramos\n        D\nTodopoderoso y Soberano\n           Em  C         G           D\nGrande en misericordia y poder para salvar\n           G\nTú eres el Dios que adoramos\n                  D\nQuien derrotó la muerte y el pecado\n   Em        C     Em     D\nGlorioso redentor y rey, te adoramos\n\n\nIntro\n\n\nEstrofa 2:\n   G                         D\nEl Dios que descendió desde su trono\n                      Em\nPara llevar sobre sus hombros\n                         C\nNuestra culpa y transgresión\n   G                  D\nJesús, exaltado sobre todo\n                  Em\nNombre sobre todo nombre\n                     C\nSólo en Él hay salvación\n\n\nPre Coro\n\nCoro\n\nInstrumental: // Em  D  C  D //\n\n         C             D\n// A Él sea la gloria y el poder\n     Em        D\nTodo es de Él y para Él //\n\n\nCoro\n\n\nFin: G  D  Em  C  G  D  G"
-  },
-  {
-    "id": 10,
-    "title": "Tu Amor Oh Dios",
-    "artist": "Generación sin Fronteras",
-    "type": "cantos",
-    "tone": "F",
-    "content": "F               Bb2                    F      C/E\nTu amor oh Dios     más alto que los cielos\nDm7              Bb2                    F   C/E\nTu gracia oh Rey     Tan ancha como el mar\nDm7        Bb2                  F     C/E\nTu gran poder como una gran montaña\nDm7          Bb2           F    C/E\nJusto y fiel como el ancho mar\n\nCORO:\n\nC/E         C     Bb2             F   C/E\nY alzaré mi voz para adorarte oh Rey\n             C       Bb2            Gm   C/E\nMi refugio está a la sombra de tus pies"
   }
 ];
