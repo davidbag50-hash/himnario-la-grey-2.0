@@ -1,0 +1,60 @@
+name: La Grey Song Ingest V2
+
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  ingest:
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[La Grey Song V2]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Build and validate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          git rev-parse HEAD > "$RUNNER_TEMP/lagrey-base.txt"
+          node .github/scripts/lagrey-song-ingest.js
+
+      - name: Commit and push
+        if: env.LAGREY_DRY_RUN != 'true'
+        run: |
+          set -euo pipefail
+          BASE="$(cat "$RUNNER_TEMP/lagrey-base.txt")"
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$BASE" || { echo "main cambió; abortando"; exit 1; }
+          git config user.name "La Grey Maintenance"
+          git config user.email "actions@users.noreply.github.com"
+          git add songs.js sw.js
+          git diff --cached --check
+          test "$(git diff --cached --name-only | sort)" = "$(printf 'songs.js\nsw.js')" || exit 1
+          git commit -F "$RUNNER_TEMP/lagrey-message.txt"
+          git push origin HEAD:main
+
+      - name: Report success
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          R="$(cat "$RUNNER_TEMP/lagrey-result.txt")"
+          if [ "$LAGREY_DRY_RUN" = "true" ]; then M="✅ Dry-run correcto. No se modificaron songs.js ni sw.js. $R"; else M="✅ Canto integrado y validado. $R"; fi
+          gh issue comment "$ISSUE_NUMBER" --body "$M"
+          gh issue close "$ISSUE_NUMBER" --reason completed
+
+      - name: Report failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh issue comment "$ISSUE_NUMBER" --body "❌ Operación abortada; no considerar publicado el canto."
