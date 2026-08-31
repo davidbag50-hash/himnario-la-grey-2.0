@@ -34,3 +34,12 @@ body.lg35-song-open #lg35SongToolsTab{display:flex}
 .lg-home-tools,.lg-global-fab,.lg-global-menu{display:none!important}
 @media(min-width:720px){#home .home-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}#home .home-grid .card{min-height:125px!important}}
 @media(max-width:420px){#home .home-grid .card{min-height:102px!important;padding:12px!important}#home .home-grid .card .muted{font-size:11px!important}#lg35SongToolsTab{width:40px;height:40px;font-size:26px}#lg35SongToolsDrawer{top:46px;width:50px}#lg38ToolStrip{width:48px}.lg38-tool{width:40px;height:40px;flex-basis:40px;font-size:20px}#lg38ToneDown,#lg38ToneUp{font-size:14px}#lg40ScrollPopup{right:54px;width:min(210px,calc(100vw - 78px));top:calc(40px * 8 + 4px)}}
+
+/* Listas de Cantos e Himnos: columnas visuales estables */
+#listing .list .song,#artistSongsView .list .song,#home #results .song{display:grid!important;grid-template-columns:minmax(0,1fr) 76px!important;align-items:center!important;column-gap:14px!important;min-height:70px!important;text-align:left!important}
+#listing .song-main,#artistSongsView .song-main,#home #results .song>span:first-child{min-width:0!important;display:block!important}
+#listing .song-main b,#artistSongsView .song-main b,#home #results .song>span:first-child b{display:block!important;line-height:1.25!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#listing .song-main small,#artistSongsView .song-main small,#home #results .song>span:first-child small{display:block!important;margin-top:4px!important;line-height:1.2!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+#listing .song-actions,#artistSongsView .song-actions{width:76px!important;justify-content:center!important;justify-self:end!important}
+#listing .tone,#artistSongsView .tone,#home #results .tone{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:64px!important;max-width:76px!important;text-align:center!important;padding-left:8px!important;padding-right:8px!important;justify-self:end!important}
+@media(max-width:420px){#listing .list .song,#artistSongsView .list .song,#home #results .song{grid-template-columns:minmax(0,1fr) 66px!important;column-gap:10px!important;padding:14px 13px!important}#listing .song-actions,#artistSongsView .song-actions{width:66px!important}#listing .tone,#artistSongsView .tone,#home #results .tone{min-width:58px!important;max-width:66px!important;padding:5px 7px!important}}
