@@ -3,7 +3,6 @@
 const $=s=>document.querySelector(s);
 const home=$('#home'),shell=$('#lgExactHome');
 if(!home||!shell)return;
-shell.querySelector('[data-open="songs2"]')?.remove();
 
 const profile=$('#profileBtn'),notation=$('#notationBtn'),settings=$('#settingsBtn');
 const lang=()=>localStorage.getItem('lagrey_language')==='en'?'en':'es',tx=(es,en)=>lang()==='en'?en:es;
