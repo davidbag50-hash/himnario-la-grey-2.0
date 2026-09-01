@@ -14,13 +14,17 @@ function decorate(root=document){
  if(s?.bookNumber){if(!n){n=document.createElement('span');n.id='hymnNumberBadge';n.className='badge';badge?.insertAdjacentElement('afterend',n)}if(n){n.textContent=`${lang()==='en'?'No.':'N.º'} ${s.bookNumber}`;n.classList.remove('hidden')}}
  else n?.classList.add('hidden');
 }
+function openNumericSearchResult(id){
+ const s=byId(id),q=$('q'),r=$('results');if(!s||!q||!r)return;
+ /* Reutiliza el buscador canónico de app.js para que todos los resultados,
+    incluidos los himnos posteriores al 120, abran directo desde Inicio. */
+ q.value=s.title;
+ q.dispatchEvent(new Event('input',{bubbles:true}));
+ const direct=r.querySelector(`[data-search-song="${id}"]`);
+ if(direct)direct.click();
+}
 function numericSearch(){
- const q=$('q')?.value.trim();if(!q)return;const m=q.match(/^(?:(?:himno|hymn)\s*)?#?\s*(\d{1,3})$/i);if(!m)return;const num=Number(m[1]);const found=songs().filter(s=>s.type==='himnos'&&Number(s.bookNumber)===num);const r=$('results');if(!r)return;r.classList.toggle('hidden',!found.length);r.innerHTML=found.map(s=>`<button class="song" data-search-song="${s.id}"><span><b>${s.bookNumber}. ${s.title}</b><br><small class="muted">${s.artist}</small></span><span class="tone">${s.tone}</span></button>`).join('');r.querySelectorAll('[data-search-song]').forEach(b=>{const id=Number(b.dataset.searchSong);b.onclick=()=>{
-   /* La lista se prepara y el himno se abre en el mismo ciclo, antes de que el navegador pinte la vista intermedia. */
-   document.querySelector('[data-open="hymns"]')?.click();
-   const item=document.querySelector(`#songList [data-song="${id}"]`);
-   if(item)item.click();
- }});
+ const q=$('q')?.value.trim();if(!q)return;const m=q.match(/^(?:(?:himno|hymn)\s*)?#?\s*(\d{1,3})$/i);if(!m)return;const num=Number(m[1]);const found=songs().filter(s=>s.type==='himnos'&&Number(s.bookNumber)===num);const r=$('results');if(!r)return;r.classList.toggle('hidden',!found.length);r.innerHTML=found.map(s=>`<button class="song" data-search-song="${s.id}"><span><b>${s.bookNumber}. ${s.title}</b><br><small class="muted">${s.artist}</small></span><span class="tone">${s.tone}</span></button>`).join('');r.querySelectorAll('[data-search-song]').forEach(b=>{const id=Number(b.dataset.searchSong);b.onclick=()=>openNumericSearchResult(id)});
 }
 function schedule(){setTimeout(()=>{decorate();numericSearch()},0);setTimeout(()=>decorate(),80)}
 function wire(){
