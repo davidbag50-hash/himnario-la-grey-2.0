@@ -11,7 +11,6 @@ function loadRoot(src){return new Promise((resolve,reject)=>{if(document.querySe
   try{
     for(const file of FILES)await load(file);
     await loadRoot('credential-isolation-v1.js');
-    await loadRoot('account-onboarding-v1.js');
     document.documentElement.dataset.lagreyCloudReady='1';
     window.dispatchEvent(new CustomEvent('lagrey:cloud-ready',{detail:window.LAGREY_CLOUD?.getState?.()||null}));
   }catch(error){
