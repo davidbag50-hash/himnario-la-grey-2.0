@@ -106,6 +106,34 @@ async function updateRosterMember(rosterId,patch={}){
   return data;
 }
 
+async function updateRosterMemberAdmin({rosterId,displayName,musicRoles=[],preferredInstrument='none',cloudRole='member'}){
+  const c=await client();
+  const {data,error}=await c.rpc('update_roster_member_admin',{
+    target_roster_member:rosterId,
+    new_display_name:String(displayName||'').trim(),
+    new_music_roles:[...new Set((musicRoles||[]).map(x=>String(x||'').trim()).filter(Boolean))],
+    new_preferred_instrument:['guitar','piano','voice','all','none'].includes(preferredInstrument)?preferredInstrument:'none',
+    new_cloud_role:['owner','member','leader','admin'].includes(cloudRole)?cloudRole:'member'
+  });
+  if(error)throw error;
+  window.dispatchEvent(new Event('lagrey:cloud-reboot'));
+  return data;
+}
+
+async function revokeRosterInvites(rosterId){
+  const c=await client();
+  const {data,error}=await c.rpc('revoke_roster_invites',{target_roster_member:rosterId});
+  if(error)throw error;
+  return Number(data||0);
+}
+
+async function removeRosterMember(rosterId){
+  const c=await client();
+  const {error}=await c.rpc('remove_roster_member',{target_roster_member:rosterId});
+  if(error)throw error;
+  window.dispatchEvent(new Event('lagrey:cloud-reboot'));
+}
+
 async function createRosterInvite({rosterId,validHours=168,allowedUses=1}){
   const c=await client();
   const {data,error}=await c.rpc('create_roster_invite',{target_roster_member:rosterId,valid_hours:validHours,allowed_uses:allowedUses});
@@ -122,6 +150,7 @@ async function touchPresence(ministryId){
 
 window.LAGREY_MINISTRIES={
   slugify,createMinistry,createInvite,joinWithCode,listInvites,revokeInvite,
-  listRoster,getMyRosterProfile,addRosterMember,updateRosterMember,createRosterInvite,touchPresence
+  listRoster,getMyRosterProfile,addRosterMember,updateRosterMember,updateRosterMemberAdmin,
+  revokeRosterInvites,removeRosterMember,createRosterInvite,touchPresence
 };
 })();
