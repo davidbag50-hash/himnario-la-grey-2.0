@@ -38,7 +38,7 @@ create or replace function public.create_ministry_invite(
 returns text
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions, pg_catalog
 as $$
 declare
   raw_code text;
@@ -62,7 +62,7 @@ create or replace function public.join_ministry_with_code(raw_code text)
 returns uuid
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions, pg_catalog
 as $$
 declare
   inv public.ministry_invites%rowtype;
