@@ -16,6 +16,12 @@ function syncNotation(b){if(!b)return;const latin=(localStorage.getItem('lagrey_
 function syncHeaderLanguage(){const p=$('#profileBtn span'),s=$('#settingsBtn');if(p)p.textContent=tx('Perfil','Profile');if(s){const label=tx('Ajustes','Settings');s.setAttribute('aria-label',label);s.setAttribute('title',label)}}
 function buildHeader(){const h=$('body>header');if(!h||h.dataset.lgExactInternal==='1')return;const source=$('#lgExactHome .exact-brand'),p=$('#profileBtn'),n=$('#notationBtn'),s=$('#settingsBtn');if(!source||!p||!n||!s){setTimeout(buildHeader,120);return}const shell=document.createElement('div');shell.className='lg-global-shell';const brand=source.cloneNode(true);brand.classList.add('lg-global-brand');const actions=document.createElement('div');actions.className='exact-actions lg-global-actions';p.className='exact-pill';n.className='exact-pill';s.className='exact-pill exact-gear';const profileLabel=$('[data-exact-action="profile"] span')?.textContent?.trim()||tx('Perfil','Profile');p.innerHTML=iconPerson()+`<span>${profileLabel}</span>`;syncNotation(n);s.innerHTML=iconGear();actions.append(p,n,s);const d=document.createElement('div');d.className='exact-divider';d.innerHTML='<span>❧</span>';shell.append(brand,actions,d);h.replaceChildren(shell);h.dataset.lgExactInternal='1';syncHeaderLanguage();n.addEventListener('click',()=>setTimeout(()=>syncNotation(n),0))}
 
+function clearHomeSearch(){
+ const real=document.getElementById('q'),safe=document.getElementById('lgSafeSearch'),results=document.getElementById('results');
+ if(safe)safe.value='';
+ if(real){real.value='';real.dispatchEvent(new Event('input',{bubbles:true}))}
+ if(results){results.innerHTML='';results.classList.add('hidden')}
+}
 function buildSafeHomeSearch(){
  const real=document.getElementById('q');
  const wrap=document.querySelector('#lgExactHome .exact-search-wrap');
@@ -39,15 +45,26 @@ function buildSafeHomeSearch(){
  safe.setAttribute('data-1p-ignore','true');
  safe.setAttribute('data-bwignore','true');
  safe.setAttribute('data-form-type','other');
- Object.assign(safe.style,{resize:'none',overflow:'hidden',whiteSpace:'nowrap',height:'100%',minHeight:'0',fontFamily:'inherit',lineHeight:'inherit'});
+ Object.assign(safe.style,{resize:'none',overflow:'hidden',whiteSpace:'nowrap',display:'block'});
  real.insertAdjacentElement('afterend',safe);
  const push=()=>{real.value=safe.value.replace(/[\r\n]+/g,' ');real.dispatchEvent(new Event('input',{bubbles:true}))};
  safe.addEventListener('input',push);
  safe.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();push()}});
  safe.addEventListener('paste',()=>setTimeout(push,0));
 }
+function observeHomeReturn(){
+ const home=document.getElementById('home');
+ if(!home||home.dataset.lgSearchReturnObserved==='1')return;
+ home.dataset.lgSearchReturnObserved='1';
+ let wasVisible=!home.classList.contains('hidden');
+ new MutationObserver(()=>{
+  const visible=!home.classList.contains('hidden');
+  if(visible&&!wasVisible)clearHomeSearch();
+  wasVisible=visible;
+ }).observe(home,{attributes:true,attributeFilter:['class']});
+}
 
-function refresh(){observeModals();wireTouchLock();syncModalLock();buildHeader();syncHeaderLanguage();buildSafeHomeSearch()}
+function refresh(){observeModals();wireTouchLock();syncModalLock();buildHeader();syncHeaderLanguage();buildSafeHomeSearch();observeHomeReturn()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh);else refresh();
 setTimeout(refresh,120);setTimeout(refresh,500);
 document.addEventListener('click',()=>setTimeout(syncModalLock,50),true);
