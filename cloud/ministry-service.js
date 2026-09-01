@@ -36,7 +36,7 @@ async function joinWithCode(code){
 
 async function listInvites(ministryId){
   const c=await client();
-  const {data,error}=await c.from('ministry_invites').select('id,ministry_id,role,created_by,created_at,expires_at,max_uses,use_count,revoked_at').eq('ministry_id',ministryId).order('created_at',{ascending:false});
+  const {data,error}=await c.from('ministry_invites').select('id,ministry_id,roster_member_id,role,created_by,created_at,expires_at,max_uses,use_count,revoked_at').eq('ministry_id',ministryId).order('created_at',{ascending:false});
   if(error)throw error;
   return data||[];
 }
@@ -47,5 +47,81 @@ async function revokeInvite(inviteId){
   if(error)throw error;
 }
 
-window.LAGREY_MINISTRIES={slugify,createMinistry,createInvite,joinWithCode,listInvites,revokeInvite};
+async function listRoster(ministryId){
+  const c=await client();
+  const {data,error}=await c.from('ministry_roster')
+    .select('id,ministry_id,display_name,music_roles,preferred_instrument,cloud_role,user_id,legacy_key,created_at,updated_at,last_seen_at')
+    .eq('ministry_id',ministryId)
+    .order('display_name',{ascending:true});
+  if(error)throw error;
+  return data||[];
+}
+
+async function getMyRosterProfile(ministryId){
+  const c=await client();
+  const user=await window.LAGREY_AUTH.getUser();
+  if(!user)return null;
+  const {data,error}=await c.from('ministry_roster')
+    .select('id,ministry_id,display_name,music_roles,preferred_instrument,cloud_role,user_id,legacy_key,last_seen_at')
+    .eq('ministry_id',ministryId)
+    .eq('user_id',user.id)
+    .maybeSingle();
+  if(error)throw error;
+  return data||null;
+}
+
+async function addRosterMember({ministryId,displayName,musicRoles=[],preferredInstrument='none',cloudRole='member',legacyKey=null}){
+  const c=await client();
+  const user=await window.LAGREY_AUTH.getUser();
+  if(!user)throw new Error('Authentication required');
+  const name=String(displayName||'').trim();
+  if(!name)throw new Error('El miembro necesita un nombre');
+  if(!['member','leader','admin'].includes(cloudRole))throw new Error('Rol inválido');
+  const payload={
+    ministry_id:ministryId,
+    display_name:name,
+    music_roles:[...new Set((musicRoles||[]).map(x=>String(x||'').trim()).filter(Boolean))],
+    preferred_instrument:['guitar','piano','voice','all','none'].includes(preferredInstrument)?preferredInstrument:'none',
+    cloud_role:cloudRole,
+    user_id:null,
+    legacy_key:legacyKey||null,
+    created_by:user.id
+  };
+  const {data,error}=await c.from('ministry_roster').insert(payload).select().single();
+  if(error)throw error;
+  return data;
+}
+
+async function updateRosterMember(rosterId,patch={}){
+  const c=await client();
+  const allowed={};
+  if(patch.displayName!==undefined)allowed.display_name=String(patch.displayName||'').trim();
+  if(patch.musicRoles!==undefined)allowed.music_roles=[...new Set((patch.musicRoles||[]).map(x=>String(x||'').trim()).filter(Boolean))];
+  if(patch.preferredInstrument!==undefined)allowed.preferred_instrument=['guitar','piano','voice','all','none'].includes(patch.preferredInstrument)?patch.preferredInstrument:'none';
+  if(patch.cloudRole!==undefined&&['owner','member','leader','admin'].includes(patch.cloudRole))allowed.cloud_role=patch.cloudRole;
+  if(patch.legacyKey!==undefined)allowed.legacy_key=patch.legacyKey||null;
+  if(!Object.keys(allowed).length)return null;
+  const {data,error}=await c.from('ministry_roster').update(allowed).eq('id',rosterId).select().single();
+  if(error)throw error;
+  return data;
+}
+
+async function createRosterInvite({rosterId,validHours=168,allowedUses=1}){
+  const c=await client();
+  const {data,error}=await c.rpc('create_roster_invite',{target_roster_member:rosterId,valid_hours:validHours,allowed_uses:allowedUses});
+  if(error)throw error;
+  return data;
+}
+
+async function touchPresence(ministryId){
+  const c=await client();
+  const {data,error}=await c.rpc('touch_ministry_presence',{target_ministry:ministryId});
+  if(error)throw error;
+  return data||null;
+}
+
+window.LAGREY_MINISTRIES={
+  slugify,createMinistry,createInvite,joinWithCode,listInvites,revokeInvite,
+  listRoster,getMyRosterProfile,addRosterMember,updateRosterMember,createRosterInvite,touchPresence
+};
 })();
