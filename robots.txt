@@ -3,3 +3,4 @@ Allow: /
 
 Sitemap: https://davidbag50-hash.github.io/himnario-la-grey-2.0/sitemap.xml
 Sitemap: https://davidbag50-hash.github.io/himnario-la-grey-2.0/sitemap.txt
+Sitemap: https://davidbag50-hash.github.io/himnario-la-grey-2.0/sitemap-seo.xml
