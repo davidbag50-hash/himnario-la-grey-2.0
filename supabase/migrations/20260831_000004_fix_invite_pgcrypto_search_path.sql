@@ -3,9 +3,9 @@
 begin;
 
 alter function public.create_ministry_invite(uuid,public.ministry_role,integer,integer)
-set search_path = public, extensions, pg_catalog;
+set search_path = pg_catalog, extensions, public;
 
 alter function public.join_ministry_with_code(text)
-set search_path = public, extensions, pg_catalog;
+set search_path = pg_catalog, extensions, public;
 
 commit;
