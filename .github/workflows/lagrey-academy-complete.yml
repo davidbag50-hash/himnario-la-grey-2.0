@@ -33,6 +33,7 @@ jobs:
           node --check voice.js
           node .github/scripts/lagrey-library-validate.js
           git diff --check
+          git add -N ACADEMIA-VOICE-VIDEO-SCRIPTS-v1.md academy-videos/README.md
           CHANGED="$(git diff --name-only | sort)"
           EXPECTED="$(printf 'ACADEMIA-VOICE-VIDEO-SCRIPTS-v1.md\nacademy-videos/README.md\nsw.js\nvoice.css\nvoice.js')"
           test "$CHANGED" = "$EXPECTED" || { echo "Archivos inesperados:"; printf '%s\n' "$CHANGED"; exit 1; }
