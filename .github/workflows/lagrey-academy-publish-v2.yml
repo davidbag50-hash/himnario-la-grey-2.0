@@ -1,0 +1,56 @@
+name: La Grey Academy Publish v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lagrey-academy-publish-v2.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lagrey-academy-publish-v2
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Build candidate
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/lagrey-academy-complete.py
+          sed -i 's/[[:space:]]\+$//' ACADEMIA-VOICE-VIDEO-SCRIPTS-v1.md academy-videos/README.md
+      - name: Validate candidate
+        run: |
+          set -euo pipefail
+          node --check voice.js
+          node .github/scripts/lagrey-library-validate.js
+          git diff --check
+          git add -N ACADEMIA-VOICE-VIDEO-SCRIPTS-v1.md academy-videos/README.md
+          CHANGED="$(git diff --name-only | sort)"
+          EXPECTED="$(printf 'ACADEMIA-VOICE-VIDEO-SCRIPTS-v1.md\nacademy-videos/README.md\nsw.js\nvoice.css\nvoice.js')"
+          test "$CHANGED" = "$EXPECTED" || { echo "Archivos inesperados:"; printf '%s\n' "$CHANGED"; exit 1; }
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "La Grey Maintenance"
+          git config user.email "actions@users.noreply.github.com"
+          git add ACADEMIA-VOICE-VIDEO-SCRIPTS-v1.md academy-videos/README.md voice.js voice.css sw.js
+          git diff --cached --check
+          git commit -m "Completar Academia vocal interactiva y preparar videos IA"
+          git push origin HEAD:main
+      - name: Verify
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+          node --check voice.js
+          node .github/scripts/lagrey-library-validate.js
