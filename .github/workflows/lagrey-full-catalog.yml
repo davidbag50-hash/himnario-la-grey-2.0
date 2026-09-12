@@ -1,0 +1,80 @@
+name: La Grey Full Catalog
+
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: lagrey-full-catalog-main
+  cancel-in-progress: false
+
+jobs:
+  full_catalog:
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[La Grey Full Catalog]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with: {ref: main, fetch-depth: 0}
+      - name: Validate current library
+        run: node .github/scripts/lagrey-library-validate.js
+      - name: Read import mode
+        env:
+          ISSUE_BODY: '${{ github.event.issue.body }}'
+        run: |
+          if printf '%s\n' "$ISSUE_BODY" | grep -Eiq '^dry_run:[[:space:]]*true[[:space:]]*$'; then echo 'LAGREY_FULL_DRY_RUN=true' >> "$GITHUB_ENV"; else echo 'LAGREY_FULL_DRY_RUN=false' >> "$GITHUB_ENV"; fi
+      - name: Build full catalog from verified L.A.M source
+        run: python3 .github/scripts/lagrey-full-catalog.py
+      - name: Validate complete candidate
+        run: |
+          set -euo pipefail
+          node .github/scripts/lagrey-library-validate.js
+          git diff --check
+          CHANGED="$(git diff --name-only | sort)"
+          EXPECTED="$(printf 'app.js\nindex.html\nsongs.js\nsw.js')"
+          test "$CHANGED" = "$EXPECTED" || { echo "Archivos inesperados: $CHANGED"; exit 1; }
+          printf '%s\n' app.js index.html songs.js sw.js > "$RUNNER_TEMP/lagrey-expected-files.txt"
+          : > "$RUNNER_TEMP/lagrey-hashes.txt"
+          while IFS= read -r FILE; do printf '%s\t%s\n' "$(git hash-object "$FILE")" "$FILE" >> "$RUNNER_TEMP/lagrey-hashes.txt"; done < "$RUNNER_TEMP/lagrey-expected-files.txt"
+      - name: Commit and push full catalog
+        if: env.LAGREY_FULL_DRY_RUN != 'true'
+        run: |
+          set -euo pipefail
+          BASE="$(cat "$RUNNER_TEMP/lagrey-base.txt")"
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$BASE" || { echo 'main cambió; abortando.'; exit 1; }
+          mapfile -t FILES < "$RUNNER_TEMP/lagrey-expected-files.txt"
+          git config user.name "La Grey Maintenance"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- "${FILES[@]}"
+          git diff --cached --check
+          test "$(git diff --cached --name-only | sort)" = "$(sort "$RUNNER_TEMP/lagrey-expected-files.txt")"
+          while IFS=$'\t' read -r HASH FILE; do test "$(git hash-object "$FILE")" = "$HASH"; done < "$RUNNER_TEMP/lagrey-hashes.txt"
+          git commit -F "$RUNNER_TEMP/lagrey-message.txt"
+          git push origin HEAD:main
+      - name: Verify published full catalog
+        if: env.LAGREY_FULL_DRY_RUN != 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          HEAD_SHA="$(git rev-parse HEAD)"
+          test "$(git rev-parse origin/main)" = "$HEAD_SHA"
+          while IFS=$'\t' read -r HASH FILE; do test "$(git rev-parse "HEAD:$FILE")" = "$HASH"; done < "$RUNNER_TEMP/lagrey-hashes.txt"
+          node .github/scripts/lagrey-library-validate.js
+      - name: Report success
+        if: success()
+        env: {GH_TOKEN: '${{ github.token }}', ISSUE_NUMBER: '${{ github.event.issue.number }}'}
+        run: |
+          RESULT="$(cat "$RUNNER_TEMP/lagrey-result.txt")"
+          if [ "$LAGREY_FULL_DRY_RUN" = "true" ]; then MSG="✅ Dry-run del catálogo completo correcto. No se publicó nada. $RESULT"; else MSG="✅ Catálogo completo publicado y verificado. $RESULT"; fi
+          gh issue comment "$ISSUE_NUMBER" --body "$MSG"
+          gh issue close "$ISSUE_NUMBER" --reason completed
+      - name: Report failure
+        if: failure()
+        env: {GH_TOKEN: '${{ github.token }}', ISSUE_NUMBER: '${{ github.event.issue.number }}'}
+        run: gh issue comment "$ISSUE_NUMBER" --body "❌ Importación del catálogo completo abortada de forma segura. No se publicó el candidato."
