@@ -12,6 +12,7 @@ function loadRoot(src){return new Promise((resolve,reject)=>{if(document.querySe
     for(const file of FILES)await load(file);
     await loadRoot('credential-isolation-v1.js');
     await loadRoot('account-onboarding-v2.js');
+    await loadRoot('account-onboarding-ministry-v1.js');
     await loadRoot('members-roster-v1.js');
     await loadRoot('members-roster-state-fix-v1.js');
     await loadRoot('members-management-v1.js');
