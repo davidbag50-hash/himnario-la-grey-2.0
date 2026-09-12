@@ -25,7 +25,9 @@ jobs:
           fetch-depth: 0
 
       - name: Build Academy voice completion
-        run: python3 .github/scripts/lagrey-academy-complete.py
+        run: |
+          python3 .github/scripts/lagrey-academy-complete.py
+          sed -i 's/[[:space:]]\+$//' ACADEMIA-VOICE-VIDEO-SCRIPTS-v1.md academy-videos/README.md
 
       - name: Validate candidate
         run: |
