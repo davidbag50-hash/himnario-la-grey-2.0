@@ -1,0 +1,44 @@
+name: La Grey - Pulir video de Academia
+
+on:
+  push:
+    paths:
+      - '.github/workflows/lagrey-academy-video-polish.yml'
+      - '.github/scripts/lagrey-academy-video-polish.py'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Aplicar cambios canónicos
+        run: python3 .github/scripts/lagrey-academy-video-polish.py
+      - name: Validar implementación
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check voice.js
+          ! grep -q 'resource2.heygen.ai/text_to_speech' voice.js
+          ! grep -q '<audio controls' voice.js
+          grep -q 'preload="${preload}"' voice.js
+          grep -q 'academy-videos/passaggio/scene-01.svg' voice.js
+          grep -q "la-grey-v3-202-academy-video-eager" sw.js
+          grep -q "./academy-videos/passaggio/scene-01.svg" sw.js
+          git diff --check
+          changed=$(git diff --name-only | sort | tr '\n' ' ')
+          echo "Cambios: $changed"
+          test "$changed" = "sw.js voice.js "
+      - name: Publicar cambios canónicos
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add voice.js sw.js
+          git commit -m "Acelerar video de Passaggio y retirar narración antigua"
+          git push origin HEAD:main
