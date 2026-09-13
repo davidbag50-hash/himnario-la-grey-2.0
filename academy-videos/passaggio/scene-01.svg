@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071f2b"/><stop offset="0.55" stop-color="#0b3542"/><stop offset="1" stop-color="#0b5360"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#65d9d4" stop-opacity=".35"/><stop offset="1" stop-color="#65d9d4" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1280" height="720" fill="url(#bg)"/><circle cx="1040" cy="160" r="270" fill="url(#glow)"/>
+<g fill="none" stroke="#83e6df" stroke-opacity=".18" stroke-width="3"><path d="M40 210 C210 90 340 330 510 210 S820 90 1010 215 S1190 310 1280 220"/><path d="M20 250 C190 130 360 370 540 245 S830 130 1040 250 S1200 340 1300 250"/></g>
+<g opacity=".16" fill="none" stroke="#fff" stroke-width="3"><path d="M865 460 C930 380 1000 380 1065 460 C1130 540 1200 540 1260 460"/></g>
+<text x="90" y="105" fill="#a7e9e4" font-family="Arial,sans-serif" font-size="23" letter-spacing="5">LA GREY · ACADEMIA</text>
+<text x="90" y="145" fill="#b9cdd1" font-family="Arial,sans-serif" font-size="15" letter-spacing="4">VOZ AVANZADA</text>
+<line x1="90" y1="177" x2="400" y2="177" stroke="#6dd7d1" stroke-width="2" opacity=".7"/>
+<text x="90" y="320" fill="#f5f7f5" font-family="Georgia,serif" font-size="76">Passaggio</text>
+<text x="90" y="400" fill="#75d9d3" font-family="Georgia,serif" font-style="italic" font-size="76">sin tensión</text>
+<text x="94" y="462" fill="#d6e4e5" font-family="Arial,sans-serif" font-size="25">Coordina la transición. No conquistes la nota a la fuerza.</text>
+<g transform="translate(795,480)"><rect x="0" y="0" width="390" height="135" rx="18" fill="#06171f" fill-opacity=".55" stroke="#65d9d4" stroke-opacity=".35"/>
+<text x="28" y="35" fill="#9ee7e2" font-family="Arial,sans-serif" font-size="16" letter-spacing="2">GRAVE</text><text x="172" y="35" fill="#9ee7e2" font-family="Arial,sans-serif" font-size="16" letter-spacing="2">MEDIO</text><text x="302" y="35" fill="#9ee7e2" font-family="Arial,sans-serif" font-size="16" letter-spacing="2">AGUDO</text>
+<path d="M30 87 C120 120 150 45 205 82 C250 112 288 48 355 75" fill="none" stroke="#72ddd6" stroke-width="6" stroke-linecap="round"/><circle cx="205" cy="82" r="14" fill="#e9ffff"/><text x="145" y="124" fill="#cfecee" font-family="Arial,sans-serif" font-size="14">zona de transición</text></g>
+<text x="90" y="650" fill="#9ab7ba" font-family="Arial,sans-serif" font-size="15" letter-spacing="4">TÉCNICA · EXPRESIÓN · ADORACIÓN</text>
+</svg>
