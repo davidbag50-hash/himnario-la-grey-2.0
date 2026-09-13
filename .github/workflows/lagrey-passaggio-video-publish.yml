@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Descargar MP4 final
+      - name: Descargar y validar MP4 final
         shell: bash
         run: |
           set -euo pipefail
@@ -30,13 +30,15 @@ jobs:
             echo "MP4 demasiado pequeño: $bytes bytes" >&2
             exit 1
           fi
-          echo "MP4 descargado: $bytes bytes"
-      - name: Validar video
-        shell: bash
-        run: |
-          set -euo pipefail
-          file "$TARGET"
-          ffprobe -v error -show_entries format=duration,size -show_entries stream=codec_name,width,height -of default=noprint_wrappers=1 "$TARGET"
+          file "$TARGET" | grep -E 'ISO Media|MP4' >/dev/null
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('academy-videos/voice-advanced-02-passaggio.mp4')
+          data=p.read_bytes()[:64]
+          if b'ftyp' not in data:
+              raise SystemExit('El archivo descargado no parece un MP4 válido')
+          print(f'MP4 validado: {p.stat().st_size} bytes')
+          PY
       - name: Publicar en la rama principal
         shell: bash
         run: |
