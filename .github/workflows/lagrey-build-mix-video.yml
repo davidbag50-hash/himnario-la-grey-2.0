@@ -59,7 +59,9 @@ jobs:
           ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 /tmp/voice1.mp3
 
       - name: Build Mix lesson video
-        run: python .github/scripts/lagrey-build-mix-video.py
+        run: |
+          export MECABRC="$(python -c "import unidic_lite, os; print(os.path.join(unidic_lite.DICDIR, 'mecabrc'))")"
+          python .github/scripts/lagrey-build-mix-video.py
 
       - name: Validate final MP4
         run: |
