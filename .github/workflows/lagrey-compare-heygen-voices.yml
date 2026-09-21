@@ -1,0 +1,112 @@
+name: La Grey Compare HeyGen Voices
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lagrey-compare-heygen-voices.yml'
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          python -m pip install 'speechbrain==1.0.3' 'soundfile>=0.12' 'librosa>=0.10' 'huggingface_hub<1.0'
+
+      - name: Download HeyGen previews
+        run: |
+          curl -L --fail 'https://resource2.heygen.ai/voice_preview/RL5lt8U5iZPap1qaQQuU.mp3' -o /tmp/voz1.mp3
+          curl -L --fail 'https://resource2.heygen.ai/voice_preview/p7FO3b63O1YZ2DyVefwt.mp3' -o /tmp/voz3.mp3
+          ffmpeg -y -v error -i /tmp/voz1.mp3 -ar 16000 -ac 1 /tmp/voz1.wav
+          ffmpeg -y -v error -i /tmp/voz3.mp3 -ar 16000 -ac 1 /tmp/voz3.wav
+          ffmpeg -y -v error -i academy-videos/voice-advanced-02-passaggio.mp4 -vn -ar 16000 -ac 1 /tmp/passaggio.wav
+
+      - name: Compare speaker similarity
+        run: |
+          python - <<'PY'
+          import json, math
+          import torch
+          import torchaudio
+          import librosa
+          import numpy as np
+          from speechbrain.inference.speaker import EncoderClassifier
+
+          model = EncoderClassifier.from_hparams(
+              source='speechbrain/spkrec-ecapa-voxceleb',
+              savedir='/tmp/spkrec-ecapa'
+          )
+
+          def load(path):
+              wav, sr = torchaudio.load(path)
+              if sr != 16000:
+                  wav = torchaudio.functional.resample(wav, sr, 16000)
+              return wav.mean(dim=0, keepdim=True)
+
+          def embed(wav):
+              with torch.no_grad():
+                  e = model.encode_batch(wav).squeeze().cpu()
+              return torch.nn.functional.normalize(e, dim=0)
+
+          def trim_silence_np(path):
+              y, sr = librosa.load(path, sr=16000, mono=True)
+              y, _ = librosa.effects.trim(y, top_db=35)
+              return torch.from_numpy(y).float().unsqueeze(0)
+
+          p = trim_silence_np('/tmp/passaggio.wav')
+          v1 = trim_silence_np('/tmp/voz1.wav')
+          v3 = trim_silence_np('/tmp/voz3.wav')
+
+          # Average several Passaggio windows so one phrase does not dominate.
+          sr = 16000
+          win = 18 * sr
+          hop = 12 * sr
+          embeds = []
+          for start in range(0, max(1, p.shape[-1] - win + 1), hop):
+              chunk = p[..., start:start+win]
+              if chunk.shape[-1] >= 6 * sr:
+                  embeds.append(embed(chunk))
+          if not embeds:
+              embeds = [embed(p)]
+          pe = torch.nn.functional.normalize(torch.stack(embeds).mean(dim=0), dim=0)
+          e1 = embed(v1)
+          e3 = embed(v3)
+
+          s1 = torch.dot(pe, e1).item()
+          s3 = torch.dot(pe, e3).item()
+
+          def pitch_stats(path):
+              y, sr = librosa.load(path, sr=16000, mono=True)
+              f0, voiced, _ = librosa.pyin(y, fmin=60, fmax=300, sr=sr)
+              vals = f0[np.isfinite(f0)]
+              return {
+                  'median_hz': float(np.median(vals)) if len(vals) else None,
+                  'mean_hz': float(np.mean(vals)) if len(vals) else None
+              }
+
+          result = {
+              'passaggio_windows': len(embeds),
+              'voice1_similarity': round(s1, 6),
+              'voice3_similarity': round(s3, 6),
+              'winner': 'voz 3' if s3 > s1 else 'voz 1',
+              'margin': round(abs(s3-s1), 6),
+              'pitch': {
+                  'passaggio': pitch_stats('/tmp/passaggio.wav'),
+                  'voz1': pitch_stats('/tmp/voz1.wav'),
+                  'voz3': pitch_stats('/tmp/voz3.wav')
+              }
+          }
+          print('LAGREY_VOICE_COMPARISON=' + json.dumps(result, ensure_ascii=False))
+          PY
