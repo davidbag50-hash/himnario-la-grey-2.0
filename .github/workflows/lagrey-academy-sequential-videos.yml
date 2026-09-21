@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: lagrey-academy-video-production
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -56,9 +56,9 @@ jobs:
       - name: Extract Passaggio voice reference
         run: |
           test -s academy-videos/voice-advanced-02-passaggio.mp4
-          ffmpeg -y -v error -ss 2 -t 18 -i academy-videos/voice-advanced-02-passaggio.mp4 -vn -af loudnorm=I=-18:TP=-2:LRA=7 -ar 24000 -ac 1 -c:a pcm_s16le /tmp/passaggio-voice.wav
+          ffmpeg -y -v error -ss 10 -t 24 -i academy-videos/voice-advanced-02-passaggio.mp4 -vn -af loudnorm=I=-18:TP=-2:LRA=7 -ar 24000 -ac 1 -c:a pcm_s16le /tmp/passaggio-voice.wav
           ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 /tmp/passaggio-voice.wav
 
       - name: Build and publish Academy videos one by one
-        # Voice correction pass: Passaggio reference + Chatterbox V3
+        # Voice correction pass v2: smoother prosody, Mix only until approved
         run: python .github/scripts/lagrey-build-academy-sequential.py
