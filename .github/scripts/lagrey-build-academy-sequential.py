@@ -12,7 +12,7 @@ ROOT = Path(os.environ.get("GITHUB_WORKSPACE", ".")).resolve()
 VOICE_REF = Path("/tmp/passaggio-voice.wav")
 SR = 24000
 
-LESSONS = [
+# REVIEW_GATE_AFTER_MIX: validar la voz corregida antes de reemplazar las demás clases.\nLESSONS = [
     {
         "id": "voice-advanced-01-mix",
         "slug": "mix",
