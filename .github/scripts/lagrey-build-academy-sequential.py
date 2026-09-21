@@ -3,13 +3,13 @@ import os
 import shutil
 import subprocess
 import sys
+import re
 import torch
-from openvoice.api import ToneColorConverter
-from melo.api import TTS
+import torchaudio as ta
+from chatterbox.mtl_tts import ChatterboxMultilingualTTS
 
 ROOT = Path(os.environ.get("GITHUB_WORKSPACE", ".")).resolve()
 VOICE_REF = Path("/tmp/passaggio-voice.wav")
-CHECKPOINT_HINT = Path("/tmp/OpenVoiceV2")
 SR = 24000
 
 LESSONS = [
@@ -17,7 +17,7 @@ LESSONS = [
         "id": "voice-advanced-01-mix",
         "slug": "mix",
         "label": "Mezcla vocal",
-        "commit": "Agregar video Academia · Mezcla vocal",
+        "commit": "Corregir voz Academia · Mezcla vocal con referencia Passaggio",
         "narration": [
             "Bienvenido a Academia La Grey. En esta clase trabajaremos la mezcla vocal y la transición entre registros. La mezcla no es una voz nueva ni un lugar misterioso. Es una coordinación progresiva que permite subir sin convertir cada nota alta en más volumen y más presión. La meta es mantener continuidad mientras ajustamos peso, intensidad y vocal de manera gradual. Trabaja siempre en una zona cómoda y recuerda que una nota más alta no tiene que sentirse como una nota más pesada.",
             "Al subir, la voz necesita reorganizarse. Normalmente conviene reducir un poco el peso, mantener el cuello y la mandíbula libres y permitir que la vocal se vuelva más eficiente. No buscamos esconder la voz ni volverla débil. Buscamos conservar energía útil sin arrastrar una coordinación pesada hacia arriba. Si el sonido se vuelve más libre y repetible, vas por buen camino. Si cada repetición exige más fuerza, baja intensidad o vuelve a una nota más cómoda.",
@@ -31,7 +31,7 @@ LESSONS = [
         "id": "voice-advanced-03-dynamics",
         "slug": "dynamics",
         "label": "Control dinámico",
-        "commit": "Agregar video Academia · Control dinámico",
+        "commit": "Corregir voz Academia · Control dinámico con referencia Passaggio",
         "narration": [
             "Bienvenido a Academia La Grey. En esta clase vamos a trabajar control dinámico y volumen útil. Cantar suave no significa cantar sin apoyo, y cantar firme no significa gritar. La dinámica es una herramienta musical para crear contraste y comunicar mejor el texto sin obligar a la voz a trabajar siempre al máximo.",
             "Cuando cambias de suave a medio o de medio a firme, la afinación debería mantenerse estable y el cuello no tendría que endurecerse. Piensa en intensidad útil, no en volumen absoluto. El micrófono está para amplificarte. No necesitas competir acústicamente con la batería, las guitarras o los monitores.",
@@ -45,7 +45,7 @@ LESSONS = [
         "id": "voice-advanced-04-intervals",
         "slug": "intervals",
         "label": "Afinación e intervalos",
-        "commit": "Agregar video Academia · Afinación e intervalos",
+        "commit": "Corregir voz Academia · Afinación e intervalos con referencia Passaggio",
         "narration": [
             "Bienvenido a Academia La Grey. En esta clase trabajaremos afinación avanzada e intervalos. Afinar no es solamente llegar a una nota. También implica escuchar la referencia, anticipar la distancia y entrar de forma limpia sin deslizarte desde otra nota para encontrarla.",
             "Antes de cantar un salto, escucha mentalmente la nota de destino. Esa pequeña anticipación cambia la coordinación. Una entrada segura suele ser más pequeña y precisa, no más fuerte. Si no estás seguro de la nota, subir el volumen no la vuelve más correcta.",
@@ -59,7 +59,7 @@ LESSONS = [
         "id": "voice-advanced-05-harmony",
         "slug": "harmony",
         "label": "Armonías",
-        "commit": "Agregar video Academia · Armonías",
+        "commit": "Corregir voz Academia · Armonías con referencia Passaggio",
         "narration": [
             "Bienvenido a Academia La Grey. En esta clase vamos a trabajar armonías para ministerios de alabanza. Una segunda voz útil no consiste en cantar cualquier nota diferente de la melodía. Debe pertenecer al acorde y cumplir una función dentro del arreglo.",
             "Empecemos con una tríada mayor: raíz, tercera y quinta. Aprende a reconocer cada función por separado. La raíz da estabilidad, la tercera define gran parte del color mayor o menor, y la quinta completa el acorde. Escuchar el acorde completo es tan importante como escuchar tu propia voz.",
@@ -73,7 +73,7 @@ LESSONS = [
         "id": "voice-advanced-06-endurance",
         "slug": "endurance",
         "label": "Resistencia vocal",
-        "commit": "Agregar video Academia · Resistencia vocal",
+        "commit": "Corregir voz Academia · Resistencia vocal con referencia Passaggio",
         "narration": [
             "Bienvenido a Academia La Grey. En esta clase trabajaremos resistencia vocal para ensayos y cultos. Resistencia no significa aguantar dolor ni cantar fuerte durante más tiempo. Significa administrar la voz para que siga coordinada durante una sesión larga.",
             "La resistencia se construye con eficiencia, pausas, tonos adecuados e intensidad sostenible. Una buena señal es terminar el ensayo con una voz parecida a como empezaste. Si cada canción exige el máximo, el problema no se resuelve simplemente intentando resistir más.",
@@ -87,7 +87,7 @@ LESSONS = [
         "id": "voice-advanced-07-agility",
         "slug": "agility",
         "label": "Agilidad y melismas",
-        "commit": "Agregar video Academia · Agilidad y melismas",
+        "commit": "Corregir voz Academia · Agilidad y melismas con referencia Passaggio",
         "narration": [
             "Bienvenido a Academia La Grey. En esta clase vamos a trabajar agilidad y melismas controlados. Un adorno rápido solo es útil cuando conserva ritmo, afinación y claridad. La velocidad no debería esconder notas que todavía no están coordinadas.",
             "Antes de acelerar un melisma, cántalo lento y asegúrate de que puedes identificar cada nota. La mandíbula no debe marcar cada cambio. Piensa en una línea continua donde cada nota tiene un lugar exacto dentro del pulso.",
@@ -101,7 +101,7 @@ LESSONS = [
         "id": "voice-advanced-08-setlist",
         "slug": "setlist",
         "label": "Preparar un setlist",
-        "commit": "Agregar video Academia · Preparar un setlist",
+        "commit": "Corregir voz Academia · Preparar un setlist con referencia Passaggio",
         "narration": [
             "Bienvenido a Academia La Grey. En esta clase vamos a convertir todo lo anterior en una preparación vocal concreta para un setlist real. La preparación avanzada comienza antes de cantar: revisa tonalidad, frases exigentes, duración, armonías y distribución de carga.",
             "Por cada canción identifica el tono oficial, la frase más exigente, cuánto tiempo cantas de forma continua y dónde aparecen las armonías. Saber esto antes del ensayo evita descubrir en vivo que una canción está demasiado alta o que varias canciones difíciles quedaron juntas.",
@@ -117,64 +117,76 @@ def sh(cmd, check=True):
     print("+", " ".join(map(str, cmd)), flush=True)
     return subprocess.run([str(x) for x in cmd], check=check)
 
-def find_ckpt_root():
-    candidates = [
-        CHECKPOINT_HINT,
-        CHECKPOINT_HINT / "checkpoints_v2",
-        Path("/tmp/checkpoints_v2"),
-    ]
-    for c in candidates:
-        if (c / "converter" / "config.json").exists() and (c / "base_speakers" / "ses").exists():
-            return c
-    for cfg in Path("/tmp").glob("**/converter/config.json"):
-        c = cfg.parent.parent
-        if (c / "base_speakers" / "ses").exists():
-            return c
-    raise RuntimeError("OpenVoice V2 checkpoints not found")
-
-def torch_load(path, device="cpu"):
-    try:
-        return torch.load(path, map_location=device, weights_only=False)
-    except TypeError:
-        return torch.load(path, map_location=device)
-
 def init_voice():
     if not VOICE_REF.exists():
         raise RuntimeError("Passaggio voice reference is missing")
-    ckpt = find_ckpt_root()
     device = "cpu"
-    converter = ToneColorConverter(str(ckpt / "converter" / "config.json"), device=device)
-    converter.load_ckpt(str(ckpt / "converter" / "checkpoint.pth"))
-    target_se = converter.extract_se(str(VOICE_REF))
-    model = TTS(language="ES", device=device)
-    speaker_ids = model.hps.data.spk2id
-    if not speaker_ids:
-        raise RuntimeError("MeloTTS Spanish speaker unavailable")
-    speaker_key = next(iter(speaker_ids.keys()))
-    speaker_id = speaker_ids[speaker_key]
-    key = speaker_key.lower().replace("_", "-")
-    source_se_path = ckpt / "base_speakers" / "ses" / f"{key}.pth"
-    if not source_se_path.exists():
-        matches = list((ckpt / "base_speakers" / "ses").glob("*.pth"))
-        spanish = [p for p in matches if "es" in p.stem.lower()]
-        source_se_path = (spanish or matches)[0]
-    source_se = torch_load(source_se_path, device)
-    return model, speaker_id, converter, source_se, target_se
+    torch.set_num_threads(max(2, min(4, os.cpu_count() or 2)))
+    model = ChatterboxMultilingualTTS.from_pretrained(device=device, t3_model="v3")
+    model.prepare_conditionals(str(VOICE_REF), exaggeration=0.45)
+    print(f"Chatterbox Multilingual V3 ready at {model.sr} Hz using Passaggio reference", flush=True)
+    return model
+
+def split_for_tts(text, max_chars=260):
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\\s+", text.strip()) if s.strip()]
+    chunks = []
+    current = ""
+    for sentence in sentences:
+        candidate = sentence if not current else current + " " + sentence
+        if len(candidate) <= max_chars:
+            current = candidate
+            continue
+        if current:
+            chunks.append(current)
+        if len(sentence) <= max_chars:
+            current = sentence
+            continue
+        words = sentence.split()
+        current = ""
+        for word in words:
+            candidate = word if not current else current + " " + word
+            if len(candidate) > max_chars and current:
+                chunks.append(current)
+                current = word
+            else:
+                current = candidate
+    if current:
+        chunks.append(current)
+    return chunks
 
 def clone_tts(text, output, voice):
-    model, speaker_id, converter, source_se, target_se = voice
     output = Path(output)
-    base = output.with_name(output.stem + "-base.wav")
-    model.tts_to_file(text, speaker_id, str(base), speed=1.0)
-    converter.convert(
-        audio_src_path=str(base),
-        src_se=source_se,
-        tgt_se=target_se,
-        output_path=str(output),
-        message="LaGreyAcademy",
-    )
-    sh(["ffmpeg", "-y", "-v", "error", "-i", output, "-ar", str(SR), "-ac", "1", "-c:a", "pcm_s16le", output.with_suffix(".normalized.wav")])
-    output.with_suffix(".normalized.wav").replace(output)
+    pieces = []
+    chunks = split_for_tts(text)
+    if not chunks:
+        raise RuntimeError("Empty narration chunk")
+    for index, chunk in enumerate(chunks):
+        torch.manual_seed(20260921 + len(text) + index)
+        with torch.inference_mode():
+            wav = voice.generate(
+                chunk,
+                language_id="es",
+                exaggeration=0.45,
+                cfg_weight=0.35,
+                temperature=0.72,
+                repetition_penalty=1.2,
+                min_p=0.05,
+                top_p=1.0,
+            )
+        if wav.dim() == 1:
+            wav = wav.unsqueeze(0)
+        pieces.append(wav.cpu())
+        if index < len(chunks) - 1:
+            pieces.append(torch.zeros((1, int(voice.sr * 0.18)), dtype=wav.dtype))
+    merged = torch.cat(pieces, dim=-1)
+    raw = output.with_name(output.stem + "-raw.wav")
+    ta.save(str(raw), merged, voice.sr)
+    sh([
+        "ffmpeg", "-y", "-v", "error", "-i", raw,
+        "-af", "loudnorm=I=-18:TP=-2:LRA=7",
+        "-ar", str(SR), "-ac", "1", "-c:a", "pcm_s16le", output
+    ])
+    raw.unlink(missing_ok=True)
 
 def media_duration(path):
     return float(subprocess.check_output([
