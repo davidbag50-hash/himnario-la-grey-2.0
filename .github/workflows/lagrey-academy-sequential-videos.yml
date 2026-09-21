@@ -42,13 +42,15 @@ jobs:
           python -m pip install 'torch==2.6.0' 'torchaudio==2.6.0' --index-url https://download.pytorch.org/whl/cpu
           python -m pip install 'chatterbox-tts==0.1.7'
           python -m pip install --no-deps --force-reinstall git+https://github.com/resemble-ai/chatterbox.git@master
+          python -m pip install --force-reinstall git+https://github.com/resemble-ai/Perth.git@master
           python - <<'PY'
-          import torch, torchaudio
+          import torch, torchaudio, perth
           from chatterbox.mtl_tts import ChatterboxMultilingualTTS
           print('torch', torch.__version__, 'torchaudio', torchaudio.__version__)
           import inspect
           print('languages', ChatterboxMultilingualTTS.get_supported_languages().get('es'))
           print('from_pretrained', inspect.signature(ChatterboxMultilingualTTS.from_pretrained))
+          print('watermarker', perth.PerthImplicitWatermarker)
           PY
 
       - name: Extract Passaggio voice reference
