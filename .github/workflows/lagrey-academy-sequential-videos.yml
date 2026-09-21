@@ -42,7 +42,7 @@ jobs:
           python -m pip install 'torch==2.6.0' 'torchaudio==2.6.0' --index-url https://download.pytorch.org/whl/cpu
           python -m pip install 'chatterbox-tts==0.1.7'
           python -m pip install --no-deps --force-reinstall git+https://github.com/resemble-ai/chatterbox.git@master
-          python -m pip install --force-reinstall git+https://github.com/resemble-ai/Perth.git@master
+          python -m pip install --no-deps --force-reinstall git+https://github.com/resemble-ai/Perth.git@master
           python - <<'PY'
           import torch, torchaudio, perth
           from chatterbox.mtl_tts import ChatterboxMultilingualTTS
@@ -60,4 +60,5 @@ jobs:
           ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 /tmp/passaggio-voice.wav
 
       - name: Build and publish Academy videos one by one
+        # Voice correction pass: Passaggio reference + Chatterbox V3
         run: python .github/scripts/lagrey-build-academy-sequential.py
