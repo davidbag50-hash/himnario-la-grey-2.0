@@ -5,7 +5,7 @@ import subprocess
 import sys
 import re
 import torch
-import torchaudio as ta
+import soundfile as sf
 from chatterbox.mtl_tts import ChatterboxMultilingualTTS
 
 ROOT = Path(os.environ.get("GITHUB_WORKSPACE", ".")).resolve()
@@ -180,7 +180,7 @@ def clone_tts(text, output, voice):
             pieces.append(torch.zeros((1, int(voice.sr * 0.18)), dtype=wav.dtype))
     merged = torch.cat(pieces, dim=-1)
     raw = output.with_name(output.stem + "-raw.wav")
-    ta.save(str(raw), merged, voice.sr)
+    sf.write(str(raw), merged.squeeze(0).numpy(), voice.sr, subtype="PCM_16")
     sh([
         "ffmpeg", "-y", "-v", "error", "-i", raw,
         "-af", "loudnorm=I=-18:TP=-2:LRA=7",
