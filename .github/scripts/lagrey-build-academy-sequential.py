@@ -12,7 +12,8 @@ ROOT = Path(os.environ.get("GITHUB_WORKSPACE", ".")).resolve()
 VOICE_REF = Path("/tmp/passaggio-voice.wav")
 SR = 24000
 
-# REVIEW_GATE_AFTER_MIX: validar la voz corregida antes de reemplazar las demás clases.\nLESSONS = [
+# REVIEW_GATE_AFTER_MIX: validar la voz corregida antes de reemplazar las demás clases.
+LESSONS = [
     {
         "id": "voice-advanced-01-mix",
         "slug": "mix",
@@ -123,11 +124,11 @@ def init_voice():
     device = "cpu"
     torch.set_num_threads(max(2, min(4, os.cpu_count() or 2)))
     model = ChatterboxMultilingualTTS.from_pretrained(device=device, t3_model="v3")
-    model.prepare_conditionals(str(VOICE_REF), exaggeration=0.45)
+    model.prepare_conditionals(str(VOICE_REF), exaggeration=0.30)
     print(f"Chatterbox Multilingual V3 ready at {model.sr} Hz using Passaggio reference", flush=True)
     return model
 
-def split_for_tts(text, max_chars=260):
+def split_for_tts(text, max_chars=800):
     sentences = [s.strip() for s in re.split(r"(?<=[.!?])\\s+", text.strip()) if s.strip()]
     chunks = []
     current = ""
@@ -166,18 +167,18 @@ def clone_tts(text, output, voice):
             wav = voice.generate(
                 chunk,
                 language_id="es",
-                exaggeration=0.45,
-                cfg_weight=0.35,
-                temperature=0.72,
+                exaggeration=0.30,
+                cfg_weight=0.50,
+                temperature=0.65,
                 repetition_penalty=1.2,
                 min_p=0.05,
-                top_p=1.0,
+                top_p=0.95,
             )
         if wav.dim() == 1:
             wav = wav.unsqueeze(0)
         pieces.append(wav.cpu())
         if index < len(chunks) - 1:
-            pieces.append(torch.zeros((1, int(voice.sr * 0.18)), dtype=wav.dtype))
+            pieces.append(torch.zeros((1, int(voice.sr * 0.08)), dtype=wav.dtype))
     merged = torch.cat(pieces, dim=-1)
     raw = output.with_name(output.stem + "-raw.wav")
     sf.write(str(raw), merged.squeeze(0).numpy(), voice.sr, subtype="PCM_16")
@@ -265,7 +266,7 @@ def main():
     sh(["git", "config", "user.name", "github-actions[bot]"])
     sh(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"])
     voice = init_voice()
-    for lesson in LESSONS:
+    for lesson in LESSONS[:1]:
         print(f"=== START {lesson['id']} ===", flush=True)
         output = build_lesson(lesson, voice)
         publish(output, lesson)
