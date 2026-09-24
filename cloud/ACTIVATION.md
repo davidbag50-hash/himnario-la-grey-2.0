@@ -1,103 +1,174 @@
-# La Grey Cloud — Activación
+# La Grey Cloud — Activación y verificación
 
-La infraestructura del cliente y las migraciones están preparadas, pero la nube permanece desactivada hasta conectar un proyecto Supabase real.
+## Estado actual
 
-## 1. Crear proyecto Supabase
+La configuración pública del cliente está activa en `cloud/config.js`.
 
-Crear un proyecto de desarrollo para La Grey en Supabase.
+Eso significa que La Grey **ya intenta iniciar Supabase** cuando la aplicación carga. Este documento ya no describe una nube “apagada”; ahora sirve para comprobar que el proyecto remoto tenga todas las migraciones necesarias y que cada capacidad funcione con RLS.
 
-Guardar solamente estos valores públicos del cliente:
+Nunca colocar `service_role`, secret keys, secretos de pago ni claves privadas en el repositorio o cliente.
 
-- Project URL
-- anon/public key
+## Migraciones requeridas
 
-Nunca copiar ni publicar `service_role` ni secretos privados dentro del repositorio o de la aplicación cliente.
+Aplicar **en este orden**, sin saltos:
 
-## 2. Aplicar migraciones
+1. `20260831_000001_lagrey_cloud_base.sql`
+   - perfiles
+   - ministerios
+   - membresías
+   - repertorio
+   - notas compartidas
+   - preferencias base
+   - RLS inicial
 
-Ejecutar, en este orden:
+2. `20260831_000002_harden_ministry_ownership.sql`
+   - endurece propiedad del ministerio
+   - protege al owner
 
-1. `supabase/migrations/20260831_000001_lagrey_cloud_base.sql`
-2. `supabase/migrations/20260831_000002_security_hardening.sql`
-3. `supabase/migrations/20260831_000003_ministry_invites.sql`
+3. `20260831_000003_ministry_invites.sql`
+   - invitaciones
 
-## 3. Activar configuración pública
+4. `20260831_000004_fix_invite_pgcrypto_search_path.sql`
+   - corrige el `search_path` de invitaciones
 
-Editar `cloud/config.js`:
+5. `20260901_000005_ministry_roster_presence.sql`
+   - roster del ministerio
+   - funciones musicales
+   - instrumento preferido inicial
+
+6. `20260901_000006_roster_member_management.sql`
+   - administración segura de miembros
+   - RPCs de edición
+
+7. `20260924_000007_ministry_calendar.sql`
+   - calendario compartido
+   - ensayos
+   - servicios/eventos
+   - setlists
+
+8. `20260924_000008_user_favorites.sql`
+   - favoritos personales sincronizados
+
+9. `20260924_000009_learning_progress.sql`
+   - progreso genérico de Academia/Mi Ruta/setlists
+
+10. `20260924_000010_preferred_music_roles.sql`
+    - amplía función/instrumento preferido a Bajo y Batería
+
+11. `20260924_000011_user_song_notes.sql`
+    - notas personales privadas por canción
+
+## Cómo comprobar el estado real
+
+Con La Grey abierta, autenticado:
 
 ```js
-window.LAGREY_CLOUD_CONFIG={
-  enabled:true,
-  supabaseUrl:'https://TU-PROYECTO.supabase.co',
-  supabaseAnonKey:'TU-ANON-PUBLIC-KEY',
-  schema:'public'
-};
+const report = await LAGREY_CLOUD_DIAGNOSTICS.run();
+console.table(report.checks);
+report.summary;
 ```
 
-La anon key es pública por diseño. La seguridad real depende de Auth + RLS.
-
-## 4. Cargar Cloud desde la app
-
-La integración se concentra en un único cargador:
-
-```html
-<script src="cloud/loader.js"></script>
-```
-
-`cloud/loader.js` carga, en orden:
-
-- `config.js`
-- `data-service.js`
-- `supabase-client.js`
-- `auth-service.js`
-- `ministry-service.js`
-- `bootstrap.js`
-- `diagnostics.js`
-
-Mientras `enabled=false`, no se crea cliente Supabase ni se realizan consultas de nube.
-
-## 5. Diagnóstico
-
-Con Cloud cargado y un usuario autenticado:
-
-```js
-await LAGREY_CLOUD_DIAGNOSTICS.run()
-```
-
-Debe comprobar:
+El diagnóstico comprueba:
 
 - configuración;
 - cliente Supabase;
+- existencia del esquema esperado;
 - autenticación;
 - perfil;
 - membresías;
-- ministerios visibles;
+- ministerios;
 - bootstrap;
-- lectura de repertorio.
+- repertorio;
+- calendario;
+- favoritos;
+- progreso de aprendizaje;
+- notas personales.
 
-## 6. Prueba de aislamiento obligatoria
+Los checks con nombre `schema:...` permiten detectar una migración que aún no está aplicada.
 
-Antes de conectar Favoritos/Repertorio a producción, crear dos ministerios de prueba y verificar que:
+## Importante sobre fallbacks
 
-- usuarios de A no leen B;
-- usuarios de B no leen A;
-- `member` solo lee repertorio;
-- `leader` puede gestionar repertorio y tono;
-- `admin` gestiona membresías sin poder modificar al owner;
-- el owner no puede transferirse mediante UPDATE normal;
-- modificar manualmente `ministry_id` desde el navegador no evade RLS.
+Varias funciones nuevas tienen fallback local/offline para no romper la aplicación cuando la tabla remota todavía no existe.
 
-Ver también `supabase/tests/README.md`.
+Eso **no significa** que la función esté sincronizando en nube.
 
-## 7. Flujo previsto
+Ejemplos:
 
-- invitado -> `GuestLocalAdapter` -> favoritos/localStorage;
-- autenticado sin ministerio -> modo local provisional + opción crear/unirse;
-- autenticado con ministerio -> `MinistryCloudAdapter`;
-- repertorio y tono oficial -> ministerio;
-- preferencias personales -> usuario;
-- catálogo de cantos/himnos -> sigue empaquetado/offline.
+- calendario puede seguir local si falta el esquema compartido;
+- favoritos pueden seguir locales;
+- progreso puede seguir local;
+- notas personales pueden seguir locales.
 
-## Estado
+Por eso la verificación del diagnóstico es obligatoria antes de dar una capacidad cloud por activada.
 
-No activar producción hasta disponer de proyecto Supabase real y completar las pruebas RLS.
+## Prueba de aislamiento obligatoria
+
+Crear como mínimo:
+
+- Ministerio A
+  - owner A
+  - admin/leader A
+  - member A
+- Ministerio B
+  - owner B
+  - member B
+
+Verificar:
+
+### Ministerios y miembros
+
+- A no puede leer datos privados de B.
+- B no puede leer datos privados de A.
+- `member` no puede administrar miembros.
+- `admin` no puede editar/eliminar al owner.
+- `owner_user_id` no se cambia mediante un UPDATE normal.
+
+### Repertorio
+
+- owner/admin/leader pueden administrar repertorio.
+- member solo lee.
+- tono oficial y notas compartidas pertenecen al ministerio.
+
+### Calendario
+
+- cualquier miembro puede leer eventos de su ministerio.
+- owner/admin/leader pueden crear/editar/eliminar eventos.
+- member no puede escribir eventos.
+- un usuario de otro ministerio no puede leer ni modificar esos eventos.
+
+### Datos personales
+
+Cada usuario solo puede leer/escribir los suyos:
+
+- `user_preferences`
+- `user_favorites`
+- `user_learning_progress`
+- `user_song_notes`
+
+Cambiar manualmente `user_id` o `ministry_id` desde el navegador no debe saltarse RLS.
+
+## Catálogo y offline
+
+El catálogo global de canciones e himnos sigue empaquetado en la aplicación y no se duplica en PostgreSQL.
+
+Los IDs de canciones/himnos siguen siendo los IDs estables usados por:
+
+- repertorio;
+- favoritos;
+- setlists;
+- notas;
+- progreso vinculado a canciones;
+- SEO.
+
+La nube complementa el catálogo, no lo sustituye.
+
+## Criterio de aprobación
+
+Considerar La Grey Cloud plenamente activa solo cuando:
+
+1. las 11 migraciones estén aplicadas;
+2. `LAGREY_CLOUD_DIAGNOSTICS.run()` no reporte capacidades faltantes;
+3. las pruebas RLS entre dos ministerios pasen;
+4. se confirme comportamiento offline y reconciliación al recuperar conexión.
+
+No asumir estado remoto únicamente porque `cloud/config.js` tenga `enabled:true`.
