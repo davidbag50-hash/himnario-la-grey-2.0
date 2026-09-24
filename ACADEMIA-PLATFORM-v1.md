@@ -80,7 +80,6 @@ Campos futuros:
 
 Futuro:
 
-- voz básica;
 - armonía vocal;
 - piano intermedio;
 - guitarra intermedia;
