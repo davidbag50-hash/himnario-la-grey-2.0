@@ -459,7 +459,7 @@ const ACADEMY_EXACT_VISUALS={
  'voice-foundations-01-breathing':{
   asset:'academy-media/voice-foundations-breathing.webp',
   steps:[
-   {title:['Postura estable','Stable posture'],text:['De pie o sentado, alarga la columna sin levantar el pecho. Hombros y mandíbula quedan libres.','Standing or seated, lengthen the spine without lifting the chest. Keep shoulders and jaw free.']},
+   {title:['Postura estable','Stable posture'],text:['Alarga la columna sin levantar el pecho. Hombros, cuello y mandíbula quedan libres.','Lengthen the spine without lifting the chest. Keep shoulders, neck, and jaw free.']},
    {title:['Inhalación silenciosa','Silent inhale'],text:['Toma aire sin subir los hombros. Observa expansión suave alrededor de costillas y abdomen.','Inhale without lifting the shoulders. Notice gentle expansion around ribs and abdomen.']},
    {title:['Sostén del aire','Steady airflow'],text:['Suelta el aire de forma pareja. El torso no colapsa de golpe y el cuello sigue relajado.','Release air evenly. The torso does not collapse suddenly and the neck stays relaxed.']},
    {title:['Frase cantada relajada','Relaxed sung phrase'],text:['Lleva la misma coordinación a una frase corta: aire estable, mandíbula libre y volumen cómodo.','Carry the same coordination into a short phrase: steady air, free jaw, comfortable volume.']}
@@ -470,8 +470,80 @@ const ACADEMY_EXACT_VISUALS={
   steps:[
    {title:['Rostro relajado','Relaxed face'],text:['Antes de emitir sonido, comprueba que mandíbula, lengua y cuello no estén rígidos.','Before making sound, check that jaw, tongue, and neck are not rigid.']},
    {title:['Vocal abierta','Open vowel'],text:['Abre la vocal sin empujar la barbilla hacia delante. La boca crea espacio sin exagerar.','Open the vowel without pushing the chin forward. Create space without exaggerating.']},
-   {title:['Enfoque del sonido','Focused sound'],text:['Busca vibración fácil al frente con un humming o NG suave, sin apretar la garganta.','Look for easy forward vibration with a gentle hum or NG, without squeezing the throat.']},
+   {title:['Enfoque del sonido','Focused sound'],text:['Busca vibración fácil al frente con humming o NG suave, sin apretar la garganta.','Look for easy forward vibration with a gentle hum or NG, without squeezing the throat.']},
    {title:['Frase con brillo','Bright phrase'],text:['Pasa del ejercicio a una frase real manteniendo claridad y sensación libre, no más fuerza.','Move from the exercise to a real phrase while keeping clarity and freedom, not extra force.']}
+  ]
+ },
+ 'piano-foundations-02-posture-fingers':{
+  asset:'academy-media/piano-foundations-posture.webp',
+  steps:[
+   {title:['Siéntate bien','Sit well'],text:['Siéntate al frente del banco con espalda larga, hombros sueltos y ambos pies estables.','Sit toward the front of the bench with a tall back, loose shoulders, and both feet stable.']},
+   {title:['Altura correcta','Correct height'],text:['Ajusta la distancia para que antebrazos y codos queden cómodos frente al teclado.','Adjust your distance so forearms and elbows sit comfortably in front of the keyboard.']},
+   {title:['Manos curvas','Curved hands'],text:['Deja los dedos naturalmente curvos y la muñeca neutra; evita hundirla o levantarla.','Keep fingers naturally curved and the wrist neutral; do not collapse or lift it.']},
+   {title:['Encuentra Do','Find C'],text:['Busca cada Do justo antes del grupo de dos teclas negras y úsalo como referencia.','Find each C immediately before a group of two black keys and use it as your reference.']}
+  ]
+ },
+ 'piano-foundations-03-major-triads':{
+  asset:'academy-media/piano-foundations-major-triads.webp',
+  steps:[
+   {title:['Raíz clara','Clear root'],text:['Ubica primero la nota raíz del acorde. Esa nota te dice desde dónde construirlo.','Locate the chord root first. That note tells you where to build from.']},
+   {title:['Triada mayor','Major triad'],text:['Forma la triada con raíz, tercera y quinta. En C: C–E–G / Do–Mi–Sol.','Build the triad with root, third, and fifth. In C: C–E–G / Do–Mi–Sol.']},
+   {title:['Cambio suave','Smooth change'],text:['Cambia entre C, F y G manteniendo la muñeca libre y moviendo solo lo necesario.','Move among C, F, and G with a free wrist and only the movement you need.']},
+   {title:['Acompaña','Accompany'],text:['Pon los acordes dentro de un pulso constante; la meta ya no es solo formarlos, sino sostener música.','Place the chords inside a steady pulse; the goal is not only to form them but to sustain music.']}
+  ]
+ },
+ 'guitar-foundations-02-first-chords':{
+  asset:'academy-media/guitar-foundations-first-chords.webp',
+  steps:[
+   {title:['Guitarra estable','Stable guitar'],text:['Apoya el instrumento sin encorvarte. El mástil queda accesible y los hombros permanecen sueltos.','Support the instrument without hunching. Keep the neck accessible and shoulders loose.']},
+   {title:['Mano izquierda','Left hand'],text:['Pisa cerca del traste con la punta de los dedos y evita aplastar cuerdas vecinas.','Fret near the fret wire with fingertips and avoid touching neighboring strings.']},
+   {title:['Mano derecha','Right hand'],text:['Ataca o rasguea con movimiento pequeño y relajado cerca de la boca de la guitarra.','Pick or strum with a small relaxed motion near the soundhole.']},
+   {title:['Acorde limpio','Clean chord'],text:['Toca cuerda por cuerda. Si una se apaga o trastea, corrige ese dedo antes de seguir.','Play one string at a time. If one is muted or buzzes, correct that finger before moving on.']}
+  ]
+ },
+ 'guitar-foundations-04-strumming':{
+  asset:'academy-media/guitar-foundations-strumming.webp',
+  steps:[
+   {title:['Cuenta el pulso','Count the pulse'],text:['Cuenta 1–2–3–4 antes de tocar y mantén ese tiempo internamente durante todo el ejercicio.','Count 1–2–3–4 before playing and keep that time internally throughout the exercise.']},
+   {title:['Baja y sube','Down and up'],text:['La mano continúa abajo/arriba de forma natural; no la detengas entre golpes.','Keep the hand moving naturally down/up; do not stop it between strokes.']},
+   {title:['Patrón simple','Simple pattern'],text:['Aplica un patrón corto a un solo acorde hasta que el movimiento sea estable.','Apply a short pattern to one chord until the motion is stable.']},
+   {title:['Acompaña al canto','Accompany the song'],text:['Mantén el patrón mientras cambias acordes; el pulso importa más que añadir golpes.','Keep the pattern through chord changes; the pulse matters more than adding strokes.']}
+  ]
+ },
+ 'bass-foundations-02-technique':{
+  asset:'academy-media/bass-foundations-technique.webp',
+  steps:[
+   {title:['Bajo cómodo','Comfortable bass'],text:['Ajusta correa o asiento para alcanzar el diapasón sin doblar la muñeca ni subir el hombro.','Adjust strap or seat so you can reach the fretboard without bending the wrist or raising the shoulder.']},
+   {title:['Mano izquierda','Left hand'],text:['Pisa cerca del traste con presión suficiente para una nota limpia, no más.','Fret close to the fret wire with enough pressure for a clean note, no more.']},
+   {title:['Mano derecha','Right hand'],text:['Alterna índice y medio con recorridos cortos y deja que el pulgar tenga un apoyo estable.','Alternate index and middle fingers with short motions and keep the thumb on a stable anchor.']},
+   {title:['Nota limpia','Clean note'],text:['Escucha ataque, duración y final de cada nota. Silencia las cuerdas que no deben sonar.','Listen to the attack, length, and end of each note. Mute strings that should not ring.']}
+  ]
+ },
+ 'bass-foundations-06-groove-drums':{
+  asset:'academy-media/bass-foundations-groove.webp',
+  steps:[
+   {title:['Escucha el bombo','Listen to the kick'],text:['Antes de llenar espacios, identifica dónde cae el bombo y siente el pulso común con la batería.','Before filling space, identify where the kick lands and feel the shared pulse with the drums.']},
+   {title:['Raíz firme','Firm root'],text:['Coloca la raíz con precisión en los puntos importantes del compás y controla su duración.','Place the root precisely on important beats and control its length.']},
+   {title:['Frase repetida','Repeated phrase'],text:['Repite un groove corto sin cambiarlo cada vuelta. La consistencia crea sensación de tiempo.','Repeat a short groove without changing it every cycle. Consistency creates the sense of time.']},
+   {title:['Sirve a la banda','Serve the band'],text:['Escucha batería, armonía y voz. Deja espacio cuando la canción lo pide y sostén la base.','Listen to drums, harmony, and vocals. Leave space when the song asks for it and hold the foundation.']}
+  ]
+ },
+ 'drums-foundations-01-kit-posture':{
+  asset:'academy-media/drums-foundations-kit-posture.webp',
+  steps:[
+   {title:['Siéntate centrado','Sit centered'],text:['Siéntate con equilibrio, espalda firme pero relajada y distancia suficiente para mover brazos y piernas.','Sit balanced with a firm but relaxed back and enough distance to move arms and legs.']},
+   {title:['Agarre natural','Natural grip'],text:['Sujeta la baqueta sin apretarla. Pulgar e índice guían y los demás dedos permiten el rebote.','Hold the stick without squeezing. Thumb and index guide while the other fingers allow rebound.']},
+   {title:['Pies listos','Feet ready'],text:['Coloca un pie en el bombo y otro en el hi-hat sin perder estabilidad en el asiento.','Place one foot on the kick and the other on the hi-hat without losing balance on the throne.']},
+   {title:['Golpe controlado','Controlled stroke'],text:['Golpea y permite rebote. Evita bloquear muñeca y dedos después de tocar.','Strike and allow rebound. Avoid locking the wrist and fingers after the hit.']}
+  ]
+ },
+ 'drums-foundations-06-fills-transitions':{
+  asset:'academy-media/drums-foundations-fills.webp',
+  steps:[
+   {title:['Bombo y caja','Kick and snare'],text:['Antes del fill, asegúrate de que el groove principal tenga bombo y caja claros y estables.','Before the fill, make sure the main groove has a clear, steady kick and snare.']},
+   {title:['Hi-hat estable','Steady hi-hat'],text:['Mantén la subdivisión del hi-hat para que el tiempo siga claro antes de la transición.','Keep the hi-hat subdivision steady so time stays clear before the transition.']},
+   {title:['Fill corto','Short fill'],text:['Usa un adorno breve que termine dentro del compás; no sacrifiques el pulso por tocar más notas.','Use a short fill that ends inside the bar; do not sacrifice the pulse to play more notes.']},
+   {title:['Vuelve al groove','Return to the groove'],text:['Aterriza en el 1 con seguridad y vuelve inmediatamente al patrón principal.','Land confidently on beat 1 and return immediately to the main groove.']}
   ]
  }
 };
