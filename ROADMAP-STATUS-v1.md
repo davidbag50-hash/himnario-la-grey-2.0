@@ -49,7 +49,8 @@ Este archivo describe el estado técnico/producto actual. Antes de modificar có
 - preparación personal por canción de setlist;
 - prioridad automática de eventos asignados;
 - panel operativo básico para owner/admin/leader;
-- plantillas compartidas de eventos.
+- plantillas compartidas de eventos;
+- historial de repertorio derivado de setlists.
 
 ### Academia
 
@@ -85,7 +86,7 @@ Este archivo describe el estado técnico/producto actual. Antes de modificar có
 ## Diseñado pero no implementado
 
 - objetivos personales de aprendizaje;
-- herramientas avanzadas de ministerio (historial, mentoría y exportaciones; resumen operativo y plantillas ya implementados);
+- herramientas avanzadas de ministerio (mentoría y exportaciones; resumen operativo, plantillas e historial de repertorio ya implementados);
 - expansión Premium/pagos;
 - SEO estático por canción/himno como artefacto de deployment;
 - multi-himnario/denominaciones.
@@ -127,7 +128,6 @@ La PWA sigue siendo la base única.
 - más contenido y videos de Academia;
 - objetivos personales;
 - resumen operativo para líderes;
-- historial de repertorio;
 - multi-himnarios;
 - SEO estático;
 - Premium cuando tenga valor suficiente.
