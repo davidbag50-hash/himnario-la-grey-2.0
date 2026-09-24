@@ -18,7 +18,7 @@ const criticalJs=[
 criticalJs.forEach(checkJs);
 
 const html=read('index.html');
-const ids=[...html.matchAll(/\\bid=["']([^"']+)["']/gi)].map(match=>match[1]);
+const ids=[...html.matchAll(/\bid=["']([^"']+)["']/gi)].map(match=>match[1]);
 const duplicates=[...new Set(ids.filter((id,index)=>ids.indexOf(id)!==index))];
 if(duplicates.length)fail('IDs HTML duplicados: '+duplicates.join(', '));
 
@@ -29,13 +29,13 @@ const requiredIds=[
 ];
 for(const id of requiredIds)if(!ids.includes(id))fail('Falta el ID principal #'+id+' en index.html');
 
-const localScripts=[...html.matchAll(/<script\\b[^>]*\\bsrc=["']([^"']+)["'][^>]*><\\/script>/gi)]
-  .map(match=>match[1].split(/[?#]/)[0].replace(/^\\.\\//,''))
-  .filter(src=>src&&!/^https?:\\/\\//i.test(src));
+const localScripts=[...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*><\/script>/gi)]
+  .map(match=>match[1].split(/[?#]/)[0].replace(/^\.\//,''))
+  .filter(src=>src&&!/^https?:\/\//i.test(src));
 for(const file of localScripts)if(!exists(file))fail('index.html carga un script inexistente: '+file);
 
 const sw=read('sw.js');
-const cacheMatches=[...sw.matchAll(/const CACHE\\s*=\\s*(['"])([^'"]+)\\1\\s*;/g)];
+const cacheMatches=[...sw.matchAll(/const CACHE\s*=\s*(['"])([^'"]+)\1\s*;/g)];
 if(cacheMatches.length!==1)fail('sw.js debe declarar exactamente un const CACHE.');
 const requiredPrecache=[
   'index.html','styles.css','app.js','profiles-v3.js','settings-v2.js',
@@ -92,7 +92,7 @@ for(const token of ['getLearningProgress','setLearningItemCompleted','getPersona
 const migrationDir='supabase/migrations';
 const migrations=fs.readdirSync(migrationDir).filter(name=>name.endsWith('.sql')).sort();
 const numbered=migrations.map(name=>{
-  const match=name.match(/^\\d{8}_(\\d{6})_/);
+  const match=name.match(/^\d{8}_(\d{6})_/);
   if(!match)fail('Migración fuera del formato esperado: '+name);
   return{number:Number(match[1]),name};
 });
