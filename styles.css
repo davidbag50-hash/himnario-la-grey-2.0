@@ -106,3 +106,8 @@ body.lg-modal-open>nav,body.lg-modal-open .exact-bottom,body.lg-modal-open #read
 .route-step-summary .route-step-marker span{width:34px;height:34px}.route-step-summary .route-step-icon{font-size:19px}.route-step-summary h2{font-size:17px;margin:0}.route-step-state{color:#8fc9ef;font-size:22px;font-weight:850}.route-step.completed .route-step-state{font-size:12px;color:#9de0b3}
 .route-step[open] .route-step-state:not(:first-child){transform:rotate(90deg)}.route-step .route-step-body{padding:0 14px 14px 91px}.route-step .route-step-body p{margin:0 0 10px;line-height:1.4;font-size:13px}.route-step .route-step-actions{margin:0}
 @media(max-width:620px){.route-step-summary{grid-template-columns:34px 24px 1fr auto;padding:12px}.route-step .route-step-body{padding:0 12px 12px 70px}.route-step-summary h2{font-size:16px}}
+
+.tool-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tool-title-row h1{margin:0}
+.tool-privacy-badge{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;border:1px solid rgba(76,190,121,.24);background:rgba(55,171,98,.08);color:#b9f1ca;font-size:11px;font-weight:800}
+.tuner-head-clean{padding-bottom:14px}
