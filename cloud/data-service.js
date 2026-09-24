@@ -160,6 +160,30 @@ class MinistryCloudAdapter{
       .order('event_date',{ascending:true})
       .order('event_time',{ascending:true});
     const rows=this._ok(result)||[];
+    const assignmentsByEvent=new Map();
+    const eventIds=rows.map(row=>row.id).filter(Boolean);
+    if(eventIds.length){
+      try{
+        const assignmentResult=await this.client
+          .from('ministry_event_assignments')
+          .select('event_id,roster_member_id,display_name,music_role,position')
+          .in('event_id',eventIds)
+          .order('position',{ascending:true});
+        if(assignmentResult.error)throw assignmentResult.error;
+        for(const item of assignmentResult.data||[]){
+          const list=assignmentsByEvent.get(item.event_id)||[];
+          list.push({
+            rosterMemberId:item.roster_member_id||null,
+            displayName:item.display_name||'',
+            musicRole:item.music_role||'',
+            position:Number(item.position)||list.length+1
+          });
+          assignmentsByEvent.set(item.event_id,list);
+        }
+      }catch(error){
+        console.warn('[La Grey Cloud] event assignments unavailable',error);
+      }
+    }
     return rows.map(row=>({
       id:row.id,
       type:row.event_type||'service',
@@ -170,6 +194,7 @@ class MinistryCloudAdapter{
       leader:row.leader||'',
       singers:row.singers||'',
       notes:row.notes||'',
+      assignments:assignmentsByEvent.get(row.id)||[],
       setlist:(row.ministry_event_setlist||[])
         .slice()
         .sort((a,b)=>Number(a.position)-Number(b.position))
@@ -206,7 +231,23 @@ class MinistryCloudAdapter{
       new_setlist:setlist
     });
     if(error)throw error;
-    return data;
+    let assignmentsSynced=true,assignmentError='';
+    if(Array.isArray(event?.assignments)){
+      const assignments=event.assignments.map(item=>({
+        rosterMemberId:String(item?.rosterMemberId||'').trim(),
+        musicRole:String(item?.musicRole||'').trim()
+      })).filter(item=>item.rosterMemberId&&['voice','guitar','piano','bass','drums'].includes(item.musicRole));
+      const assignmentResult=await this.client.rpc('set_ministry_event_assignments',{
+        target_event:data,
+        new_assignments:assignments
+      });
+      if(assignmentResult.error){
+        assignmentsSynced=false;
+        assignmentError=assignmentResult.error.message||String(assignmentResult.error);
+        console.warn('[La Grey Cloud] event assignments not synced',assignmentResult.error);
+      }
+    }
+    return{id:data,assignmentsSynced,assignmentError};
   }
 
   async deleteEvent(eventId){
