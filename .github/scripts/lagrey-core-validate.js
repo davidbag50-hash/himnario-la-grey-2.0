@@ -24,7 +24,7 @@ if(duplicates.length)fail('IDs HTML duplicados: '+duplicates.join(', '));
 
 const requiredIds=[
   'home','listing','detail','calendarView','setlistView','academyView','academyFocus',
-  'myRouteView','profileModal','profileMusicModal','settingsView','settingsCloudStatusBtn',
+  'myRouteView','ministryOverviewView','profileModal','profileMusicModal','settingsView','settingsCloudStatusBtn',
   'personalSongNotesPanel','eventAssignmentsPanel'
 ];
 for(const id of requiredIds)if(!ids.includes(id))fail('Falta el ID principal #'+id+' en index.html');
