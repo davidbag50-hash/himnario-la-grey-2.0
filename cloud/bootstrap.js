@@ -4,7 +4,13 @@
 const ACTIVE_KEY='lagrey_cloud_active_ministry';
 let state={mode:'guest',ready:false,user:null,ministry:null,role:null,data:null,error:null};
 const listeners=new Set();
-const emit=()=>listeners.forEach(fn=>{try{fn({...state})}catch{}});
+const emit=()=>{
+  const snapshot={...state};
+  listeners.forEach(fn=>{try{fn(snapshot)}catch{}});
+  if(document.documentElement.dataset.lagreyCloudReady==='1'){
+    window.dispatchEvent(new CustomEvent('lagrey:cloud-ready',{detail:snapshot}));
+  }
+};
 
 function readActiveMinistry(userId){
   try{const o=JSON.parse(localStorage.getItem(ACTIVE_KEY)||'{}');return o?.userId===userId?o.ministryId:null}catch{return null}
