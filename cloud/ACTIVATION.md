@@ -68,6 +68,11 @@ Aplicar **en este orden**, sin saltos:
     - permite cambiar su instrumento/función preferida
     - no permite modificar rol administrativo, identidad ni otro miembro
 
+14. `20260924_000014_event_participation_response.sql`
+    - respuesta personal a ensayos/servicios asignados
+    - estados confirmado / tal vez / no disponible
+    - un miembro solo puede responder por su propia ficha y si está asignado
+
 ## Cómo comprobar el estado real
 
 Con La Grey abierta, autenticado:
@@ -176,7 +181,7 @@ La nube complementa el catálogo, no lo sustituye.
 
 Considerar La Grey Cloud plenamente activa solo cuando:
 
-1. las 13 migraciones estén aplicadas;
+1. las 14 migraciones estén aplicadas;
 2. `LAGREY_CLOUD_DIAGNOSTICS.run()` no reporte capacidades faltantes;
 3. las pruebas RLS entre dos ministerios pasen;
 4. se confirme comportamiento offline y reconciliación al recuperar conexión.
