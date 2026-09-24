@@ -115,3 +115,18 @@ body.lg-modal-open>nav,body.lg-modal-open .exact-bottom,body.lg-modal-open #read
 .academy-lesson{display:block;padding:0;overflow:hidden}.academy-lesson-summary{display:grid;grid-template-columns:48px 1fr auto;gap:13px;align-items:center;padding:15px 17px;cursor:pointer;list-style:none}.academy-lesson-summary::-webkit-details-marker{display:none}.academy-lesson-summary small{color:#8fa9bd;font-size:11px;text-transform:uppercase;letter-spacing:.08em}.academy-lesson-summary h3{margin:3px 0 0}.academy-lesson-chevron{font-size:28px;color:#79bce8;transition:transform .18s}.academy-lesson[open] .academy-lesson-chevron{transform:rotate(90deg)}
 .academy-lesson-body{padding:0 17px 17px 78px}.academy-steps{display:grid;gap:8px;margin:12px 0}.academy-step{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start;padding:10px 12px;border-radius:13px;background:rgba(13,114,216,.06);border:1px solid rgba(126,190,232,.11)}.academy-step>span{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:rgba(216,165,45,.12);color:#f0c756;font-weight:900}.academy-step b{font-size:13px;color:#eef8ff}.academy-step p{margin:3px 0 0!important;font-size:13px!important;line-height:1.4!important;color:#b9cddd!important}
 @media(max-width:650px){.academy-lesson-summary{grid-template-columns:38px 1fr auto;padding:13px}.academy-lesson-body{padding:0 13px 13px}.academy-visual-label{display:grid}.academy-visual-label span{max-width:none;text-align:left}.academy-lesson-svg{aspect-ratio:720/405}}
+
+/* Escritorio oficial La Grey */
+.desktop-sidebar{display:none}
+@media(min-width:1100px){
+  body{padding-left:216px}
+  main{max-width:none;width:100%;padding-left:24px;padding-right:24px}
+  .desktop-sidebar{display:flex;position:fixed;left:0;top:0;bottom:0;width:216px;z-index:80;flex-direction:column;padding:20px 10px 16px;background:linear-gradient(180deg,#0a131f,#09111b 55%,#07101a);border-right:1px solid rgba(119,164,204,.15);box-shadow:10px 0 35px rgba(0,0,0,.18)}
+  .desktop-brand{display:flex;align-items:center;gap:11px;padding:3px 14px 22px;color:#fff;font-size:18px;letter-spacing:.02em}
+  .desktop-brand-mark{color:#2b91ff;font-size:28px;line-height:1}
+  .desktop-nav{display:grid;gap:4px}.desktop-nav-bottom{margin-top:auto;border-top:1px solid rgba(159,187,211,.14);padding-top:12px}
+  .desktop-nav button{appearance:none;border:0;background:transparent;color:#b9c4d3;border-radius:10px;display:grid;grid-template-columns:32px 1fr;align-items:center;text-align:left;gap:8px;padding:11px 12px;cursor:pointer;font-size:14px}
+  .desktop-nav button>span{display:grid;place-items:center;font-size:18px;color:#abb8ca}.desktop-nav button>b{font-weight:580}
+  .desktop-nav button:hover{background:rgba(45,123,208,.09);color:#fff}.desktop-nav button.active{background:linear-gradient(90deg,rgba(31,104,203,.34),rgba(25,88,170,.22));color:#fff}.desktop-nav button.active>span{color:#58a9ff}
+  body.exact-home-screen #lgExactHome{max-width:1180px;margin:0 auto}
+}
