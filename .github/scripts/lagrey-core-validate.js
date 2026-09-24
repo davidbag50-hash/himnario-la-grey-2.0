@@ -85,7 +85,7 @@ for(const token of ['updateMyRosterMusic','getMyRosterProfile','updateRosterMemb
   if(!ministryService.includes(token))fail('Falta método de ministerio: '+token);
 }
 const dataService=read('cloud/data-service.js');
-for(const token of ['getLearningProgress','setLearningItemCompleted','getPersonalSongNote','savePersonalSongNote','saveEventAssignments']){
+for(const token of ['getLearningProgress','setLearningItemCompleted','getPersonalSongNote','savePersonalSongNote','saveEventAssignments','respondToEvent']){
   if(!dataService.includes(token))fail('Falta método cloud: '+token);
 }
 
@@ -96,11 +96,11 @@ const numbered=migrations.map(name=>{
   if(!match)fail('Migración fuera del formato esperado: '+name);
   return{number:Number(match[1]),name};
 });
-for(let expected=1;expected<=13;expected++){
+for(let expected=1;expected<=14;expected++){
   const item=numbered.find(entry=>entry.number===expected);
   if(!item)fail('Falta la migración secuencial '+String(expected).padStart(6,'0')+'.');
 }
-if(numbered.some(entry=>entry.number>13))fail('Hay migraciones nuevas: actualiza lagrey-core-validate.js para incluirlas explícitamente.');
+if(numbered.some(entry=>entry.number>14))fail('Hay migraciones nuevas: actualiza lagrey-core-validate.js para incluirlas explícitamente.');
 
 const activation=read('cloud/ACTIVATION.md');
 for(const item of numbered)if(!activation.includes(item.name))fail('cloud/ACTIVATION.md no referencia '+item.name);
@@ -116,10 +116,15 @@ for(const token of ['enable row level security','public.is_ministry_member','set
   if(!assignments.includes(token))fail('La migración de asignaciones perdió la garantía: '+token);
 }
 
+const participation=read(path.join(migrationDir,'20260924_000014_event_participation_response.sql'));
+for(const token of ['respond_to_ministry_event','You are not assigned to this event','user_id=auth.uid()','enable row level security']){
+  if(!participation.includes(token))fail('La migración de respuesta de participación perdió la garantía: '+token);
+}
+
 console.log(
   'La Grey core válido. '+
   'HTML IDs: '+ids.length+' únicos. '+
   'Academia: '+expectedTracks.length+' tracks principales, '+allLessonIds.length+' lecciones genéricas. '+
-  'Migraciones: '+numbered.length+' verificadas (000001-000013). '+
+  'Migraciones: '+numbered.length+' verificadas (000001-000014). '+
   'Cache: '+cacheMatches[0][2]+'.'
 );
