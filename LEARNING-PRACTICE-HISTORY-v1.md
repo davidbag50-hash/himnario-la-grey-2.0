@@ -4,7 +4,7 @@
 
 Diseño de producto y datos.
 
-El historial privado de práctica ya está implementado. Los objetivos personales siguen en diseño. El progreso actual `user_learning_progress` sigue siendo la fuente de completado de lecciones.
+El historial privado de práctica y los objetivos personales ya están implementados. El progreso actual `user_learning_progress` sigue siendo la fuente de completado de lecciones.
 
 ## Objetivo
 
@@ -63,7 +63,7 @@ Eso merece entidades separadas si se implementa.
 - note opcional
 - created_at
 
-### learning_goals — pendiente
+### learning_goals — implementado
 
 - id
 - user_id
@@ -170,7 +170,7 @@ Premium puede añadir:
 
 No borrar historial si termina Premium.
 
-## Orden futuro
+## Siguiente expansión
 
 1. Validar UX de registro rápido.
 2. Definir esquema y RLS.
