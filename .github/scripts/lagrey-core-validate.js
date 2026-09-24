@@ -25,7 +25,7 @@ if(duplicates.length)fail('IDs HTML duplicados: '+duplicates.join(', '));
 const requiredIds=[
   'home','listing','detail','calendarView','setlistView','academyView','academyFocus',
   'myRouteView','ministryOverviewView','profileModal','profileMusicModal','settingsView','settingsCloudStatusBtn',
-  'personalSongNotesPanel','eventAssignmentsPanel','academyPractice','practiceModal'
+  'personalSongNotesPanel','eventAssignmentsPanel','academyPractice','practiceModal','eventTemplateTools','eventTemplateSelect','eventTemplateApplyBtn','eventTemplateSaveBtn','eventTemplateDeleteBtn'
 ];
 for(const id of requiredIds)if(!ids.includes(id))fail('Falta el ID principal #'+id+' en index.html');
 
@@ -85,7 +85,7 @@ for(const token of ['updateMyRosterMusic','getMyRosterProfile','updateRosterMemb
   if(!ministryService.includes(token))fail('Falta método de ministerio: '+token);
 }
 const dataService=read('cloud/data-service.js');
-for(const token of ['getLearningProgress','setLearningItemCompleted','getPersonalSongNote','savePersonalSongNote','saveEventAssignments','respondToEvent','getPracticeSessions','savePracticeSession','deletePracticeSession']){
+for(const token of ['getLearningProgress','setLearningItemCompleted','getPersonalSongNote','savePersonalSongNote','saveEventAssignments','respondToEvent','getPracticeSessions','savePracticeSession','deletePracticeSession','getEventTemplates','saveEventTemplate','deleteEventTemplate']){
   if(!dataService.includes(token))fail('Falta método cloud: '+token);
 }
 const repertoireBlock=dataService.slice(dataService.indexOf('async getRepertoire(){'),dataService.indexOf('async addToRepertoire('));
@@ -102,11 +102,11 @@ const numbered=migrations.map(name=>{
   if(!match)fail('Migración fuera del formato esperado: '+name);
   return{number:Number(match[1]),name};
 });
-for(let expected=1;expected<=15;expected++){
+for(let expected=1;expected<=16;expected++){
   const item=numbered.find(entry=>entry.number===expected);
   if(!item)fail('Falta la migración secuencial '+String(expected).padStart(6,'0')+'.');
 }
-if(numbered.some(entry=>entry.number>15))fail('Hay migraciones nuevas: actualiza lagrey-core-validate.js para incluirlas explícitamente.');
+if(numbered.some(entry=>entry.number>16))fail('Hay migraciones nuevas: actualiza lagrey-core-validate.js para incluirlas explícitamente.');
 
 const activation=read('cloud/ACTIVATION.md');
 for(const item of numbered)if(!activation.includes(item.name))fail('cloud/ACTIVATION.md no referencia '+item.name);
@@ -132,10 +132,15 @@ for(const token of ['user_practice_sessions','user_id=auth.uid()','enable row le
   if(!practice.includes(token))fail('La migración de práctica perdió la garantía: '+token);
 }
 
+const templates=read(path.join(migrationDir,'20260924_000016_event_templates.sql'));
+for(const token of ['ministry_event_templates','ministry_event_template_assignments','upsert_ministry_event_template','delete_ministry_event_template','public.has_ministry_role']){
+  if(!templates.includes(token))fail('La migración de plantillas perdió la garantía: '+token);
+}
+
 console.log(
   'La Grey core válido. '+
   'HTML IDs: '+ids.length+' únicos. '+
   'Academia: '+expectedTracks.length+' tracks principales, '+allLessonIds.length+' lecciones genéricas. '+
-  'Migraciones: '+numbered.length+' verificadas (000001-000015). '+
+  'Migraciones: '+numbered.length+' verificadas (000001-000016). '+
   'Cache: '+cacheMatches[0][2]+'.'
 );
