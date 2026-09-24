@@ -92,7 +92,23 @@ async function addRosterMember({ministryId,displayName,musicRoles=[],preferredIn
   return data;
 }
 
-async function updateRosterMember(rosterId,patch={}){
+async function updateMyRosterMusic(ministryId,{musicRoles=[],preferredInstrument='none'}={}){
+   const c=await client(),user=await window.LAGREY_AUTH.getUser();
+   if(!user)throw new Error('Authentication required');
+   const roles=[...new Set((musicRoles||[]).map(x=>String(x||'').trim()).filter(Boolean))];
+   const allowedRoles=new Set(['voice','guitar','piano','bass','drums','all']);
+   if(roles.some(role=>!allowedRoles.has(role)))throw new Error('Invalid music role');
+   if(roles.includes('all')&&roles.length>1)throw new Error('All instruments cannot be combined with individual roles');
+   const preferred=['guitar','piano','voice','bass','drums','all','none'].includes(preferredInstrument)?preferredInstrument:'none';
+   const {data,error}=await c.rpc('update_my_roster_music',{
+     target_ministry:ministryId,
+     new_music_roles:roles,
+     new_preferred_instrument:preferred
+   });
+   if(error)throw error;
+   return data;
+  }
+  async function updateRosterMember(rosterId,patch={}){
   const c=await client();
   const allowed={};
   if(patch.displayName!==undefined)allowed.display_name=String(patch.displayName||'').trim();
@@ -150,7 +166,7 @@ async function touchPresence(ministryId){
 
 window.LAGREY_MINISTRIES={
   slugify,createMinistry,createInvite,joinWithCode,listInvites,revokeInvite,
-  listRoster,getMyRosterProfile,addRosterMember,updateRosterMember,updateRosterMemberAdmin,
+  listRoster,getMyRosterProfile,addRosterMember,updateMyRosterMusic,updateRosterMember,updateRosterMemberAdmin,
   revokeRosterInvites,removeRosterMember,createRosterInvite,touchPresence
 };
 })();
