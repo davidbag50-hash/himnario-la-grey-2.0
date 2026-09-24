@@ -13,6 +13,8 @@ const CURRENT_SCHEMA_CHECKS=[
   {name:'ministry_event_setlist',table:'ministry_event_setlist',columns:'id,event_id'},
   {name:'ministry_event_assignments',table:'ministry_event_assignments',columns:'id,event_id,roster_member_id,music_role'},
   {name:'ministry_event_responses',table:'ministry_event_responses',columns:'event_id,roster_member_id,response_status'},
+  {name:'ministry_event_templates',table:'ministry_event_templates',columns:'id,ministry_id,name,event_type'},
+  {name:'ministry_event_template_assignments',table:'ministry_event_template_assignments',columns:'id,template_id,roster_member_id,music_role'},
   {name:'user_favorites',table:'user_favorites',columns:'user_id,song_id'},
   {name:'user_learning_progress',table:'user_learning_progress',columns:'user_id,track_id,item_id'},
   {name:'user_practice_sessions',table:'user_practice_sessions',columns:'id,user_id,practiced_at,instrument_role'},
