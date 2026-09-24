@@ -1,45 +1,202 @@
 # Pruebas RLS — La Grey Cloud
 
-Estas pruebas se ejecutarán cuando exista un proyecto Supabase de desarrollo con las migraciones aplicadas.
+Estas pruebas validan que los datos de ministerios y usuarios no puedan cruzar fronteras mediante el cliente público.
 
-## Objetivo
+## Preparación
 
-Comprobar que Row Level Security aísla completamente los datos entre ministerios y que los roles solo pueden realizar las acciones autorizadas.
+Crear:
 
-## Escenarios mínimos
+- owner A
+- admin A
+- leader A
+- member A
+- owner B
+- member B
 
-1. Crear dos usuarios de prueba: usuario A y usuario B.
-2. Crear dos ministerios: Ministerio A propiedad del usuario A y Ministerio B propiedad del usuario B.
-3. Añadir una canción distinta al repertorio de cada ministerio.
-4. Iniciar sesión como usuario A y verificar:
-   - puede leer Ministerio A;
-   - puede leer el repertorio de Ministerio A;
-   - no puede leer Ministerio B;
-   - no puede leer el repertorio de Ministerio B;
-   - no puede insertar, actualizar o eliminar datos usando el ministry_id de Ministerio B.
-5. Repetir el mismo conjunto de pruebas iniciando sesión como usuario B.
-6. Crear un miembro con rol `member` dentro del Ministerio A y verificar:
-   - puede leer ministerio, miembros, repertorio y notas compartidas;
-   - no puede añadir ni eliminar canciones del repertorio;
-   - no puede cambiar el tono oficial;
-   - no puede modificar notas compartidas;
-   - no puede administrar membresías.
-7. Cambiar ese usuario a rol `leader` y verificar:
-   - puede añadir/eliminar repertorio;
-   - puede cambiar tono oficial;
-   - puede modificar notas compartidas;
-   - no puede administrar membresías ni cambiar propietario.
-8. Crear un `admin` y verificar:
-   - puede administrar miembros que no sean owner;
-   - no puede cambiar ni eliminar la fila owner;
-   - no puede cambiar `owner_user_id` mediante un UPDATE normal.
-9. Verificar que un usuario autenticado solo pueda leer/modificar su propio `profiles` y `user_preferences`.
-10. Verificar que el rol `anon` no pueda leer ninguna tabla privada de ministerios.
+Crear:
+
+- Ministerio A
+- Ministerio B
+
+Usar sesiones normales de Supabase Auth y la clave pública del cliente.
+
+**Nunca usar `service_role` para estas pruebas**, porque omite RLS.
+
+## 1. Aislamiento de ministerios
+
+Como usuario de A:
+
+- puede leer su ministerio;
+- puede leer miembros/roster permitidos de A;
+- no puede leer datos privados de B;
+- modificar manualmente `ministry_id` hacia B no funciona.
+
+Repetir desde B hacia A.
+
+## 2. Roles administrativos
+
+### member
+
+Puede leer lo necesario para participar.
+
+No puede:
+
+- administrar miembros;
+- modificar repertorio;
+- cambiar tono oficial;
+- escribir notas compartidas;
+- crear/editar/eliminar calendario compartido.
+
+### leader
+
+Puede:
+
+- administrar repertorio;
+- tono oficial;
+- notas compartidas;
+- calendario/setlists.
+
+No puede:
+
+- promoverse a owner;
+- cambiar al owner;
+- administrar propiedad del ministerio fuera de las reglas definidas.
+
+### admin
+
+Puede administrar miembros no-owner y las capacidades de líder.
+
+No puede:
+
+- eliminar/editar el owner como si fuera un miembro normal;
+- asignar owner mediante el RPC de edición;
+- cambiar `owner_user_id` con un UPDATE normal.
+
+### owner
+
+Mantiene las capacidades máximas del ministerio según el modelo actual.
+
+## 3. Repertorio
+
+Crear una canción distinta en A y B.
+
+Comprobar:
+
+- member A lee repertorio A;
+- member A no escribe repertorio A;
+- leader/admin/owner A sí pueden escribir;
+- ningún rol de B puede leer/escribir repertorio A.
+
+Probar:
+
+- agregar canción;
+- quitar canción;
+- cambiar `official_tone`;
+- guardar notas compartidas.
+
+## 4. Calendario y setlists
+
+En A:
+
+- leader/admin/owner pueden crear evento;
+- pueden guardar setlist;
+- member puede leer;
+- member no puede llamar con éxito a RPCs de escritura;
+- B no puede leer eventos ni setlists de A.
+
+Comprobar cascada:
+
+- eliminar evento elimina sus filas de setlist.
+
+Comprobar repertorio:
+
+- el RPC no permite meter una canción fuera del repertorio del ministerio.
+
+## 5. Datos personales
+
+Usar al menos dos usuarios autenticados.
+
+Cada usuario solo puede leer/escribir sus propios registros en:
+
+- `profiles` según las reglas existentes;
+- `user_preferences`;
+- `user_favorites`;
+- `user_learning_progress`;
+- `user_song_notes`.
+
+Intentar manualmente usar el `user_id` del otro usuario.
+
+Debe fallar o devolver cero filas según la operación.
+
+## 6. Favoritos
+
+- Usuario A añade un favorito.
+- Usuario B no lo puede leer.
+- A lo puede eliminar.
+- B no lo puede eliminar.
+- repetir insert no debe crear duplicados.
+
+## 7. Progreso de aprendizaje
+
+Probar varios `track_id`:
+
+- `voice-advanced-v1`
+- `piano-foundations-v1`
+- `ministry-integration-v1`
+- un track de preparación de setlist
+
+Verificar:
+
+- completar item;
+- descompletar item;
+- el progreso de A no es visible para B.
+
+## 8. Notas personales
+
+- A guarda una nota personal para una canción.
+- B no puede leerla.
+- A puede editarla.
+- guardar cuerpo vacío elimina la nota mediante la lógica cliente.
+- las notas personales no aparecen en `ministry_song_notes`.
+
+## 9. Invitaciones
+
+Verificar:
+
+- token válido permite el flujo esperado;
+- token inválido/expirado no concede membresía;
+- manipular ministerio/token no concede acceso a otro ministerio.
+
+## 10. Anon
+
+Sin sesión autenticada:
+
+- no puede leer tablas privadas;
+- no puede ejecutar escrituras privadas;
+- el catálogo local de canciones/himnos sigue funcionando porque no depende de estas tablas.
+
+## 11. Diagnóstico de esquema
+
+Antes de las pruebas funcionales ejecutar:
+
+```js
+const report = await LAGREY_CLOUD_DIAGNOSTICS.run();
+console.table(report.checks);
+report.summary;
+```
+
+No continuar con la certificación cloud si hay checks `schema:...` fallidos.
 
 ## Criterio de aprobación
 
-La nube no se conectará a la interfaz pública de La Grey hasta que todas estas pruebas pasen. Manipular manualmente `ministry_id`, `user_id` o cualquier payload desde el navegador nunca debe permitir cruzar la frontera de otro ministerio.
+La nube se considera correctamente activada solo cuando:
 
-## Nota sobre el cliente
+- esquema completo;
+- aislamiento A/B correcto;
+- permisos member/leader/admin/owner correctos;
+- datos personales aislados;
+- calendario y repertorio protegidos;
+- fallbacks offline probados;
+- reconciliación al recuperar conexión probada.
 
-Estas pruebas deben realizarse usando sesiones normales de Supabase Auth y la clave pública del cliente. No deben ejecutarse con `service_role`, porque esa clave omite RLS y no representa el comportamiento real de la aplicación.
+Un éxito visual en la interfaz no sustituye estas pruebas.
