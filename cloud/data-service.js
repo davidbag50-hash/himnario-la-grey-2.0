@@ -241,7 +241,7 @@ class MinistryCloudAdapter{
 
   async savePreferences(patch={}){
     const row={user_id:this.userId};
-    if(['guitar','piano','voice','all','none'].includes(patch.preferredInstrument))row.preferred_instrument=patch.preferredInstrument;
+    if(['guitar','piano','voice','bass','drums','all','none'].includes(patch.preferredInstrument))row.preferred_instrument=patch.preferredInstrument;
     if(['american','latin'].includes(patch.notation))row.notation=patch.notation;
     if(Number.isInteger(Number(patch.fontSize))&&Number(patch.fontSize)>=8&&Number(patch.fontSize)<=30)row.font_size=Number(patch.fontSize);
     if(Number.isInteger(Number(patch.autoscrollSpeed))&&Number(patch.autoscrollSpeed)>=1&&Number(patch.autoscrollSpeed)<=100)row.autoscroll_speed=Number(patch.autoscrollSpeed);

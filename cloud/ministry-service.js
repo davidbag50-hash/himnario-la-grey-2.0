@@ -81,7 +81,7 @@ async function addRosterMember({ministryId,displayName,musicRoles=[],preferredIn
     ministry_id:ministryId,
     display_name:name,
     music_roles:[...new Set((musicRoles||[]).map(x=>String(x||'').trim()).filter(Boolean))],
-    preferred_instrument:['guitar','piano','voice','all','none'].includes(preferredInstrument)?preferredInstrument:'none',
+    preferred_instrument:['guitar','piano','voice','bass','drums','all','none'].includes(preferredInstrument)?preferredInstrument:'none',
     cloud_role:cloudRole,
     user_id:null,
     legacy_key:legacyKey||null,
@@ -97,7 +97,7 @@ async function updateRosterMember(rosterId,patch={}){
   const allowed={};
   if(patch.displayName!==undefined)allowed.display_name=String(patch.displayName||'').trim();
   if(patch.musicRoles!==undefined)allowed.music_roles=[...new Set((patch.musicRoles||[]).map(x=>String(x||'').trim()).filter(Boolean))];
-  if(patch.preferredInstrument!==undefined)allowed.preferred_instrument=['guitar','piano','voice','all','none'].includes(patch.preferredInstrument)?patch.preferredInstrument:'none';
+  if(patch.preferredInstrument!==undefined)allowed.preferred_instrument=['guitar','piano','voice','bass','drums','all','none'].includes(patch.preferredInstrument)?patch.preferredInstrument:'none';
   if(patch.cloudRole!==undefined&&['owner','member','leader','admin'].includes(patch.cloudRole))allowed.cloud_role=patch.cloudRole;
   if(patch.legacyKey!==undefined)allowed.legacy_key=patch.legacyKey||null;
   if(!Object.keys(allowed).length)return null;
@@ -112,7 +112,7 @@ async function updateRosterMemberAdmin({rosterId,displayName,musicRoles=[],prefe
     target_roster_member:rosterId,
     new_display_name:String(displayName||'').trim(),
     new_music_roles:[...new Set((musicRoles||[]).map(x=>String(x||'').trim()).filter(Boolean))],
-    new_preferred_instrument:['guitar','piano','voice','all','none'].includes(preferredInstrument)?preferredInstrument:'none',
+    new_preferred_instrument:['guitar','piano','voice','bass','drums','all','none'].includes(preferredInstrument)?preferredInstrument:'none',
     new_cloud_role:['owner','member','leader','admin'].includes(cloudRole)?cloudRole:'member'
   });
   if(error)throw error;
