@@ -76,6 +76,18 @@ No puede:
 
 Mantiene las capacidades máximas del ministerio según el modelo actual.
 
+## 2.1 Perfil musical propio
+
+Para cada usuario autenticado del ministerio:
+
+- puede actualizar únicamente sus propias `music_roles` y `preferred_instrument` mediante `update_my_roster_music`;
+- no puede usar el RPC para modificar otra ficha;
+- no puede cambiar `cloud_role`, `display_name`, `user_id` ni `ministry_id` mediante este flujo;
+- un `member` puede editar su propio perfil musical aunque no tenga permisos administrativos;
+- funciones válidas: `voice`, `guitar`, `piano`, `bass`, `drums`, `all`;
+- `all` no puede mezclarse con funciones individuales;
+- el instrumento preferido acepta `voice`, `guitar`, `piano`, `bass`, `drums`, `all`, `none`.
+
 ## 3. Repertorio
 
 Crear una canción distinta en A y B.

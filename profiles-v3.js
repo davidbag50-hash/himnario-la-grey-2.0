@@ -9,6 +9,7 @@ const tx=(es,en)=>lang()==='en'?en:es;
 const norm=s=>String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const byId=id=>members.find(m=>m.id===id)||null;
 const findMember=name=>{const n=norm(name);return members.find(m=>(m.aliases||[]).some(a=>norm(a)===n))||null};
+const MUSIC_OPTIONS={voice:{icon:'🎤',es:'Voz',en:'Voice'},guitar:{icon:'🎸',es:'Guitarra',en:'Guitar'},piano:{icon:'🎹',es:'Piano',en:'Piano'},bass:{icon:'🎸',es:'Bajo',en:'Bass'},drums:{icon:'🥁',es:'Batería',en:'Drums'}};
 let profile=null,step='choose';
 try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved?.id==='visitor'||saved?.ministryId)profile=saved;else profile=byId(saved?.id)}catch{}
 
@@ -36,7 +37,7 @@ function protectCatalogSearch(){
 function scrubCatalogSearch(){protectCatalogSearch();setTimeout(protectCatalogSearch,120);setTimeout(protectCatalogSearch,700)}
 
 function renderStep(next='choose'){
- step=next;const p=modalParts(),other=ensureOtherButton();if(!p)return;setStatus('');setPasswordVisible(false);
+ step=next;const p=modalParts(),other=ensureOtherButton(),musicBtn=$('profileMusicBtn');if(!p)return;setStatus('');setPasswordVisible(false);show(musicBtn,step==='account');if(musicBtn)musicBtn.textContent=tx('🎼 Editar mi perfil musical','🎼 Edit my music profile');
  if(step==='account'){
   p.title.textContent=tx('👤 Mi perfil','👤 My profile');p.sub.textContent=tx('Tu sesión de La Grey Cloud está activa.','Your La Grey Cloud session is active.');p.hero.innerHTML=`☁️ <b>${profile?.name||tx('Miembro','Member')}</b>`;show(p.label,false);show(p.primary,true);show(other,true);show(p.visitor,false);p.primary.textContent=tx('Cerrar','Close');other.textContent=tx('Cerrar sesión','Sign out');setStatus(`${profile?.name||''} · ${groupText(profile)} · ${roleLabel(profile?.cloudRole||'member')}`,true);if(p.hint)p.hint.textContent=profile?.email?`${profile.email} · ${tx('Datos sincronizados con La Grey Cloud','Synced with La Grey Cloud')}`:tx('Datos sincronizados con La Grey Cloud','Synced with La Grey Cloud');return;
  }
@@ -51,6 +52,62 @@ function renderStep(next='choose'){
  }
 }
 
+function musicLabel(role){const item=MUSIC_OPTIONS[role];return item?`${item.icon} ${tx(item.es,item.en)}`:role}
+function setMusicStatus(message,ok=false){const el=$('profileMusicStatus');if(!el)return;el.textContent=message||'';el.classList.toggle('profile-ok',!!ok)}
+function renderMusicEditor(){
+ const box=$('profileMusicChecks'),preferred=$('profileMusicPreferred'),title=$('profileMusicTitle'),subtitle=$('profileMusicSubtitle'),label=$('profileMusicPreferredLabel'),save=$('profileMusicSaveBtn');
+ if(!box||!preferred)return;
+ const roles=Array.isArray(profile?.musicRoles)?profile.musicRoles:[];
+ box.innerHTML=Object.entries(MUSIC_OPTIONS).map(([role,item])=>`<label class="profile-music-check"><input type="checkbox" value="${role}" data-profile-music-role ${roles.includes(role)?'checked':''}> <span>${item.icon} ${tx(item.es,item.en)}</span></label>`).join('');
+ const current=['voice','guitar','piano','bass','drums','none'].includes(profile?.instrument)?profile.instrument:'none';
+ preferred.innerHTML=`<option value="none">${tx('Sin preferencia','No preference')}</option>`+Object.entries(MUSIC_OPTIONS).map(([role,item])=>`<option value="${role}">${item.icon} ${tx(item.es,item.en)}</option>`).join('');
+ preferred.value=current;
+ if(title)title.textContent=tx('🎼 Mi perfil musical','🎼 My music profile');
+ if(subtitle)subtitle.textContent=tx('Elige tus funciones musicales y cuál quieres ver primero en La Grey.','Choose your music roles and which one La Grey should prioritize.');
+ if(label)label.firstChild.textContent=tx('Instrumento / función preferida','Preferred instrument / role');
+ if(save)save.textContent=tx('Guardar mi perfil musical','Save my music profile');
+ setMusicStatus('');
+}
+async function openMusicEditor(){
+ if(!profile?.cloud||!profile?.ministryId)return;
+ try{
+  await ensureCloud();
+  const mine=await window.LAGREY_MINISTRIES?.getMyRosterProfile?.(profile.ministryId);
+  if(mine){
+   profile.musicRoles=Array.isArray(mine.music_roles)?mine.music_roles.filter(role=>MUSIC_OPTIONS[role]):[];
+   profile.instrument=['voice','guitar','piano','bass','drums','none'].includes(mine.preferred_instrument)?mine.preferred_instrument:'none';
+   profile.rosterId=mine.id||profile.rosterId;
+   localStorage.setItem(key,JSON.stringify(profile));
+  }
+ }catch(error){console.warn('[La Grey profile] using cached music profile',error)}
+ renderMusicEditor();
+ $('profileMusicModal')?.classList.remove('hidden');
+}
+async function saveMusicEditor(){
+ if(!profile?.cloud||!profile?.ministryId)return;
+ const roles=[...document.querySelectorAll('[data-profile-music-role]:checked')].map(input=>input.value).filter(role=>MUSIC_OPTIONS[role]);
+ let preferred=String($('profileMusicPreferred')?.value||'none');
+ if(preferred!=='none'&&!roles.includes(preferred)){
+  setMusicStatus(tx('La función preferida también debe estar marcada arriba.','Your preferred role must also be selected above.'));
+  return;
+ }
+ const button=$('profileMusicSaveBtn');if(button)button.disabled=true;
+ setMusicStatus(tx('Guardando…','Saving…'));
+ try{
+  await ensureCloud();
+  if(!window.LAGREY_MINISTRIES?.updateMyRosterMusic)throw new Error(tx('La edición musical todavía no está activa en Cloud.','Music profile editing is not active in Cloud yet.'));
+  const row=await window.LAGREY_MINISTRIES.updateMyRosterMusic(profile.ministryId,{musicRoles:roles,preferredInstrument:preferred});
+  profile.musicRoles=Array.isArray(row?.music_roles)?row.music_roles:roles;
+  profile.instrument=row?.preferred_instrument||preferred;
+  profile.rosterId=row?.id||profile.rosterId;
+  localStorage.setItem(key,JSON.stringify(profile));
+  updateUI();setMusicStatus(tx('Perfil musical actualizado.','Music profile updated.'),true);
+  document.dispatchEvent(new CustomEvent('lagrey:profile-changed',{detail:{profile}}));
+  setTimeout(()=>{$('profileMusicModal')?.classList.add('hidden');renderStep('account')},450);
+ }catch(error){setMusicStatus(error?.message||String(error))}
+ finally{if(button)button.disabled=false}
+}
+function closeMusicEditor(){$('profileMusicModal')?.classList.add('hidden')}
 async function ensureCloud(){
  if(window.LAGREY_AUTH&&window.LAGREY_CLOUD)return true;
  if(!document.querySelector('script[data-lagrey-cloud-loader]')){const s=document.createElement('script');s.src='cloud/loader.js?v=2';s.dataset.lagreyCloudLoader='1';document.head.appendChild(s)}
@@ -89,11 +146,11 @@ function primaryAction(){if(step==='account')return closeProfileModal();if(step=
 function otherAction(){if(step==='account')return signOutCloud();renderStep('choose')}
 async function visitor(){try{if(window.LAGREY_AUTH){const session=await window.LAGREY_AUTH.getSession();if(session)await window.LAGREY_AUTH.signOut()}}catch{}saveProfile({id:'visitor',name:'Visitante',roles:[],instrument:'none',ministryId:null,ministryName:null})}
 function rememberMultiInstrument(k){if(profile?.instrument==='all'&&(k==='guitar'||k==='piano'))localStorage.setItem(instrumentKey,k)}
-window.LAGREY_GET_PREFERRED_CHORD_INSTRUMENT=()=>preferredInstrument();window.LAGREY_REFRESH_PROFILE_I18N=()=>updateUI();
+window.LAGREY_GET_PREFERRED_CHORD_INSTRUMENT=()=>preferredInstrument();window.LAGREY_REFRESH_PROFILE_I18N=()=>{updateUI();if(!$('profileModal')?.classList.contains('hidden'))renderStep(profile?.cloud?'account':step);if(!$('profileMusicModal')?.classList.contains('hidden'))renderMusicEditor()};
 
 async function restoreCloudSession(){
  try{await ensureCloud();const session=await window.LAGREY_AUTH.getSession();if(!session){scrubCatalogSearch();return}const result=await refreshCloudProfile(null);if(result.profile){profile=result.profile;localStorage.setItem(key,JSON.stringify(profile));updateUI();closeProfileModal();scrubCatalogSearch();document.dispatchEvent(new CustomEvent('lagrey:profile-changed',{detail:{profile}}))}}catch(error){console.warn('[La Grey profile] cloud restore skipped',error);scrubCatalogSearch()}
 }
-function wire(){const other=ensureOtherButton();ensurePasswordField();protectCatalogSearch();$('profileBtn')?.addEventListener('click',openProfileModal);$('profileLoginBtn')?.addEventListener('click',primaryAction);other?.addEventListener('click',()=>{if(step==='choose')renderStep('external-auth');else otherAction()});$('profileVisitorBtn')?.addEventListener('click',visitor);$('profileCloseBtn')?.addEventListener('click',()=>{if(profile)closeProfileModal();else visitor()});$('profileName')?.addEventListener('keydown',e=>{if(e.key==='Enter')primaryAction()});$('profilePassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')primaryAction()});$('profileModal')?.addEventListener('click',e=>{if(e.target.id==='profileModal'&&profile)closeProfileModal()});$('guitarTab')?.addEventListener('click',()=>rememberMultiInstrument('guitar'));$('pianoTab')?.addEventListener('click',()=>rememberMultiInstrument('piano'));updateUI();if(!profile)openProfileModal();restoreCloudSession()}
+function wire(){const other=ensureOtherButton();ensurePasswordField();protectCatalogSearch();$('profileBtn')?.addEventListener('click',openProfileModal);$('profileLoginBtn')?.addEventListener('click',primaryAction);$('profileMusicBtn')?.addEventListener('click',openMusicEditor);$('profileMusicSaveBtn')?.addEventListener('click',saveMusicEditor);$('profileMusicCloseBtn')?.addEventListener('click',closeMusicEditor);$('profileMusicModal')?.addEventListener('click',e=>{if(e.target.id==='profileMusicModal')closeMusicEditor()});other?.addEventListener('click',()=>{if(step==='choose')renderStep('external-auth');else otherAction()});$('profileVisitorBtn')?.addEventListener('click',visitor);$('profileCloseBtn')?.addEventListener('click',()=>{if(profile)closeProfileModal();else visitor()});$('profileName')?.addEventListener('keydown',e=>{if(e.key==='Enter')primaryAction()});$('profilePassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')primaryAction()});$('profileModal')?.addEventListener('click',e=>{if(e.target.id==='profileModal'&&profile)closeProfileModal()});$('guitarTab')?.addEventListener('click',()=>rememberMultiInstrument('guitar'));$('pianoTab')?.addEventListener('click',()=>rememberMultiInstrument('piano'));updateUI();if(!profile)openProfileModal();restoreCloudSession()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();
 })();
