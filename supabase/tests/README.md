@@ -112,6 +112,15 @@ Comprobar repertorio:
 
 - el RPC no permite meter una canción fuera del repertorio del ministerio.
 
+### Asignaciones de integrantes
+
+- leader/admin/owner pueden asignar integrantes del roster al evento;
+- member puede leer las asignaciones pero no modificarlas;
+- no se puede asignar una ficha de roster perteneciente a otro ministerio;
+- las funciones permitidas son `voice`, `guitar`, `piano`, `bass`, `drums`;
+- eliminar una ficha del roster conserva el nombre histórico ya guardado en el evento;
+- eliminar el evento elimina sus asignaciones por cascada.
+
 ## 5. Datos personales
 
 Usar al menos dos usuarios autenticados.
