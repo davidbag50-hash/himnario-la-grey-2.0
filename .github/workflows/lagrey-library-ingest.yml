@@ -36,16 +36,19 @@ jobs:
           git fetch origin main
           test "$(git rev-parse origin/main)" = "$BASE" || { echo 'main cambió durante la operación; abortando.'; exit 1; }
           git config user.name "La Grey Maintenance"; git config user.email "actions@users.noreply.github.com"
-          git add songs.js sw.js; git diff --cached --check
-          test "$(git diff --cached --name-only | sort)" = "$(printf 'songs.js\nsw.js')"
+          git add songs.js sw.js sitemap.txt sitemap.xml; git diff --cached --check
+          test "$(git diff --cached --name-only | sort)" = "$(printf 'sitemap.txt\nsitemap.xml\nsongs.js\nsw.js')"
           test "$(git hash-object songs.js)" = "$(cat "$RUNNER_TEMP/songs-blob.txt")"
           test "$(git hash-object sw.js)" = "$(cat "$RUNNER_TEMP/sw-blob.txt")"
+          test "$(git hash-object sitemap.txt)" = "$(cat "$RUNNER_TEMP/sitemap-txt-blob.txt")"
+          test "$(git hash-object sitemap.xml)" = "$(cat "$RUNNER_TEMP/sitemap-xml-blob.txt")"
           git commit -F "$RUNNER_TEMP/lagrey-message.txt"; git push origin HEAD:main
       - name: Verify published commit
         if: env.LAGREY_DRY_RUN != 'true'
         run: |
           set -euo pipefail; git fetch origin main; HEAD_SHA="$(git rev-parse HEAD)"; test "$(git rev-parse origin/main)" = "$HEAD_SHA"
           test "$(git rev-parse HEAD:songs.js)" = "$(cat "$RUNNER_TEMP/songs-blob.txt")"; test "$(git rev-parse HEAD:sw.js)" = "$(cat "$RUNNER_TEMP/sw-blob.txt")"
+          test "$(git rev-parse HEAD:sitemap.txt)" = "$(cat "$RUNNER_TEMP/sitemap-txt-blob.txt")"; test "$(git rev-parse HEAD:sitemap.xml)" = "$(cat "$RUNNER_TEMP/sitemap-xml-blob.txt")"
           node .github/scripts/lagrey-library-validate.js
       - name: Report success
         if: success()
