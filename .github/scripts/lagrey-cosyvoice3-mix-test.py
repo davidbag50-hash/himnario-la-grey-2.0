@@ -107,7 +107,7 @@ def synth_chunk(client, text, ref, out, seed):
                 PROMPT_TEXT,
                 handle_file(str(ref)),
                 None,
-                "",
+                "You are a helpful assistant. 请用广东话表达。<|endofprompt|>",
                 seed,
                 False,
                 "En",
