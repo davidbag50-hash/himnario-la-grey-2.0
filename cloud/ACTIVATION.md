@@ -63,6 +63,11 @@ Aplicar **en este orden**, sin saltos:
     - funciones musicales por evento
     - snapshot de nombre para historial
 
+13. `20260924_000013_self_music_profile.sql`
+    - permite que cada miembro edite sus propias funciones musicales
+    - permite cambiar su instrumento/función preferida
+    - no permite modificar rol administrativo, identidad ni otro miembro
+
 ## Cómo comprobar el estado real
 
 Con La Grey abierta, autenticado:
@@ -171,7 +176,7 @@ La nube complementa el catálogo, no lo sustituye.
 
 Considerar La Grey Cloud plenamente activa solo cuando:
 
-1. las 12 migraciones estén aplicadas;
+1. las 13 migraciones estén aplicadas;
 2. `LAGREY_CLOUD_DIAGNOSTICS.run()` no reporte capacidades faltantes;
 3. las pruebas RLS entre dos ministerios pasen;
 4. se confirme comportamiento offline y reconciliación al recuperar conexión.
