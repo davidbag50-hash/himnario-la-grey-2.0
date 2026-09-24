@@ -351,6 +351,69 @@ class MinistryCloudAdapter{
     return false;
   }
 
+  async getPracticeSessions(limit=40){
+    const safeLimit=Math.max(1,Math.min(200,Number(limit)||40));
+    const rows=this._ok(await this.client.from('user_practice_sessions')
+      .select('id,practiced_at,duration_minutes,instrument_role,track_id,item_id,song_id,event_id,note,created_at,updated_at')
+      .eq('user_id',this.userId)
+      .order('practiced_at',{ascending:false})
+      .limit(safeLimit))||[];
+    return rows.map(row=>({
+      id:row.id,
+      practicedAt:row.practiced_at,
+      durationMinutes:row.duration_minutes==null?null:Number(row.duration_minutes),
+      instrumentRole:row.instrument_role||'none',
+      trackId:row.track_id||'',
+      itemId:row.item_id||'',
+      songId:row.song_id==null?null:Number(row.song_id),
+      eventId:row.event_id||null,
+      note:row.note||'',
+      createdAt:row.created_at||null,
+      updatedAt:row.updated_at||null
+    }));
+  }
+
+  async savePracticeSession(session={}){
+    const id=String(session?.id||'').trim();
+    if(!id)throw new Error('Practice session id is required');
+    const duration=session?.durationMinutes==null||session.durationMinutes===''?null:Number(session.durationMinutes);
+    if(duration!==null&&(!Number.isInteger(duration)||duration<1||duration>720))throw new Error('Invalid practice duration');
+    const role=['voice','guitar','piano','bass','drums','all','none'].includes(String(session?.instrumentRole||''))?String(session.instrumentRole):'none';
+    const note=String(session?.note||'');
+    if(note.length>2000)throw new Error('Practice note is too long');
+    const row={
+      id,
+      user_id:this.userId,
+      practiced_at:session?.practicedAt||new Date().toISOString(),
+      duration_minutes:duration,
+      instrument_role:role,
+      track_id:String(session?.trackId||'').trim()||null,
+      item_id:String(session?.itemId||'').trim()||null,
+      song_id:session?.songId==null?null:Number(session.songId),
+      event_id:String(session?.eventId||'').trim()||null,
+      note
+    };
+    const data=this._ok(await this.client.from('user_practice_sessions').upsert(row,{onConflict:'id'}).select('id,practiced_at,duration_minutes,instrument_role,track_id,item_id,song_id,event_id,note,created_at,updated_at').single());
+    return{
+      id:data.id,
+      practicedAt:data.practiced_at,
+      durationMinutes:data.duration_minutes==null?null:Number(data.duration_minutes),
+      instrumentRole:data.instrument_role||'none',
+      trackId:data.track_id||'',
+      itemId:data.item_id||'',
+      songId:data.song_id==null?null:Number(data.song_id),
+      eventId:data.event_id||null,
+      note:data.note||'',
+      createdAt:data.created_at||null,
+      updatedAt:data.updated_at||null
+    };
+  }
+
+  async deletePracticeSession(sessionId){
+    this._ok(await this.client.from('user_practice_sessions').delete().eq('user_id',this.userId).eq('id',String(sessionId||'')));
+    return true;
+  }
+
   async getPersonalSongNote(songId){
     const result=await this.client.from('user_song_notes').select('body,updated_at').eq('user_id',this.userId).eq('song_id',Number(songId)).maybeSingle();
     if(result?.error)throw result.error;
