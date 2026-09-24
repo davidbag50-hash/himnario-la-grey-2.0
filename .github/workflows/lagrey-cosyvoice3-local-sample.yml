@@ -80,6 +80,9 @@ jobs:
             'omegaconf==2.3.0' \
             'onnx==1.16.0' \
             'onnxruntime==1.18.0' \
+            'pyarrow==18.1.0' \
+            'pydantic==2.7.0' \
+            'pyworld==0.3.4' \
             'protobuf==4.25.3' \
             'rich==13.7.1' \
             'soundfile==0.12.1' \
