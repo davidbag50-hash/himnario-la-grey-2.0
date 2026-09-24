@@ -110,8 +110,8 @@ function installPreferredGetter(){window.LAGREY_GET_PREFERRED_CHORD_INSTRUMENT=(
 
 function syncProfileMusic(mine){
  if(!mine)return;const p=$('profileModal'),hint=p?.querySelector('.hint');if(!p||p.classList.contains('hidden')||!hint)return;let line=$('lgRosterProfileMusic');if(!line){line=document.createElement('div');line.id='lgRosterProfileMusic';line.className='lg-roster-profile-music';hint.insertAdjacentElement('beforebegin',line)}line.textContent=`${musicText(mine)} · ${roleLabel(mine.cloud_role)}`;
- try{const saved=JSON.parse(localStorage.getItem(PROFILE_KEY)||'null');if(saved?.cloud){saved.musicRoles=mine.music_roles||[];saved.instrument=mine.preferred_instrument||saved.instrument;saved.rosterId=mine.id;localStorage.setItem(PROFILE_KEY,JSON.stringify(saved))}}catch{}
-}
+ try{const saved=JSON.parse(localStorage.getItem(PROFILE_KEY)||'null');if(saved?.cloud){const before=JSON.stringify({musicRoles:saved.musicRoles||[],instrument:saved.instrument||null,rosterId:saved.rosterId||null});saved.musicRoles=mine.music_roles||[];saved.instrument=mine.preferred_instrument||saved.instrument;saved.rosterId=mine.id;localStorage.setItem(PROFILE_KEY,JSON.stringify(saved));const after=JSON.stringify({musicRoles:saved.musicRoles||[],instrument:saved.instrument||null,rosterId:saved.rosterId||null});if(before!==after)document.dispatchEvent(new CustomEvent('lagrey:profile-changed',{detail:{profile:saved}}))}}catch{}
+ }
 async function syncProfileOnOpen(){const s=state();if(s?.mode!=='ministry')return;try{const mine=await window.LAGREY_MINISTRIES.getMyRosterProfile(s.ministry.id);if(mine){myPreferred=mine.preferred_instrument||null;syncProfileMusic(mine)}}catch{}}
 
 function refreshShell(){ensureStyles();ensureCard();installPreferredGetter()}
