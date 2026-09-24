@@ -280,6 +280,62 @@ class MinistryCloudAdapter{
     return true;
   }
 
+  async getEventTemplates(){
+    const result=await this.client
+      .from('ministry_event_templates')
+      .select('id,ministry_id,name,event_type,title,event_time,leader,singers,notes,created_by,created_at,updated_at,ministry_event_template_assignments(id,roster_member_id,display_name,music_role,position)')
+      .eq('ministry_id',this.ministryId)
+      .order('name',{ascending:true});
+    const rows=this._ok(result)||[];
+    return rows.map(row=>({
+      id:row.id,
+      name:row.name||'',
+      type:row.event_type||'service',
+      title:row.title||'',
+      time:row.event_time?String(row.event_time).slice(0,5):'',
+      leader:row.leader||'',
+      singers:row.singers||'',
+      notes:row.notes||'',
+      assignments:(row.ministry_event_template_assignments||[])
+        .slice()
+        .sort((a,b)=>Number(a.position)-Number(b.position))
+        .map((item,index)=>({
+          rosterMemberId:item.roster_member_id||'',
+          displayName:item.display_name||'',
+          musicRole:item.music_role||'',
+          position:Number(item.position)||index+1
+        })),
+      updatedAt:row.updated_at||null
+    }));
+  }
+
+  async saveEventTemplate(template){
+    const payload=(Array.isArray(template?.assignments)?template.assignments:[]).map(item=>({
+      rosterMemberId:String(item?.rosterMemberId||'').trim(),
+      musicRole:String(item?.musicRole||'').trim()
+    })).filter(item=>item.rosterMemberId&&['voice','guitar','piano','bass','drums'].includes(item.musicRole));
+    const {data,error}=await this.client.rpc('upsert_ministry_event_template',{
+      target_template:template?.id||null,
+      target_ministry:this.ministryId,
+      new_name:String(template?.name||'').trim(),
+      new_event_type:['service','rehearsal','event'].includes(template?.type)?template.type:'service',
+      new_title:String(template?.title||'').trim(),
+      new_event_time:template?.time||null,
+      new_leader:String(template?.leader||'').trim(),
+      new_singers:String(template?.singers||'').trim(),
+      new_notes:String(template?.notes||''),
+      new_assignments:payload
+    });
+    if(error)throw error;
+    return data;
+  }
+
+  async deleteEventTemplate(templateId){
+    const {error}=await this.client.rpc('delete_ministry_event_template',{target_template:templateId});
+    if(error)throw error;
+    return true;
+  }
+
   async respondToEvent(eventId,status){
     const clean=['pending','confirmed','tentative','unavailable'].includes(String(status||''))?String(status):'pending';
     const {data,error}=await this.client.rpc('respond_to_ministry_event',{
