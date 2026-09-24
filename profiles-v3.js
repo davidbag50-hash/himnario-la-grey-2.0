@@ -59,10 +59,14 @@ async function ensureCloud(){
 }
 async function cloudProfileFromState(state){
  if(!state?.user||!state?.ministry)return null;
- let row=null;try{row=await state.data?.getCurrentProfile?.()}catch{}
- const name=String(row?.display_name||state.user.email?.split('@')[0]||tx('Miembro','Member')).trim();
- const legacy=findMember(name);const cloudRole=state.role||'member';
- return{id:state.user.id,name,aliases:[name],roles:legacy?.roles?.length?legacy.roles:[cloudRole],instrument:legacy?.instrument||'all',icon:legacy?.icon||'☁️',ministryId:state.ministry.id,ministryName:state.ministry.name,cloudRole,email:state.user.email||'',cloud:true};
+ let row=null,roster=null;
+ try{row=await state.data?.getCurrentProfile?.()}catch{}
+ try{roster=await window.LAGREY_MINISTRIES?.getMyRosterProfile?.(state.ministry.id)}catch{}
+ const name=String(roster?.display_name||row?.display_name||state.user.email?.split('@')[0]||tx('Miembro','Member')).trim();
+ const legacy=findMember(name),musicRoles=Array.isArray(roster?.music_roles)?roster.music_roles.filter(Boolean):[];
+ const cloudRole=roster?.cloud_role||state.role||'member';
+ const preferred=['guitar','piano','voice','all','none'].includes(roster?.preferred_instrument)?roster.preferred_instrument:(legacy?.instrument||'all');
+ return{id:state.user.id,name,aliases:[name],roles:legacy?.roles?.length?legacy.roles:[cloudRole],musicRoles,instrument:preferred,icon:legacy?.icon||'☁️',rosterId:roster?.id||null,ministryId:state.ministry.id,ministryName:state.ministry.name,cloudRole,email:state.user.email||'',cloud:true};
 }
 async function refreshCloudProfile(expectedSlug=null){await ensureCloud();const state=await window.LAGREY_CLOUD.boot();if(state.mode!=='ministry'||!state.ministry)return{state,profile:null};if(expectedSlug&&state.ministry.slug!==expectedSlug)return{state,profile:null};return{state,profile:await cloudProfileFromState(state)}}
 function friendlyAuthError(error){const m=String(error?.message||error||'');if(/invalid login credentials/i.test(m))return tx('Correo o contraseña incorrectos.','Incorrect email or password.');if(/email not confirmed/i.test(m))return tx('Tu correo todavía no está confirmado.','Your email is not confirmed yet.');if(/failed to fetch|network/i.test(m))return tx('No pude conectar con La Grey Cloud. Revisa internet.','Could not connect to La Grey Cloud. Check your internet.');return m||tx('No se pudo iniciar sesión.','Could not sign in.')}
