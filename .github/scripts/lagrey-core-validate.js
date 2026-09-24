@@ -11,7 +11,7 @@ const checkJs=file=>{
 
 const criticalJs=[
   'app.js','profiles-v3.js','settings-v2.js','exact-home-controller-v1.js',
-  'members-roster-v1.js','members-management-v1.js','voice.js',
+  'members-roster-v1.js','members-management-v1.js','voice.js','ministry-history-v1.js',
   'cloud/config.js','cloud/bootstrap.js','cloud/data-service.js',
   'cloud/ministry-service.js','cloud/diagnostics.js','sw.js'
 ];
@@ -25,7 +25,7 @@ if(duplicates.length)fail('IDs HTML duplicados: '+duplicates.join(', '));
 const requiredIds=[
   'home','listing','detail','calendarView','setlistView','academyView','academyFocus',
   'myRouteView','ministryOverviewView','profileModal','profileMusicModal','settingsView','settingsCloudStatusBtn',
-  'personalSongNotesPanel','eventAssignmentsPanel','academyPractice','practiceModal','eventTemplateTools','eventTemplateSelect','eventTemplateApplyBtn','eventTemplateSaveBtn','eventTemplateDeleteBtn'
+  'personalSongNotesPanel','eventAssignmentsPanel','academyPractice','practiceModal','eventTemplateTools','eventTemplateSelect','eventTemplateApplyBtn','eventTemplateSaveBtn','eventTemplateDeleteBtn','ministryOverviewHistory','ministryHistoryView','ministryHistorySearch','ministryHistorySummary','ministryHistoryList'
 ];
 for(const id of requiredIds)if(!ids.includes(id))fail('Falta el ID principal #'+id+' en index.html');
 
@@ -79,6 +79,10 @@ for(const token of [
   'function syncSetlistPreparation(eventId)',
   'function renderPersonalSongNotes(songId'
 ])if(!app.includes(token))fail('Falta integración principal: '+token);
+const ministryHistory=read('ministry-history-v1.js');
+for(const token of ['function rows()','function renderPreview()','function render()','LAGREY_SHOW_MINISTRY_HISTORY']){
+  if(!ministryHistory.includes(token))fail('Falta integración de historial de repertorio: '+token);
+}
 
 const ministryService=read('cloud/ministry-service.js');
 for(const token of ['updateMyRosterMusic','getMyRosterProfile','updateRosterMemberAdmin']){
