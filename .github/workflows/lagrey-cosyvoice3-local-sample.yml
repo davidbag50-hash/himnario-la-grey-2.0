@@ -51,7 +51,7 @@ jobs:
           old_import = 'from transformers import Qwen2ForCausalLM'
           new_import = 'from transformers import Qwen2ForCausalLM, AutoConfig'
           old_init = 'self.model = Qwen2ForCausalLM.from_pretrained(pretrain_path)'
-          new_init = 'self.model = Qwen2ForCausalLM.from_config(AutoConfig.from_pretrained(pretrain_path))'
+          new_init = 'self.model = Qwen2ForCausalLM(AutoConfig.from_pretrained(pretrain_path))'
           if old_import not in s or old_init not in s:
               raise SystemExit('CosyVoice Qwen patch target changed')
           s = s.replace(old_import, new_import, 1).replace(old_init, new_init, 1)
