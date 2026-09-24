@@ -1,0 +1,62 @@
+name: La Grey Academy Video Frames
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lagrey-academy-video-frames.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lagrey-academy-video-frames
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Build exact lesson photo strips from existing videos
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p academy-media /tmp/academy-frames
+          for src in academy-videos/voice-advanced-0{1,2,3,4,5,6,7,8}-*.mp4; do
+            [ -f "$src" ] || continue
+            case "$src" in
+              *cosyvoice3-local-sample*) continue ;;
+            esac
+            base="$(basename "$src" .mp4)"
+            duration="$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$src")"
+            python3 - "$duration" > /tmp/academy-times.txt <<'PY'
+import sys
+d=max(float(sys.argv[1]),1.0)
+for ratio in (0.18,0.38,0.62,0.84):
+    print(max(0.0,min(d-0.08,d*ratio)))
+PY
+            mapfile -t times < /tmp/academy-times.txt
+            frames=()
+            for i in 0 1 2 3; do
+              out="/tmp/academy-frames/${base}-$i.png"
+              ffmpeg -loglevel error -y -ss "${times[$i]}" -i "$src" -frames:v 1 -vf "scale=480:640:force_original_aspect_ratio=increase,crop=480:640" "$out"
+              frames+=("$out")
+            done
+            ffmpeg -loglevel error -y -i "${frames[0]}" -i "${frames[1]}" -i "${frames[2]}" -i "${frames[3]}" -filter_complex "hstack=inputs=4" -c:v libwebp -quality 84 "academy-media/${base}.webp"
+          done
+          ls -lh academy-media/voice-advanced-*.webp
+      - name: Commit exact video frames
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "La Grey Academy"
+          git config user.email "actions@users.noreply.github.com"
+          git add academy-media/voice-advanced-*.webp
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Crear visuales fotográficos desde videos de Voz avanzada"
+          git push origin HEAD:main
