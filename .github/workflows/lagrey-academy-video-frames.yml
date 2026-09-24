@@ -47,13 +47,54 @@ jobs:
             ffmpeg -loglevel error -y -i "${frames[0]}" -i "${frames[1]}" -i "${frames[2]}" -i "${frames[3]}" -filter_complex "hstack=inputs=4" -c:v libwebp -quality 84 "academy-media/${base}.webp"
           done
           ls -lh academy-media/voice-advanced-*.webp
+      - name: Build exact Voice foundations and Piano strips
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p academy-media /tmp/academy-pexels
+          make_strip() {
+            lesson="$1"; shift
+            files=()
+            n=0
+            for id in "$@"; do
+              src="/tmp/academy-pexels/${lesson}-${n}.jpg"
+              crop="/tmp/academy-pexels/${lesson}-${n}.png"
+              curl -L --fail --retry 3 --silent --show-error "https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1200" -o "$src"
+              ffmpeg -loglevel error -y -i "$src" -frames:v 1 -vf "scale=480:640:force_original_aspect_ratio=increase,crop=480:640" "$crop"
+              files+=("$crop")
+              n=$((n+1))
+            done
+            test "${#files[@]}" -eq 4
+            ffmpeg -loglevel error -y -i "${files[0]}" -i "${files[1]}" -i "${files[2]}" -i "${files[3]}" -filter_complex "hstack=inputs=4" -c:v libwebp -quality 84 "academy-media/${lesson}.webp"
+          }
+          make_strip voice-foundations-02-warmup 7087170 7087166 4988142 7586648
+          make_strip voice-foundations-03-pitch 7088043 4988142 8132963 8412282
+          make_strip voice-foundations-05-diction 7586648 4988142 7087170 32085451
+          make_strip voice-foundations-06-range 4988142 5650911 5650955 32085451
+          make_strip voice-foundations-07-ministry-song 7086294 5650956 5650953 5650911
+          make_strip voice-foundations-08-rehearsal 5650956 5650953 7088378 5650911
+          make_strip piano-foundations-01-layout 34434115 34583 10222311 8520426
+          make_strip piano-foundations-04-minors-inversions 30175904 37303811 10252595 9538147
+          make_strip piano-foundations-05-accompaniment 8520426 37303811 30175904 16471147
+          make_strip piano-foundations-06-song-structure 6193529 8520426 9538147 34583
+          make_strip piano-foundations-07-ministry-song 8198161 8520426 30175904 6193529
+          make_strip piano-foundations-08-rehearsal 7088378 8520426 8198161 6193529
+          make_strip piano-intermediate-01-voice-leading 10222311 30175904 37303811 9538147
+          make_strip piano-intermediate-02-voicings 30175904 10252595 37538887 34583
+          make_strip piano-intermediate-03-rhythm 9538147 16471147 30175904 37303811
+          make_strip piano-intermediate-04-left-hand 10252595 10222311 37303811 30175904
+          make_strip piano-intermediate-05-transposition 34434115 6193529 34583 30175904
+          make_strip piano-intermediate-06-dynamics 9538147 30175904 10252595 16471147
+          make_strip piano-intermediate-07-band-arrangement 8198161 7088378 5650953 8520426
+          make_strip piano-intermediate-08-setlist 6193529 8198161 7088378 8520426
+          ls -lh academy-media/voice-foundations-*.webp academy-media/piano-*.webp
       - name: Commit exact video frames
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "La Grey Academy"
           git config user.email "actions@users.noreply.github.com"
-          git add academy-media/voice-advanced-*.webp
+          git add academy-media/*.webp
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "Crear visuales fotográficos desde videos de Voz avanzada"
           git push origin HEAD:main
