@@ -48,7 +48,8 @@ Este archivo describe el estado técnico/producto actual. Antes de modificar có
 - respuesta Confirmo / Tal vez / No puedo / Pendiente;
 - preparación personal por canción de setlist;
 - prioridad automática de eventos asignados;
-- panel operativo básico para owner/admin/leader.
+- panel operativo básico para owner/admin/leader;
+- plantillas compartidas de eventos.
 
 ### Academia
 
@@ -83,7 +84,7 @@ Este archivo describe el estado técnico/producto actual. Antes de modificar có
 ## Diseñado pero no implementado
 
 - historial de práctica y objetivos;
-- herramientas avanzadas de ministerio (plantillas, historial, mentoría; resumen operativo básico ya implementado);
+- herramientas avanzadas de ministerio (historial, mentoría y exportaciones; resumen operativo y plantillas ya implementados);
 - expansión Premium/pagos;
 - SEO estático por canción/himno como artefacto de deployment;
 - multi-himnario/denominaciones.
