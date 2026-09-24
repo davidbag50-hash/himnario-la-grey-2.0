@@ -269,6 +269,25 @@ class MinistryCloudAdapter{
     this._ok(await this.client.from('user_learning_progress').delete().eq('user_id',this.userId).eq('track_id',cleanTrack).eq('item_id',cleanItem));
     return false;
   }
+
+  async getPersonalSongNote(songId){
+    const result=await this.client.from('user_song_notes').select('body,updated_at').eq('user_id',this.userId).eq('song_id',Number(songId)).maybeSingle();
+    if(result?.error)throw result.error;
+    return result?.data||null;
+  }
+
+  async savePersonalSongNote(songId,body){
+    const song=songById(songId);
+    if(!song)throw new Error('Song not found in local catalog');
+    const clean=String(body||'');
+    if(clean.length>10000)throw new Error('Personal note is too long');
+    if(!clean.trim()){
+      this._ok(await this.client.from('user_song_notes').delete().eq('user_id',this.userId).eq('song_id',Number(song.id)));
+      return null;
+    }
+    const row={user_id:this.userId,song_id:Number(song.id),body:clean};
+    return this._ok(await this.client.from('user_song_notes').upsert(row,{onConflict:'user_id,song_id'}).select('body,updated_at').single());
+  }
 }
 
 function createGuestDataService(){return new GuestLocalAdapter()}
