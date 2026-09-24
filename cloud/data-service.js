@@ -151,6 +151,69 @@ class MinistryCloudAdapter{
     const data=this._ok(await this.client.from('ministry_song_notes').upsert(row,{onConflict:'ministry_id,song_id'}).select().single());
     return data?.body||'';
   }
+
+  async getEvents(){
+    const result=await this.client
+      .from('ministry_events')
+      .select('id,ministry_id,event_type,event_date,event_time,rehearsal_at,title,leader,singers,notes,created_by,created_at,updated_at,ministry_event_setlist(id,position,song_id,song_type,tone)')
+      .eq('ministry_id',this.ministryId)
+      .order('event_date',{ascending:true})
+      .order('event_time',{ascending:true});
+    const rows=this._ok(result)||[];
+    return rows.map(row=>({
+      id:row.id,
+      type:row.event_type||'service',
+      date:row.event_date,
+      time:row.event_time?String(row.event_time).slice(0,5):'',
+      rehearsal:row.rehearsal_at?String(row.rehearsal_at).slice(0,16):'',
+      title:row.title||'',
+      leader:row.leader||'',
+      singers:row.singers||'',
+      notes:row.notes||'',
+      setlist:(row.ministry_event_setlist||[])
+        .slice()
+        .sort((a,b)=>Number(a.position)-Number(b.position))
+        .map(item=>({
+          songId:Number(item.song_id),
+          songType:item.song_type,
+          tone:item.tone||''
+        })),
+      source:'cloud'
+    }));
+  }
+
+  async saveEvent(event){
+    const setlist=(event?.setlist||[]).map(item=>{
+      const song=songById(item?.songId);
+      if(!song)throw new Error('Song not found in local catalog');
+      return {
+        songId:Number(song.id),
+        songType:item?.songType||song.type,
+        tone:String(item?.tone||'').trim()
+      };
+    });
+    const {data,error}=await this.client.rpc('upsert_ministry_event',{
+      target_event:event?.id||null,
+      target_ministry:this.ministryId,
+      new_event_type:event?.type||'service',
+      new_event_date:event?.date||null,
+      new_event_time:event?.time||null,
+      new_rehearsal_at:event?.rehearsal||null,
+      new_title:String(event?.title||'').trim(),
+      new_leader:String(event?.leader||'').trim(),
+      new_singers:String(event?.singers||'').trim(),
+      new_notes:String(event?.notes||'').trim(),
+      new_setlist:setlist
+    });
+    if(error)throw error;
+    return data;
+  }
+
+  async deleteEvent(eventId){
+    const {error}=await this.client.rpc('delete_ministry_event',{target_event:eventId});
+    if(error)throw error;
+    return true;
+  }
 }
 
 function createGuestDataService(){return new GuestLocalAdapter()}
