@@ -474,6 +474,78 @@ const ACADEMY_EXACT_VISUALS={
    {title:['Frase con brillo','Bright phrase'],text:['Pasa del ejercicio a una frase real manteniendo claridad y sensación libre, no más fuerza.','Move from the exercise to a real phrase while keeping clarity and freedom, not extra force.']}
   ]
  },
+ 'voice-advanced-01-mix':{
+  asset:'academy-media/voice-advanced-01-mix.webp',clean:true,
+  steps:[
+   {title:['Empieza ligero','Start light'],text:['Inicia en una intensidad cómoda y evita cargar demasiado el registro grave antes de subir.','Begin at a comfortable intensity and avoid carrying too much low-register weight upward.']},
+   {title:['Cruza la transición','Cross the transition'],text:['Mantén el sonido conectado mientras aligeras presión al acercarte a la zona de cambio.','Keep the sound connected while reducing pressure near the transition area.']},
+   {title:['Equilibra la mezcla','Balance the mix'],text:['Busca claridad sin empujar. El cuello y la mandíbula deben seguir disponibles.','Look for clarity without pushing. Keep neck and jaw available.']},
+   {title:['Llévalo a una frase','Apply it to a phrase'],text:['Prueba una frase real y conserva la misma coordinación que funcionó en el ejercicio.','Try a real phrase and keep the same coordination that worked in the exercise.']}
+  ]
+ },
+ 'voice-advanced-02-passaggio':{
+  asset:'academy-media/voice-advanced-02-passaggio.webp',clean:true,
+  steps:[
+   {title:['Ubica la zona','Find the zone'],text:['Identifica dónde empieza a cambiar la sensación de registro sin perseguir una nota extrema.','Identify where the register sensation starts changing without chasing an extreme note.']},
+   {title:['Reduce peso','Reduce weight'],text:['Al subir, deja que la voz se vuelva más ligera en vez de aumentar presión.','As you ascend, let the voice become lighter instead of increasing pressure.']},
+   {title:['Cruza y vuelve','Cross and return'],text:['Atraviesa la zona y regresa a notas medias conservando libertad.','Cross the area and return to middle notes while staying free.']},
+   {title:['Repite sin fatiga','Repeat without fatigue'],text:['Haz pocas repeticiones limpias; si la coordinación se endurece, detente y reinicia más suave.','Do a few clean repetitions; if coordination tightens, stop and restart more gently.']}
+  ]
+ },
+ 'voice-advanced-03-dynamics':{
+  asset:'academy-media/voice-advanced-03-dynamics.webp',clean:true,
+  steps:[
+   {title:['Suave estable','Stable soft'],text:['Canta la frase suave sin aire excesivo ni pérdida del centro tonal.','Sing the phrase softly without excessive breathiness or losing pitch center.']},
+   {title:['Nivel medio','Medium level'],text:['Aumenta energía sin cambiar la afinación ni endurecer el cuello.','Increase energy without changing pitch or tightening the neck.']},
+   {title:['Firme sin gritar','Firm without shouting'],text:['Sube intensidad manteniendo la vocal organizada y el aire controlado.','Raise intensity while keeping the vowel organized and airflow controlled.']},
+   {title:['Vuelve a suave','Return to soft'],text:['Reduce otra vez la intensidad para comprobar que el control no dependía de empujar.','Reduce intensity again to confirm control did not depend on pushing.']}
+  ]
+ },
+ 'voice-advanced-04-intervals':{
+  asset:'academy-media/voice-advanced-04-intervals.webp',clean:true,
+  steps:[
+   {title:['Escucha primero','Hear it first'],text:['Antes de cantar, imagina claramente la nota de llegada.','Before singing, clearly imagine the destination note.']},
+   {title:['Ataca limpio','Clean onset'],text:['Entra directamente en la nota sin deslizar desde abajo para encontrarla.','Enter the note directly without sliding up to find it.']},
+   {title:['Practica saltos','Practice leaps'],text:['Alterna 1→3, 1→5 y 5→8 con volumen cómodo y ritmo estable.','Alternate 1→3, 1→5, and 5→8 at a comfortable volume and steady rhythm.']},
+   {title:['Comprueba afinación','Check pitch'],text:['Repite el salto y escucha si ambas notas conservan un centro claro.','Repeat the leap and listen for a clear pitch center on both notes.']}
+  ]
+ },
+ 'voice-advanced-05-harmony':{
+  asset:'academy-media/voice-advanced-05-harmony.webp',clean:true,
+  steps:[
+   {title:['Escucha el acorde','Hear the chord'],text:['Identifica la armonía completa antes de escoger tu nota.','Identify the full harmony before choosing your note.']},
+   {title:['Encuentra tu voz','Find your part'],text:['Localiza raíz, tercera o quinta y canta solo esa nota con seguridad.','Find root, third, or fifth and sing only that note confidently.']},
+   {title:['Sostén tu línea','Hold your line'],text:['Mantén tu nota aunque otra persona cante la melodía cerca de ti.','Keep your note even while someone else sings the melody nearby.']},
+   {title:['Integra la frase','Integrate the phrase'],text:['Canta la armonía dentro de una frase completa sin seguir involuntariamente la melodía.','Sing the harmony through a full phrase without accidentally following the melody.']}
+  ]
+ },
+ 'voice-advanced-06-endurance':{
+  asset:'academy-media/voice-advanced-06-endurance.webp',clean:true,
+  steps:[
+   {title:['Calienta antes','Warm up first'],text:['Prepara la voz con una rutina breve antes de exigir duración.','Prepare the voice with a short routine before asking for endurance.']},
+   {title:['Dosifica energía','Manage energy'],text:['No cantes cada repetición al máximo; conserva margen para el resto del ensayo.','Do not sing every repetition at maximum intensity; save room for the rest of rehearsal.']},
+   {title:['Haz pausas','Take breaks'],text:['Alterna trabajo y descanso antes de que aparezca fatiga marcada.','Alternate work and rest before noticeable fatigue appears.']},
+   {title:['Evalúa al final','Check at the end'],text:['Termina comprobando si la voz conserva una sensación parecida a la del inicio.','Finish by checking whether the voice feels similar to how it felt at the start.']}
+  ]
+ },
+ 'voice-advanced-07-agility':{
+  asset:'academy-media/voice-advanced-07-agility.webp',clean:true,
+  steps:[
+   {title:['Patrón lento','Slow pattern'],text:['Aprende primero las notas y el ritmo a velocidad reducida.','Learn the notes and rhythm first at a reduced speed.']},
+   {title:['Articulación ligera','Light articulation'],text:['Evita golpes pesados entre notas; mantén mandíbula y lengua libres.','Avoid heavy attacks between notes; keep jaw and tongue free.']},
+   {title:['Aumenta poco a poco','Increase gradually'],text:['Sube la velocidad solo después de varias repeticiones limpias.','Increase speed only after several clean repetitions.']},
+   {title:['Llévalo al adorno','Apply the ornament'],text:['Usa el patrón dentro de una frase y comprueba que cada nota siga identificable.','Use the pattern inside a phrase and check that every note remains identifiable.']}
+  ]
+ },
+ 'voice-advanced-08-setlist':{
+  asset:'academy-media/voice-advanced-08-setlist.webp',clean:true,
+  steps:[
+   {title:['Revisa los tonos','Review keys'],text:['Confirma la tonalidad de cada canción antes de cantar el set completo.','Confirm the key of each song before singing the whole set.']},
+   {title:['Marca carga vocal','Mark vocal load'],text:['Identifica qué canciones exigen más agudos, potencia o armonías.','Identify which songs demand more high notes, power, or harmonies.']},
+   {title:['Planifica descansos','Plan rests'],text:['Ubica momentos donde puedes bajar intensidad, beber agua o descansar.','Identify moments where you can reduce intensity, hydrate, or rest.']},
+   {title:['Ensaya puntos críticos','Rehearse critical spots'],text:['Trabaja entradas, frases difíciles y armonías antes de hacer una pasada completa.','Work on entrances, difficult phrases, and harmonies before a full run-through.']}
+  ]
+ },
  'piano-foundations-02-posture-fingers':{
   asset:'academy-media/piano-foundations-posture.webp',
   steps:[
@@ -547,7 +619,7 @@ const ACADEMY_EXACT_VISUALS={
   ]
  }
 };
-function academyExactVisualHtml(lesson){const visual=ACADEMY_EXACT_VISUALS[String(lesson?.id||'')];if(!visual)return'';return `<div class="academy-exact-visual"><div class="academy-exact-intro"><b>👁 ${appText('Mira cada paso antes de hacerlo','Study each step before trying it')}</b><span>${academyPick(lesson.title)}</span></div><div class="academy-exact-grid">${visual.steps.map((step,i)=>`<article class="academy-exact-step"><div class="academy-exact-photo" style="--academy-photo:url('./${visual.asset}');--academy-photo-x:${i===0?'0%':i===1?'33.333%':i===2?'66.667%':'100%'}" role="img" aria-label="${esc(academyPick(step.title))}"></div><div class="academy-exact-copy"><span>${i+1}</span><div><b>${academyPick(step.title)}</b><p>${academyPick(step.text)}</p></div></div></article>`).join('')}</div></div>`}
+function academyExactVisualHtml(lesson){const visual=ACADEMY_EXACT_VISUALS[String(lesson?.id||'')];if(!visual)return'';return `<div class="academy-exact-visual"><div class="academy-exact-intro"><b>👁 ${appText('Mira cada paso antes de hacerlo','Study each step before trying it')}</b><span>${academyPick(lesson.title)}</span></div><div class="academy-exact-grid">${visual.steps.map((step,i)=>`<article class="academy-exact-step"><div class="academy-exact-photo${visual.clean?' academy-exact-clean':''}" style="--academy-photo:url('./${visual.asset}');--academy-photo-x:${i===0?'0%':i===1?'33.333%':i===2?'66.667%':'100%'}" role="img" aria-label="${esc(academyPick(step.title))}"></div><div class="academy-exact-copy"><span>${i+1}</span><div><b>${academyPick(step.title)}</b><p>${academyPick(step.text)}</p></div></div></article>`).join('')}</div></div>`}
 function academyTextStepsHtml(lesson){return `<div class="academy-text-steps"><article><span>1</span><div><b>${appText('Entiende','Understand')}</b><p>${academyPick(lesson.goal)}</p></div></article><article><span>2</span><div><b>${appText('Practica','Practice')}</b><p>${academyPick(lesson.practice)}</p></div></article><article><span>3</span><div><b>${appText('Comprueba','Check')}</b><p>${academyPick(lesson.ready)}</p></div></article></div>`}
 function academyMediaHtml(course,lesson,index){const visual=academyExactVisualHtml(lesson),media=lesson?.media;const video=media?.video?`<div class="academy-video-guide academy-video-guide-open"><div class="academy-video-title">▶ ${appText('Demostración en video','Video demonstration')}</div><video controls playsinline preload="metadata"><source src="./${media.video}" type="video/mp4"></video></div>`:'';return video+visual+(visual?'':academyTextStepsHtml(lesson))}
 function academyCourseLesson(course,lessonId=academyActiveLessonId){if(!course?.lessons?.length)return null;return course.lessons.find(x=>x.id===lessonId)||academyNextLesson(course)||course.lessons[0]}
