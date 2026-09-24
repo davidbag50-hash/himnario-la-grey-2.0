@@ -88,6 +88,12 @@ const dataService=read('cloud/data-service.js');
 for(const token of ['getLearningProgress','setLearningItemCompleted','getPersonalSongNote','savePersonalSongNote','saveEventAssignments','respondToEvent']){
   if(!dataService.includes(token))fail('Falta método cloud: '+token);
 }
+const repertoireBlock=dataService.slice(dataService.indexOf('async getRepertoire(){'),dataService.indexOf('async addToRepertoire('));
+if(/eventIds|assignmentsByEvent|ministry_event_responses/.test(repertoireBlock))fail('getRepertoire no debe depender de datos de eventos.');
+const eventsBlock=dataService.slice(dataService.indexOf('async getEvents(){'),dataService.indexOf('async saveEvent('));
+for(const token of ['const eventIds=','ministry_event_assignments','ministry_event_responses','responseStatus']){
+  if(!eventsBlock.includes(token))fail('getEvents perdió integración de participación: '+token);
+}
 
 const migrationDir='supabase/migrations';
 const migrations=fs.readdirSync(migrationDir).filter(name=>name.endsWith('.sql')).sort();
