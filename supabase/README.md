@@ -1,120 +1,100 @@
-# La Grey Cloud — puesta en marcha
+# La Grey Cloud — base de datos y seguridad
 
-Este directorio contiene la base de datos inicial de La Grey Cloud.
+Este directorio contiene las migraciones y pruebas de seguridad de La Grey Cloud.
 
-## Estado actual
+## Estado
 
-Todavía no hay credenciales de producción dentro del repositorio y la aplicación pública no depende de Supabase. Las migraciones están preparadas para ejecutarse en un proyecto Supabase cuando se cree.
+El cliente público ya está configurado para usar Supabase. El estado real del esquema remoto debe verificarse con el diagnóstico de la aplicación; este repositorio no debe asumir que una migración existe en producción solo porque el archivo SQL está aquí.
 
-Migraciones actuales:
+## Migraciones actuales
 
-1. `migrations/20260831_000001_lagrey_cloud_base.sql`
-   - profiles
-   - ministries
-   - ministry_members
-   - ministry_repertoire
-   - ministry_song_notes
-   - user_preferences
-   - triggers de `updated_at`
-   - creación automática de perfil al registrar usuario
-   - RLS base
+En orden:
 
-2. `migrations/20260831_000002_harden_ministry_ownership.sql`
-   - bloquea cambios directos de `owner_user_id`
-   - impide modificar/eliminar la membresía `owner` desde el cliente
-   - endurece políticas de administración del ministerio
+1. `20260831_000001_lagrey_cloud_base.sql`
+2. `20260831_000002_harden_ministry_ownership.sql`
+3. `20260831_000003_ministry_invites.sql`
+4. `20260831_000004_fix_invite_pgcrypto_search_path.sql`
+5. `20260901_000005_ministry_roster_presence.sql`
+6. `20260901_000006_roster_member_management.sql`
+7. `20260924_000007_ministry_calendar.sql`
+8. `20260924_000008_user_favorites.sql`
+9. `20260924_000009_learning_progress.sql`
+10. `20260924_000010_preferred_music_roles.sql`
+11. `20260924_000011_user_song_notes.sql`
+
+No renombrar migraciones ya aplicadas ni cambiar su orden histórico.
 
 ## Principio de seguridad
 
-La interfaz nunca debe confiar en un `ministry_id` enviado por el navegador. La base de datos valida la pertenencia del usuario mediante RLS y las funciones `is_ministry_member` / `has_ministry_role`.
+La interfaz nunca debe confiar en IDs enviados por el navegador.
 
-El catálogo de canciones e himnos NO se duplica en PostgreSQL. `ministry_repertoire.song_id` referencia el ID estable que ya existe en los archivos de catálogo de La Grey.
+La seguridad real depende de:
 
-## Primer despliegue
+- Supabase Auth;
+- Row Level Security;
+- funciones/RPCs que vuelven a validar rol y pertenencia.
 
-Cuando se cree el proyecto Supabase:
+Nunca distribuir `service_role`.
 
-1. Crear el proyecto en una cuenta controlada por el propietario de La Grey.
-2. Guardar URL pública y clave pública/anon únicamente en la configuración del cliente que corresponda.
-3. Nunca colocar `service_role` en JavaScript, PWA, APK, IPA ni ningún cliente distribuido.
-4. Ejecutar las migraciones en orden.
-5. Crear usuarios de prueba antes de conectar la aplicación real.
-6. Validar aislamiento entre ministerios.
-7. Solo después integrar autenticación/repertorio en la UI.
+## Datos de ministerio
 
-## Matriz mínima de prueba RLS
+Incluyen:
 
-Crear dos ministerios independientes:
+- membresías/roster;
+- repertorio;
+- tonalidades oficiales;
+- notas compartidas;
+- calendario;
+- ensayos;
+- servicios;
+- setlists.
 
-- Ministerio A
-  - owner A
-  - leader A
-  - member A
+La frontera de seguridad es el ministerio.
 
-- Ministerio B
-  - owner B
-  - leader B
-  - member B
+## Datos personales
 
-Comprobar:
+Incluyen:
 
-### Lectura
+- preferencias;
+- favoritos;
+- progreso de aprendizaje;
+- notas personales por canción.
 
-- owner A puede leer Ministerio A.
-- member A puede leer Ministerio A.
-- cualquier usuario de A NO puede leer Ministerio B.
-- cualquier usuario de B NO puede leer Ministerio A.
-- usuarios autenticados sin membresía no pueden leer datos privados de A o B.
+La frontera de seguridad es el usuario autenticado.
 
-### Repertorio
+## Catálogo
 
-- owner/admin/leader A pueden añadir y quitar canciones del repertorio A.
-- member A puede leer el repertorio A pero no modificarlo.
-- ningún usuario de B puede leer o modificar el repertorio A.
-- cambiar manualmente `ministry_id` en una petición no debe saltarse RLS.
+Canciones e himnos permanecen en los archivos empaquetados de La Grey.
 
-### Tono oficial
+PostgreSQL guarda referencias mediante `song_id` estable. No duplicar el catálogo completo en Supabase.
 
-- owner/admin/leader pueden cambiar `official_tone` del repertorio de su ministerio.
-- member solo lo puede leer.
-- el valor pertenece al ministerio, no al usuario individual.
+## Diagnóstico
 
-### Membresías
+Con sesión autenticada:
 
-- owner/admin pueden administrar miembros no-owner de su ministerio.
-- un admin no puede crear otro `owner` desde el cliente.
-- un admin no puede editar/eliminar la fila del owner.
-- `owner_user_id` no puede cambiarse mediante un UPDATE normal.
+```js
+const report = await LAGREY_CLOUD_DIAGNOSTICS.run();
+console.table(report.checks);
+```
 
-### Preferencias personales
+Debe verificarse especialmente cada check `schema:...`.
 
-- cada usuario solo puede leer/escribir su propia fila en `user_preferences`.
-- un usuario no puede leer preferencias privadas de otro.
+Ver `../cloud/ACTIVATION.md` para la secuencia completa.
 
-## Invitado
+## Pruebas RLS
 
-El invitado no usa estas tablas privadas. Sigue trabajando con el catálogo global y almacenamiento local del dispositivo.
+Ver `tests/README.md`.
 
-Mientras no exista sesión autenticada con ministerio real:
+Antes de considerar la nube lista:
 
-- favoritos -> localStorage
-- tonos personales -> localStorage
-- preferencias -> localStorage
-- sin acceso a repertorio privado de ministerios
+- usar dos ministerios distintos;
+- probar roles owner/admin/leader/member;
+- probar acceso cruzado fallido;
+- probar tablas personales entre dos usuarios;
+- usar únicamente sesiones normales y la clave pública.
 
-## Orden de integración con la app
+## Offline
 
-1. Cliente de autenticación.
-2. Sesión y perfil real.
-3. Resolver ministerio activo.
-4. Crear capa de datos:
-   - GuestLocalAdapter
-   - MinistryCloudAdapter
-5. Conectar Favoritos/Repertorio.
-6. Conectar tono oficial.
-7. Añadir caché offline y cola de sincronización.
-8. Después: notas, calendario, setlists y suscripciones.
+El fallback local es intencional para mantener La Grey utilizable sin red o mientras una capacidad cloud no esté disponible.
 
-## Regla para distribución móvil
-
-Toda clave incluida en una aplicación cliente debe considerarse pública. La seguridad real debe depender de Auth + RLS. Nunca se distribuirá una clave administrativa `service_role` dentro de la app.
+Un fallback exitoso no reemplaza la prueba de sincronización real.
