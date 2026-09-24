@@ -22,6 +22,7 @@ En orden:
 10. `20260924_000010_preferred_music_roles.sql`
 11. `20260924_000011_user_song_notes.sql`
 12. `20260924_000012_event_member_assignments.sql`
+13. `20260924_000013_self_music_profile.sql`
 
 No renombrar migraciones ya aplicadas ni cambiar su orden histórico.
 
