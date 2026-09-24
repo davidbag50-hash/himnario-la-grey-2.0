@@ -25,7 +25,7 @@ if(duplicates.length)fail('IDs HTML duplicados: '+duplicates.join(', '));
 const requiredIds=[
   'home','listing','detail','calendarView','setlistView','academyView','academyFocus',
   'myRouteView','ministryOverviewView','profileModal','profileMusicModal','settingsView','settingsCloudStatusBtn',
-  'personalSongNotesPanel','eventAssignmentsPanel','academyPractice','practiceModal','eventTemplateTools','eventTemplateSelect','eventTemplateApplyBtn','eventTemplateSaveBtn','eventTemplateDeleteBtn','ministryHistoryView','ministryHistorySearch','ministryHistoryList','ministryOverviewHistory','ministryHistoryView','ministryHistorySearch','ministryHistorySummary','ministryHistoryList'
+  'personalSongNotesPanel','eventAssignmentsPanel','academyPractice','practiceModal','eventTemplateTools','eventTemplateSelect','eventTemplateApplyBtn','eventTemplateSaveBtn','eventTemplateDeleteBtn','ministryOverviewHistory','ministryHistoryView','ministryHistorySearch','ministryHistorySummary','ministryHistoryList'
 ];
 for(const id of requiredIds)if(!ids.includes(id))fail('Falta el ID principal #'+id+' en index.html');
 
