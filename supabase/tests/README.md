@@ -133,6 +133,19 @@ Comprobar repertorio:
 - eliminar una ficha del roster conserva el nombre histórico ya guardado en el evento;
 - eliminar el evento elimina sus asignaciones por cascada.
 
+## 4.1 Respuesta personal de participación
+
+Para un integrante asignado a un evento:
+
+- puede responder `confirmed`, `tentative`, `unavailable` o volver a `pending`;
+- solo puede responder mediante `respond_to_ministry_event`;
+- no puede responder si no está asignado al evento;
+- no puede responder usando la ficha de otro integrante;
+- cualquier miembro del mismo ministerio puede leer el estado para coordinar el equipo;
+- un usuario de otro ministerio no puede leer las respuestas;
+- al quitar a una persona de todas sus funciones del evento, su respuesta anterior se elimina;
+- cambiar solo la función musical de la misma persona conserva su respuesta.
+
 ## 5. Datos personales
 
 Usar al menos dos usuarios autenticados.
