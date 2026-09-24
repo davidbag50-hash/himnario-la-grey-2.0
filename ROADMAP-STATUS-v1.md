@@ -63,7 +63,8 @@ Este archivo describe el estado técnico/producto actual. Antes de modificar có
 - sincronización/offline;
 - recomendación por función musical y progreso;
 - preparación contextual del próximo setlist;
-- Mi Ruta de integración al ministerio.
+- Mi Ruta de integración al ministerio;
+- historial privado de práctica con sincronización offline-first.
 
 ### Cloud / seguridad
 
@@ -82,7 +83,7 @@ Este archivo describe el estado técnico/producto actual. Antes de modificar có
 
 ## Diseñado pero no implementado
 
-- historial de práctica y objetivos;
+- objetivos personales de aprendizaje;
 - herramientas avanzadas de ministerio (plantillas, historial, mentoría; resumen operativo básico ya implementado);
 - expansión Premium/pagos;
 - SEO estático por canción/himno como artefacto de deployment;
@@ -123,7 +124,7 @@ La PWA sigue siendo la base única.
 ## Próximas expansiones después de desbloqueos
 
 - más contenido y videos de Academia;
-- práctica/historial;
+- objetivos personales;
 - resumen operativo para líderes;
 - plantillas;
 - historial de repertorio;
