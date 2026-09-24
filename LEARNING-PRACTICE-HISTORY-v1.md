@@ -4,7 +4,7 @@
 
 Diseño de producto y datos.
 
-No implementar todavía. El progreso actual `user_learning_progress` sigue siendo la fuente de completado de lecciones.
+El historial privado de práctica ya está implementado. Los objetivos personales siguen en diseño. El progreso actual `user_learning_progress` sigue siendo la fuente de completado de lecciones.
 
 ## Objetivo
 
@@ -49,7 +49,7 @@ Eso merece entidades separadas si se implementa.
 
 ## Entidades conceptuales futuras
 
-### practice_sessions
+### practice_sessions — implementado
 
 - id
 - user_id
@@ -63,7 +63,7 @@ Eso merece entidades separadas si se implementa.
 - note opcional
 - created_at
 
-### learning_goals
+### learning_goals — pendiente
 
 - id
 - user_id
