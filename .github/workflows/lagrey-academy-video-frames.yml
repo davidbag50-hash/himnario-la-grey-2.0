@@ -67,9 +67,9 @@ jobs:
             test "${#files[@]}" -eq 4
             ffmpeg -loglevel error -y -i "${files[0]}" -i "${files[1]}" -i "${files[2]}" -i "${files[3]}" -filter_complex "hstack=inputs=4" -c:v libwebp -quality 84 "academy-media/${lesson}.webp"
           }
-          make_strip voice-foundations-02-warmup 7087170 7087166 4988142 7586648
+          make_strip voice-foundations-02-warmup 7087171 7087166 4988142 7586648
           make_strip voice-foundations-03-pitch 7088043 4988142 8132963 8412282
-          make_strip voice-foundations-05-diction 7586648 4988142 7087170 32085451
+          make_strip voice-foundations-05-diction 7586648 4988142 7087171 32085451
           make_strip voice-foundations-06-range 4988142 5650911 5650955 32085451
           make_strip voice-foundations-07-ministry-song 7086294 5650956 5650953 5650911
           make_strip voice-foundations-08-rehearsal 5650956 5650953 7088378 5650911
