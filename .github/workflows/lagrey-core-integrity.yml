@@ -1,0 +1,29 @@
+name: La Grey Core Integrity
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lagrey-core-integrity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Validate library
+        run: node .github/scripts/lagrey-library-validate.js
+      - name: Validate application core
+        run: node .github/scripts/lagrey-core-validate.js
+      - name: Check whitespace
+        run: git diff --check
