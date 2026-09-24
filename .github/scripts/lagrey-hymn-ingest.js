@@ -51,11 +51,13 @@ const slug=norm(title).replace(/ /g,'-').slice(0,48)||`hymn-${bookNumber}`,newCa
 sw2=sw2.slice(0,vstart)+newCache+sw2.slice(vstart+c[2].length);
 const tmp=path.join(process.env.RUNNER_TEMP,'hymn-batch.candidate.js');fs.writeFileSync(tmp,batch2);if(cp.spawnSync('node',['--check',tmp],{encoding:'utf8'}).status!==0)fail(`${batch} candidato no compila.`);
 const tmpSw=path.join(process.env.RUNNER_TEMP,'sw.candidate.js');fs.writeFileSync(tmpSw,sw2);if(cp.spawnSync('node',['--check',tmpSw],{encoding:'utf8'}).status!==0)fail('sw.js candidato no compila.');
-const base=sh('git',['rev-parse','HEAD']),expected=[batch,'sw.js',...(created?['index.html']:[])].sort();
+const seoUrl=`https://davidbag50-hash.github.io/himnario-la-grey-2.0/?song=${id}`,sitemapTxt=fs.readFileSync('sitemap.txt','utf8');if(sitemapTxt.split(/\r?\n/).includes(seoUrl))fail('sitemap.txt ya contiene el ID calculado.');const sitemapTxt2=sitemapTxt.trimEnd()+'\n'+seoUrl+'\n';
+const sitemapXml=fs.readFileSync('sitemap.xml','utf8');if(sitemapXml.includes(`<loc>${seoUrl}</loc>`))fail('sitemap.xml ya contiene el ID calculado.');const closeTag='</urlset>',closePos=sitemapXml.lastIndexOf(closeTag);if(closePos<0||sitemapXml.indexOf(closeTag)!==closePos)fail('sitemap.xml no tiene un cierre canónico único.');const sitemapXml2=sitemapXml.slice(0,closePos)+`<url><loc>${seoUrl}</loc></url>\n`+sitemapXml.slice(closePos);
+const base=sh('git',['rev-parse','HEAD']),expected=[batch,'sitemap.txt','sitemap.xml','sw.js',...(created?['index.html']:[])].sort();
 fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'lagrey-base.txt'),base+'\n');fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'lagrey-expected-files.txt'),expected.join('\n')+'\n');
 fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'lagrey-message.txt'),`Agregar himno ${bookNumber} ${title}\n`);
 fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'lagrey-result.txt'),`Himno ${bookNumber} | ID ${id} | ${title} — ${artist} | ${batch}${created?' (nuevo bloque)':''} | CACHE ${c[2]} -> ${newCache} | SHA256 ${gotHash}\n`);
-fs.writeFileSync(batch,batch2);if(created)fs.writeFileSync('index.html',index2);fs.writeFileSync('sw.js',sw2);
+fs.writeFileSync(batch,batch2);if(created)fs.writeFileSync('index.html',index2);fs.writeFileSync('sw.js',sw2);fs.writeFileSync('sitemap.txt',sitemapTxt2);fs.writeFileSync('sitemap.xml',sitemapXml2);
 cp.execFileSync('node',['.github/scripts/lagrey-library-validate.js'],{stdio:'inherit'});
 if(dry){cp.execFileSync('git',['reset','--hard','HEAD'],{stdio:'inherit'});cp.execFileSync('git',['clean','-fd'],{stdio:'inherit'});}
 else{
