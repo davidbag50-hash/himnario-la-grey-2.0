@@ -49,7 +49,7 @@ La Grey usa el perfil musical para recomendar el track correspondiente.
 
 La persona avanza en su track:
 
-- `voice-advanced-v1` o futura ruta básica de Voz;
+- `voice-foundations-v1` y después `voice-advanced-v1`;
 - `piano-foundations-v1`;
 - `guitar-foundations-v1`;
 - `bass-foundations-v1`;

@@ -70,6 +70,7 @@ Campos futuros:
 
 ## Tracks iniciales
 
+- `voice-foundations-v1`
 - `voice-advanced-v1`
 - `piano-foundations-v1`
 - `guitar-foundations-v1`
@@ -79,7 +80,6 @@ Campos futuros:
 
 Futuro:
 
-- voz básica;
 - armonía vocal;
 - piano intermedio;
 - guitarra intermedia;
