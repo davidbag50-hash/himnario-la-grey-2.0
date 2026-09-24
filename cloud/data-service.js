@@ -233,21 +233,27 @@ class MinistryCloudAdapter{
     if(error)throw error;
     let assignmentsSynced=true,assignmentError='';
     if(Array.isArray(event?.assignments)){
-      const assignments=event.assignments.map(item=>({
-        rosterMemberId:String(item?.rosterMemberId||'').trim(),
-        musicRole:String(item?.musicRole||'').trim()
-      })).filter(item=>item.rosterMemberId&&['voice','guitar','piano','bass','drums'].includes(item.musicRole));
-      const assignmentResult=await this.client.rpc('set_ministry_event_assignments',{
-        target_event:data,
-        new_assignments:assignments
-      });
-      if(assignmentResult.error){
+      try{await this.saveEventAssignments(data,event.assignments)}
+      catch(error){
         assignmentsSynced=false;
-        assignmentError=assignmentResult.error.message||String(assignmentResult.error);
-        console.warn('[La Grey Cloud] event assignments not synced',assignmentResult.error);
+        assignmentError=error?.message||String(error);
+        console.warn('[La Grey Cloud] event assignments not synced',error);
       }
     }
     return{id:data,assignmentsSynced,assignmentError};
+  }
+
+  async saveEventAssignments(eventId,assignments=[]){
+    const payload=(Array.isArray(assignments)?assignments:[]).map(item=>({
+      rosterMemberId:String(item?.rosterMemberId||'').trim(),
+      musicRole:String(item?.musicRole||'').trim()
+    })).filter(item=>item.rosterMemberId&&['voice','guitar','piano','bass','drums'].includes(item.musicRole));
+    const {error}=await this.client.rpc('set_ministry_event_assignments',{
+      target_event:eventId,
+      new_assignments:payload
+    });
+    if(error)throw error;
+    return true;
   }
 
   async deleteEvent(eventId){
