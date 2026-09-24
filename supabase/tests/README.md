@@ -146,6 +146,25 @@ Para un integrante asignado a un evento:
 - al quitar a una persona de todas sus funciones del evento, su respuesta anterior se elimina;
 - cambiar solo la función musical de la misma persona conserva su respuesta.
 
+## 4.2 Plantillas compartidas de eventos
+
+Para owner/admin/leader:
+
+- puede crear, actualizar y eliminar plantillas de su ministerio mediante los RPC dedicados;
+- puede guardar tipo, título base, hora, líder, voces, notas y asignaciones habituales;
+- una asignación de plantilla solo puede apuntar a una ficha del mismo ministerio;
+- un miembro eliminado del roster no deja una asignación huérfana en plantillas;
+- un usuario de otro ministerio no puede leer ni editar plantillas;
+- miembros activos pueden leer plantillas de su propio ministerio;
+- no existe escritura directa desde cliente sobre las tablas de plantillas.
+
+Al aplicar una plantilla en la UI:
+
+- no cambia la fecha del evento;
+- no copia ni reemplaza el setlist;
+- puede funcionar desde la última copia cacheada aunque no haya conexión;
+- guardar/eliminar una plantilla requiere Cloud activa.
+
 ## 5. Datos personales
 
 Usar al menos dos usuarios autenticados.
