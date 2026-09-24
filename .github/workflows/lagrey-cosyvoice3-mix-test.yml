@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/lagrey-cosyvoice3-mix-test.yml'
-      - '.github/scripts/lagrey-cosyvoice3-mix-test.py'
+      - '.github/cosyvoice3-mix-state.txt'
   workflow_dispatch:
 
 permissions:
