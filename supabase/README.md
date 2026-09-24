@@ -21,6 +21,7 @@ En orden:
 9. `20260924_000009_learning_progress.sql`
 10. `20260924_000010_preferred_music_roles.sql`
 11. `20260924_000011_user_song_notes.sql`
+12. `20260924_000012_event_member_assignments.sql`
 
 No renombrar migraciones ya aplicadas ni cambiar su orden histórico.
 
@@ -47,7 +48,8 @@ Incluyen:
 - calendario;
 - ensayos;
 - servicios;
-- setlists.
+- setlists;
+- asignaciones estructuradas de integrantes por evento.
 
 La frontera de seguridad es el ministerio.
 
