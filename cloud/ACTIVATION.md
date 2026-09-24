@@ -58,6 +58,11 @@ Aplicar **en este orden**, sin saltos:
 11. `20260924_000011_user_song_notes.sql`
     - notas personales privadas por canción
 
+12. `20260924_000012_event_member_assignments.sql`
+    - integrantes asignados a ensayos/servicios
+    - funciones musicales por evento
+    - snapshot de nombre para historial
+
 ## Cómo comprobar el estado real
 
 Con La Grey abierta, autenticado:
@@ -166,7 +171,7 @@ La nube complementa el catálogo, no lo sustituye.
 
 Considerar La Grey Cloud plenamente activa solo cuando:
 
-1. las 11 migraciones estén aplicadas;
+1. las 12 migraciones estén aplicadas;
 2. `LAGREY_CLOUD_DIAGNOSTICS.run()` no reporte capacidades faltantes;
 3. las pruebas RLS entre dos ministerios pasen;
 4. se confirme comportamiento offline y reconciliación al recuperar conexión.
