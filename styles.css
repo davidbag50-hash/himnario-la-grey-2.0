@@ -92,3 +92,12 @@ body.lg-modal-open>nav,body.lg-modal-open .exact-bottom,body.lg-modal-open #read
 
 .academy-concept-visual{margin:10px 0 14px;border-radius:17px;overflow:hidden;border:1px solid rgba(126,190,232,.15);background:#071d30}
 .academy-lesson-svg{display:block;width:100%;height:auto;aspect-ratio:410/235}
+
+.academy-course-grid{margin-bottom:16px}
+.academy-course-card{min-height:92px;padding:14px}
+.academy-course-copy{gap:3px}.academy-course-copy b{font-size:17px}
+.practice-panel-compact{padding:12px 14px}.practice-compact-main{display:grid;grid-template-columns:42px 1fr auto;gap:11px;align-items:center}
+.practice-compact-icon{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:rgba(20,111,183,.14);font-size:20px}
+.practice-compact-main>div:nth-child(2){display:grid;gap:2px}.practice-compact-main b{font-size:15px}.practice-compact-main small{color:#91aabd;font-size:12px}
+.practice-history-fold{margin-top:10px;border-top:1px solid rgba(126,190,232,.12);padding-top:8px}.practice-history-fold summary{cursor:pointer;color:#9fcfea;font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center;list-style:none}.practice-history-fold summary::-webkit-details-marker{display:none}.practice-history-fold[open] summary span{transform:rotate(90deg)}.practice-history-fold .practice-recent{margin-top:9px}
+@media(max-width:520px){.practice-compact-main{grid-template-columns:38px 1fr}.practice-compact-main>.btn{grid-column:1/-1;width:100%}.practice-compact-icon{width:36px;height:36px}}
