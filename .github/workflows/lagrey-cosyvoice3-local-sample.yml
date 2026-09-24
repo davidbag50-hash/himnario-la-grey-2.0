@@ -61,8 +61,9 @@ jobs:
 
       - name: Install CPU inference dependencies
         run: |
-          python -m pip install --upgrade --no-cache-dir pip setuptools wheel
+          python -m pip install --upgrade --no-cache-dir pip wheel 'setuptools==80.9.0'
           python -m pip install --no-cache-dir 'torch==2.3.1' 'torchaudio==2.3.1' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install --no-cache-dir --no-build-isolation 'openai-whisper==20231117'
           python -m pip install --no-cache-dir \
             'conformer==0.3.2' \
             'diffusers==0.29.0' \
@@ -77,7 +78,6 @@ jobs:
             'omegaconf==2.3.0' \
             'onnx==1.16.0' \
             'onnxruntime==1.18.0' \
-            'openai-whisper==20231117' \
             'protobuf==4.25.3' \
             'rich==13.7.1' \
             'soundfile==0.12.1' \
