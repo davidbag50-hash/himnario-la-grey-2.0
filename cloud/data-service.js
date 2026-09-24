@@ -224,7 +224,7 @@ class MinistryCloudAdapter{
     const song=songById(songId);
     if(!song)throw new Error('Song not found in local catalog');
     const row={user_id:this.userId,song_id:Number(song.id),song_type:song.type};
-    this._ok(await this.client.from('user_favorites').upsert(row,{onConflict:'user_id,song_id'}));
+    this._ok(await this.client.from('user_favorites').upsert(row,{onConflict:'user_id,song_id',ignoreDuplicates:true}));
     return row;
   }
 
