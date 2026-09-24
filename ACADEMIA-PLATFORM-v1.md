@@ -84,7 +84,7 @@ Futuro:
 - `piano-intermediate-v1` — implementado;
 - `guitar-intermediate-v1` — implementado;
 - `bass-intermediate-v1` — implementado;
-- batería para worship;
+- `drums-intermediate-v1` — implementado;
 - liderazgo musical;
 - dirección de ensayos;
 - preparación de setlists;
