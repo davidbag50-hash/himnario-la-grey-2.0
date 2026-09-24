@@ -29,15 +29,20 @@ Añadir valor a líderes sin convertir La Grey en vigilancia de integrantes ni d
 
 ## Bloque 1 — Plantillas de evento
 
-Futuro cercano:
+Estado: implementado en su primera versión.
 
-- plantilla de ensayo;
-- plantilla de servicio;
+Incluye:
+
+- plantillas compartidas por ministerio;
+- tipo de evento;
+- título base;
+- hora;
+- líder/voces;
 - estructura de notas;
-- roles habituales;
-- checklist organizativo.
+- asignaciones habituales del roster;
+- caché local para poder aplicar una plantilla sin conexión.
 
-Una plantilla crea un punto de partida, no un evento paralelo.
+Una plantilla crea un punto de partida, no un evento paralelo. No copia fecha ni setlist.
 
 ## Bloque 2 — Historial de repertorio
 
@@ -144,7 +149,7 @@ Nunca usar herramientas avanzadas para:
 ## Orden recomendado
 
 1. ~~Resumen operativo.~~ Implementado.
-2. Plantillas de eventos.
+2. ~~Plantillas de eventos.~~ Implementado.
 3. Historial de repertorio.
 4. Formación/mentoría voluntaria.
 5. Exportaciones y analítica.
