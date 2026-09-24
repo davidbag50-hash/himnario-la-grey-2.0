@@ -1,0 +1,28 @@
+name: La Grey App Validation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lagrey-app-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+      - name: Validate canonical app
+        run: node .github/scripts/lagrey-app-validate.js
+      - name: Validate catalog and stable IDs
+        run: node .github/scripts/lagrey-library-validate.js
