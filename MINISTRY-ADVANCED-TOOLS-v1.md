@@ -46,14 +46,19 @@ Una plantilla crea un punto de partida, no un evento paralelo. No copia la fecha
 
 ## Bloque 2 — Historial de repertorio
 
-Preguntas útiles:
+Estado: implementado en su primera versión.
+
+Se deriva de los eventos y setlists ya existentes, sin duplicar datos:
 
 - cuándo se usó una canción;
-- en qué tono oficial;
-- en qué servicios apareció;
-- cuándo fue la última vez.
+- tono guardado en ese setlist;
+- en qué ensayo, servicio o evento apareció;
+- último uso;
+- cantidad de apariciones.
 
-No crear “popularidad” como ranking de personas.
+Funciona con la última copia local del calendario, por lo que puede consultarse offline.
+
+No crea “popularidad” ni rankings de personas.
 
 ## Bloque 3 — Preparación de equipo
 
@@ -150,6 +155,6 @@ Nunca usar herramientas avanzadas para:
 
 1. ~~Resumen operativo.~~ Implementado.
 2. ~~Plantillas de eventos.~~ Implementado.
-3. Historial de repertorio.
+3. ~~Historial de repertorio.~~ Implementado.
 4. Formación/mentoría voluntaria.
 5. Exportaciones y analítica.
