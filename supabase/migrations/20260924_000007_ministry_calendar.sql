@@ -84,7 +84,7 @@ security definer
 set search_path = pg_catalog, public
 as $$
 declare
-  event_id uuid;
+  saved_event_id uuid;
   item jsonb;
   item_position integer := 0;
   item_song_id integer;
@@ -123,14 +123,14 @@ begin
       target_ministry,new_event_type,new_event_date,new_event_time,new_rehearsal_at,
       trim(new_title),coalesce(new_leader,''),coalesce(new_singers,''),coalesce(new_notes,''),auth.uid()
     )
-    returning id into event_id;
+    returning id into saved_event_id;
   else
-    select id into event_id
+    select id into saved_event_id
     from public.ministry_events
     where id=target_event and ministry_id=target_ministry
     for update;
 
-    if event_id is null then
+    if saved_event_id is null then
       raise exception 'Event not found';
     end if;
 
@@ -143,14 +143,12 @@ begin
         leader=coalesce(new_leader,''),
         singers=coalesce(new_singers,''),
         notes=coalesce(new_notes,'')
-    where id=event_id;
-
-    delete from public.ministry_event_setlist where event_id=event_id;
+    where id=saved_event_id;
   end if;
 
   -- Evita ambigüedad con el nombre de variable en DELETE anterior.
   delete from public.ministry_event_setlist s
-  where s.event_id=event_id;
+  where s.event_id=saved_event_id;
 
   for item in select value from jsonb_array_elements(coalesce(new_setlist,'[]'::jsonb))
   loop
@@ -181,7 +179,7 @@ begin
 
     insert into public.ministry_event_setlist(event_id,position,song_id,song_type,tone)
     values (
-      event_id,
+      saved_event_id,
       item_position,
       item_song_id,
       item_song_type,
@@ -189,7 +187,7 @@ begin
     );
   end loop;
 
-  return event_id;
+  return saved_event_id;
 end;
 $$;
 
