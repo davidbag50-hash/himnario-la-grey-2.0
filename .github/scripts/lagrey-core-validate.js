@@ -25,7 +25,7 @@ if(duplicates.length)fail('IDs HTML duplicados: '+duplicates.join(', '));
 const requiredIds=[
   'home','listing','detail','calendarView','setlistView','academyView','academyFocus',
   'myRouteView','ministryOverviewView','profileModal','profileMusicModal','settingsView','settingsCloudStatusBtn',
-  'personalSongNotesPanel','eventAssignmentsPanel','academyPractice','practiceModal','eventTemplateTools','eventTemplateSelect','eventTemplateApplyBtn','eventTemplateSaveBtn','eventTemplateDeleteBtn','ministryOverviewHistory','ministryHistoryView','ministryHistorySearch','ministryHistorySummary','ministryHistoryList'
+  'personalSongNotesPanel','eventAssignmentsPanel','academyPractice','practiceModal','eventTemplateTools','eventTemplateSelect','eventTemplateApplyBtn','eventTemplateSaveBtn','eventTemplateDeleteBtn','ministryHistoryView','ministryHistorySearch','ministryHistoryList','ministryOverviewHistory','ministryHistoryView','ministryHistorySearch','ministryHistorySummary','ministryHistoryList'
 ];
 for(const id of requiredIds)if(!ids.includes(id))fail('Falta el ID principal #'+id+' en index.html');
 
@@ -33,6 +33,10 @@ const localScripts=[...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>
   .map(match=>match[1].split(/[?#]/)[0].replace(/^\.\//,''))
   .filter(src=>src&&!/^https?:\/\//i.test(src));
 for(const file of localScripts)if(!exists(file))fail('index.html carga un script inexistente: '+file);
+const historyModule=read('ministry-history-v1.js');
+for(const token of ['ministryRepertoireHistory','LAGREY_SHOW_MINISTRY_HISTORY','data-ministry-history-event','data-ministry-history-song']){
+  if(!historyModule.includes(token))fail('El historial de repertorio perdió la garantía: '+token);
+}
 
 const sw=read('sw.js');
 const cacheMatches=[...sw.matchAll(/const CACHE\s*=\s*(['"])([^'"]+)\1\s*;/g)];
