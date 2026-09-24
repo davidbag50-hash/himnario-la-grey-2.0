@@ -157,6 +157,16 @@ Para un usuario autenticado:
 - función válida: `voice`, `guitar`, `piano`, `bass`, `drums`, `all`, `none`;
 - una nota no puede superar 2000 caracteres.
 
+## 4.3 Objetivos personales de aprendizaje
+
+Para un usuario autenticado:
+
+- puede crear, leer, editar y eliminar únicamente sus filas de `user_learning_goals`;
+- otro usuario del mismo ministerio no puede leer sus objetivos;
+- estados válidos: `active`, `completed`, `archived`;
+- tipos válidos: `general`, `track`, `song`, `event`, `technique`;
+- el título no puede estar vacío ni superar 180 caracteres.
+
 ## 5. Datos personales
 
 Usar al menos dos usuarios autenticados.
