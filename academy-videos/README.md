@@ -1,8 +1,10 @@
 # Videos de Academia La Grey
 
-Esta carpeta usa nombres estables. Los reproductores ya están integrados en `voice.js`.
+Esta carpeta conserva únicamente los videos MP4 de Voz avanzada.
 
-Archivos esperados:
+La interfaz visual de las lecciones se genera directamente desde la implementación nativa de Academia en `app.js`. Ya no se usan láminas SVG decorativas como sustituto de una explicación.
+
+Archivos de video esperados:
 
 - `voice-advanced-01-mix.mp4`
 - `voice-advanced-02-passaggio.mp4`
@@ -13,6 +15,4 @@ Archivos esperados:
 - `voice-advanced-07-agility.mp4`
 - `voice-advanced-08-setlist.mp4`
 
-Hasta que exista cada MP4, La Grey muestra dentro de la misma ventana una guía audiovisual de escenas. No hay error visible ni dependencia de conexión para leer la clase.
-
-Recomendación de entrega: MP4 H.264/AAC, 1080p o 720p, relación 16:9, voz clara, música de fondo mínima o nula durante demostraciones vocales.
+Los videos son apoyo de la lección; la enseñanza principal debe seguir siendo entendible sin conexión y sin depender del video.
