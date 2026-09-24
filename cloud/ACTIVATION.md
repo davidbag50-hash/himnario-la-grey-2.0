@@ -78,6 +78,11 @@ Aplicar **en este orden**, sin saltos:
     - duración opcional, función musical, contexto y nota
     - RLS: cada usuario solo puede leer/escribir su propio historial
 
+16. `20260924_000016_user_learning_goals.sql`
+    - objetivos personales privados
+    - contexto opcional de ruta/canción/evento
+    - estado activo/completado/archivado con RLS por usuario
+
 ## Cómo comprobar el estado real
 
 Con La Grey abierta, autenticado:
@@ -186,7 +191,7 @@ La nube complementa el catálogo, no lo sustituye.
 
 Considerar La Grey Cloud plenamente activa solo cuando:
 
-1. las 15 migraciones estén aplicadas;
+1. las 16 migraciones estén aplicadas;
 2. `LAGREY_CLOUD_DIAGNOSTICS.run()` no reporte capacidades faltantes;
 3. las pruebas RLS entre dos ministerios pasen;
 4. se confirme comportamiento offline y reconciliación al recuperar conexión.
