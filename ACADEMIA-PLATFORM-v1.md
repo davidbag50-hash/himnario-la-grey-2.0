@@ -82,7 +82,7 @@ Futuro:
 
 - armonía vocal;
 - `piano-intermediate-v1` — implementado;
-- guitarra intermedia;
+- `guitar-intermediate-v1` — implementado;
 - bajo para worship;
 - batería para worship;
 - liderazgo musical;
