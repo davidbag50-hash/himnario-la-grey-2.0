@@ -250,6 +250,25 @@ class MinistryCloudAdapter{
     const data=this._ok(await this.client.from('user_preferences').upsert(row,{onConflict:'user_id'}).select().single());
     return data||null;
   }
+
+  async getLearningProgress(trackId){
+    const cleanTrack=String(trackId||'').trim();
+    if(!cleanTrack)throw new Error('Track id is required');
+    const rows=this._ok(await this.client.from('user_learning_progress').select('item_id,completed_at').eq('user_id',this.userId).eq('track_id',cleanTrack).order('completed_at',{ascending:true}))||[];
+    return rows.map(row=>({itemId:row.item_id,completedAt:row.completed_at}));
+  }
+
+  async setLearningItemCompleted(trackId,itemId,completed=true){
+    const cleanTrack=String(trackId||'').trim(),cleanItem=String(itemId||'').trim();
+    if(!cleanTrack||!cleanItem)throw new Error('Track and item ids are required');
+    if(completed){
+      const row={user_id:this.userId,track_id:cleanTrack,item_id:cleanItem};
+      this._ok(await this.client.from('user_learning_progress').upsert(row,{onConflict:'user_id,track_id,item_id',ignoreDuplicates:true}));
+      return true;
+    }
+    this._ok(await this.client.from('user_learning_progress').delete().eq('user_id',this.userId).eq('track_id',cleanTrack).eq('item_id',cleanItem));
+    return false;
+  }
 }
 
 function createGuestDataService(){return new GuestLocalAdapter()}
