@@ -34,12 +34,7 @@ jobs:
             esac
             base="$(basename "$src" .mp4)"
             duration="$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$src")"
-            python3 - "$duration" > /tmp/academy-times.txt <<'PY'
-import sys
-d=max(float(sys.argv[1]),1.0)
-for ratio in (0.18,0.38,0.62,0.84):
-    print(max(0.0,min(d-0.08,d*ratio)))
-PY
+            python3 -c 'import sys; d=max(float(sys.argv[1]),1.0); [print(max(0.0,min(d-0.08,d*r))) for r in (0.18,0.38,0.62,0.84)]' "$duration" > /tmp/academy-times.txt
             mapfile -t times < /tmp/academy-times.txt
             frames=()
             for i in 0 1 2 3; do
