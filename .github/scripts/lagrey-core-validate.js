@@ -25,7 +25,7 @@ if(duplicates.length)fail('IDs HTML duplicados: '+duplicates.join(', '));
 const requiredIds=[
   'home','listing','detail','calendarView','setlistView','academyView','academyFocus',
   'myRouteView','ministryOverviewView','profileModal','profileMusicModal','settingsView','settingsCloudStatusBtn',
-  'personalSongNotesPanel','eventAssignmentsPanel'
+  'personalSongNotesPanel','eventAssignmentsPanel','academyPractice','practiceModal'
 ];
 for(const id of requiredIds)if(!ids.includes(id))fail('Falta el ID principal #'+id+' en index.html');
 
@@ -85,7 +85,7 @@ for(const token of ['updateMyRosterMusic','getMyRosterProfile','updateRosterMemb
   if(!ministryService.includes(token))fail('Falta método de ministerio: '+token);
 }
 const dataService=read('cloud/data-service.js');
-for(const token of ['getLearningProgress','setLearningItemCompleted','getPersonalSongNote','savePersonalSongNote','saveEventAssignments','respondToEvent']){
+for(const token of ['getLearningProgress','setLearningItemCompleted','getPersonalSongNote','savePersonalSongNote','saveEventAssignments','respondToEvent','getPracticeSessions','savePracticeSession','deletePracticeSession']){
   if(!dataService.includes(token))fail('Falta método cloud: '+token);
 }
 const repertoireBlock=dataService.slice(dataService.indexOf('async getRepertoire(){'),dataService.indexOf('async addToRepertoire('));
@@ -102,11 +102,11 @@ const numbered=migrations.map(name=>{
   if(!match)fail('Migración fuera del formato esperado: '+name);
   return{number:Number(match[1]),name};
 });
-for(let expected=1;expected<=14;expected++){
+for(let expected=1;expected<=15;expected++){
   const item=numbered.find(entry=>entry.number===expected);
   if(!item)fail('Falta la migración secuencial '+String(expected).padStart(6,'0')+'.');
 }
-if(numbered.some(entry=>entry.number>14))fail('Hay migraciones nuevas: actualiza lagrey-core-validate.js para incluirlas explícitamente.');
+if(numbered.some(entry=>entry.number>15))fail('Hay migraciones nuevas: actualiza lagrey-core-validate.js para incluirlas explícitamente.');
 
 const activation=read('cloud/ACTIVATION.md');
 for(const item of numbered)if(!activation.includes(item.name))fail('cloud/ACTIVATION.md no referencia '+item.name);
@@ -127,10 +127,15 @@ for(const token of ['respond_to_ministry_event','You are not assigned to this ev
   if(!participation.includes(token))fail('La migración de respuesta de participación perdió la garantía: '+token);
 }
 
+const practice=read(path.join(migrationDir,'20260924_000015_user_practice_sessions.sql'));
+for(const token of ['user_practice_sessions','user_id=auth.uid()','enable row level security','duration_minutes between 1 and 720']){
+  if(!practice.includes(token))fail('La migración de práctica perdió la garantía: '+token);
+}
+
 console.log(
   'La Grey core válido. '+
   'HTML IDs: '+ids.length+' únicos. '+
   'Academia: '+expectedTracks.length+' tracks principales, '+allLessonIds.length+' lecciones genéricas. '+
-  'Migraciones: '+numbered.length+' verificadas (000001-000014). '+
+  'Migraciones: '+numbered.length+' verificadas (000001-000015). '+
   'Cache: '+cacheMatches[0][2]+'.'
 );

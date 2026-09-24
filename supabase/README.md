@@ -24,6 +24,7 @@ En orden:
 12. `20260924_000012_event_member_assignments.sql`
 13. `20260924_000013_self_music_profile.sql`
 14. `20260924_000014_event_participation_response.sql`
+15. `20260924_000015_user_practice_sessions.sql`
 
 No renombrar migraciones ya aplicadas ni cambiar su orden histórico.
 
