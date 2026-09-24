@@ -85,15 +85,17 @@ Si se implementa:
 
 ## Bloque 6 — Resumen operativo
 
-Para owner/admin/leader:
+Estado: implementado en su primera versión.
+
+Para owner/admin/leader muestra:
 
 - próximo ensayo/servicio;
 - respuestas pendientes;
-- setlist incompleto;
+- setlist vacío/incompleto a nivel básico;
 - canciones sin tonalidad oficial;
-- puestos musicales todavía sin asignar.
+- ausencia de integrantes asignados.
 
-Debe ser un resumen accionable, no un dashboard lleno de métricas decorativas.
+Usa datos ya existentes y conserva lectura offline desde caché. Es un resumen accionable, no un dashboard lleno de métricas decorativas.
 
 ## Bloque 7 — Historial y exportaciones
 
@@ -141,7 +143,7 @@ Nunca usar herramientas avanzadas para:
 
 ## Orden recomendado
 
-1. Resumen operativo.
+1. ~~Resumen operativo.~~ Implementado.
 2. Plantillas de eventos.
 3. Historial de repertorio.
 4. Formación/mentoría voluntaria.
