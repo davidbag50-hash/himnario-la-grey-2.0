@@ -194,6 +194,18 @@ Lee progreso por `track_id` e `item_id`.
 
 Siguen siendo personales y no representan preparación del ministerio.
 
+## Contexto de eventos
+
+Cuando el usuario ya tiene una ficha del roster, La Grey prioriza sus próximos ensayos/servicios asignados en:
+
+- Inicio;
+- Mi Ruta;
+- preparación contextual de Academia.
+
+Si todavía no tiene asignaciones, se usa el próximo evento general del ministerio como fallback.
+
+Una respuesta `unavailable` no se prioriza como evento personal de preparación.
+
 ## Privacidad
 
 El progreso de aprendizaje es personal por defecto.
