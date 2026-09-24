@@ -351,6 +351,58 @@ class MinistryCloudAdapter{
     return false;
   }
 
+  async getLearningGoals(limit=40){
+    const safeLimit=Math.max(1,Math.min(200,Number(limit)||40));
+    const rows=this._ok(await this.client.from('user_learning_goals')
+      .select('id,title,target_type,target_id,due_date,status,created_at,updated_at')
+      .eq('user_id',this.userId)
+      .order('updated_at',{ascending:false})
+      .limit(safeLimit))||[];
+    return rows.map(row=>({
+      id:row.id,
+      title:row.title||'',
+      targetType:row.target_type||'general',
+      targetId:row.target_id||'',
+      dueDate:row.due_date||'',
+      status:row.status||'active',
+      createdAt:row.created_at||null,
+      updatedAt:row.updated_at||null
+    }));
+  }
+
+  async saveLearningGoal(goal={}){
+    const id=String(goal?.id||'').trim(),title=String(goal?.title||'').trim();
+    if(!id)throw new Error('Learning goal id is required');
+    if(!title||title.length>180)throw new Error('Invalid learning goal title');
+    const targetType=['general','track','song','event','technique'].includes(String(goal?.targetType||''))?String(goal.targetType):'general';
+    const status=['active','completed','archived'].includes(String(goal?.status||''))?String(goal.status):'active';
+    const row={
+      id,
+      user_id:this.userId,
+      title,
+      target_type:targetType,
+      target_id:String(goal?.targetId||'').trim()||null,
+      due_date:String(goal?.dueDate||'').trim()||null,
+      status
+    };
+    const data=this._ok(await this.client.from('user_learning_goals').upsert(row,{onConflict:'id'}).select('id,title,target_type,target_id,due_date,status,created_at,updated_at').single());
+    return{
+      id:data.id,
+      title:data.title||'',
+      targetType:data.target_type||'general',
+      targetId:data.target_id||'',
+      dueDate:data.due_date||'',
+      status:data.status||'active',
+      createdAt:data.created_at||null,
+      updatedAt:data.updated_at||null
+    };
+  }
+
+  async deleteLearningGoal(goalId){
+    this._ok(await this.client.from('user_learning_goals').delete().eq('user_id',this.userId).eq('id',String(goalId||'')));
+    return true;
+  }
+
   async getPracticeSessions(limit=40){
     const safeLimit=Math.max(1,Math.min(200,Number(limit)||40));
     const rows=this._ok(await this.client.from('user_practice_sessions')
