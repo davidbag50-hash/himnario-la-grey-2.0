@@ -111,3 +111,9 @@ body.lg-modal-open>nav,body.lg-modal-open .exact-bottom,body.lg-modal-open #read
 .tool-title-row h1{margin:0}
 .tool-privacy-badge{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;border:1px solid rgba(76,190,121,.24);background:rgba(55,171,98,.08);color:#b9f1ca;font-size:11px;font-weight:800}
 .tuner-head-clean{padding-bottom:14px}
+
+.academy-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 16px;padding:6px;border:1px solid rgba(126,190,232,.16);border-radius:18px;background:rgba(4,20,34,.72);position:sticky;top:8px;z-index:8;backdrop-filter:blur(14px)}
+.academy-tab{border:1px solid transparent;background:transparent;color:#9eb5c7;border-radius:13px;padding:10px 8px;display:flex;align-items:center;justify-content:center;gap:7px;font-weight:800;cursor:pointer;min-width:0}
+.academy-tab:hover{background:rgba(126,190,232,.07);color:#e9f6ff}.academy-tab.active{background:linear-gradient(180deg,rgba(22,130,218,.28),rgba(12,74,124,.28));border-color:rgba(111,195,245,.34);color:#fff;box-shadow:inset 0 1px rgba(255,255,255,.05)}
+.academy-tab-icon{font-size:20px;line-height:1}
+@media(max-width:620px){.academy-tabs{overflow-x:auto;display:flex;scrollbar-width:none}.academy-tabs::-webkit-scrollbar{display:none}.academy-tab{flex:0 0 auto;min-width:94px;padding:10px 12px}.academy-tab span:last-child{font-size:12px}}
