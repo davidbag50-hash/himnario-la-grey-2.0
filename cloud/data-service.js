@@ -214,6 +214,42 @@ class MinistryCloudAdapter{
     if(error)throw error;
     return true;
   }
+
+  async getFavorites(){
+    const rows=this._ok(await this.client.from('user_favorites').select('song_id,song_type,created_at').eq('user_id',this.userId).order('created_at',{ascending:true}))||[];
+    return rows.map(row=>({songId:Number(row.song_id),songType:row.song_type,createdAt:row.created_at})).filter(row=>Number.isFinite(row.songId));
+  }
+
+  async addFavorite(songId){
+    const song=songById(songId);
+    if(!song)throw new Error('Song not found in local catalog');
+    const row={user_id:this.userId,song_id:Number(song.id),song_type:song.type};
+    this._ok(await this.client.from('user_favorites').upsert(row,{onConflict:'user_id,song_id'}));
+    return row;
+  }
+
+  async removeFavorite(songId){
+    this._ok(await this.client.from('user_favorites').delete().eq('user_id',this.userId).eq('song_id',Number(songId)));
+    return true;
+  }
+
+  async getPreferences(){
+    const result=await this.client.from('user_preferences').select('preferred_instrument,notation,font_size,autoscroll_speed,language,updated_at').eq('user_id',this.userId).maybeSingle();
+    if(result?.error)throw result.error;
+    return result?.data||null;
+  }
+
+  async savePreferences(patch={}){
+    const row={user_id:this.userId};
+    if(['guitar','piano','voice','all','none'].includes(patch.preferredInstrument))row.preferred_instrument=patch.preferredInstrument;
+    if(['american','latin'].includes(patch.notation))row.notation=patch.notation;
+    if(Number.isInteger(Number(patch.fontSize))&&Number(patch.fontSize)>=8&&Number(patch.fontSize)<=30)row.font_size=Number(patch.fontSize);
+    if(Number.isInteger(Number(patch.autoscrollSpeed))&&Number(patch.autoscrollSpeed)>=1&&Number(patch.autoscrollSpeed)<=100)row.autoscroll_speed=Number(patch.autoscrollSpeed);
+    if(['es','en'].includes(patch.language))row.language=patch.language;
+    if(Object.keys(row).length===1)return this.getPreferences();
+    const data=this._ok(await this.client.from('user_preferences').upsert(row,{onConflict:'user_id'}).select().single());
+    return data||null;
+  }
 }
 
 function createGuestDataService(){return new GuestLocalAdapter()}
