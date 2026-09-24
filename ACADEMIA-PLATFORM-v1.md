@@ -81,7 +81,7 @@ Campos futuros:
 Futuro:
 
 - armonía vocal;
-- piano intermedio;
+- `piano-intermediate-v1` — implementado;
 - guitarra intermedia;
 - bajo para worship;
 - batería para worship;
