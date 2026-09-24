@@ -25,6 +25,7 @@ En orden:
 13. `20260924_000013_self_music_profile.sql`
 14. `20260924_000014_event_participation_response.sql`
 15. `20260924_000015_user_practice_sessions.sql`
+16. `20260924_000016_user_learning_goals.sql`
 
 No renombrar migraciones ya aplicadas ni cambiar su orden histórico.
 
