@@ -62,15 +62,15 @@ async function run(){
       add('repertoire',Array.isArray(repertoire),`${repertoire.length} item(s)`);
 
       const capabilityChecks=[
-        ['calendar',()=>state.data.getEvents?.()],
-        ['favorites',()=>state.data.getFavorites?.()],
-        ['learning',()=>state.data.getLearningProgress?.('diagnostics')],
-        ['personal-notes',()=>state.data.getPersonalSongNote?.(1)]
+        ['calendar','getEvents',[]],
+        ['favorites','getFavorites',[]],
+        ['learning','getLearningProgress',['diagnostics']],
+        ['personal-notes','getPersonalSongNote',[1]]
       ];
-      for(const [name,fn] of capabilityChecks){
+      for(const [name,method,args] of capabilityChecks){
         try{
-          if(typeof fn!=='function'){add(`capability:${name}`,false,'Missing client method');continue}
-          const value=await fn();
+          if(typeof state.data?.[method]!=='function'){add(`capability:${name}`,false,`Missing client method: ${method}`);continue}
+          const value=await state.data[method](...args);
           add(`capability:${name}`,true,Array.isArray(value)?`${value.length} item(s)`:'available');
         }catch(error){
           add(`capability:${name}`,false,error?.message||String(error));
