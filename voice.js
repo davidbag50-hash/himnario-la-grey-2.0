@@ -194,5 +194,6 @@ function onCapture(ev){const voice=ev.target.closest('[data-open="voice"]');if(v
 window.LAGREY_REFRESH_VOICE_BASE_I18N=refreshVoiceLanguage;
 new MutationObserver(muts=>{if(muts.some(m=>m.attributeName==='lang'))refreshVoiceLanguage()}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 window.addEventListener('lagrey:cloud-ready',()=>{bindAcademyCloud();syncAcademyProgress()});window.addEventListener('lagrey:cloud-reboot',()=>setTimeout(()=>{bindAcademyCloud();syncAcademyProgress()},140));document.addEventListener('lagrey:profile-changed',()=>setTimeout(syncAcademyProgress,160));window.addEventListener('online',syncAcademyProgress);if(document.documentElement.dataset.lagreyCloudReady==='1'){bindAcademyCloud();syncAcademyProgress()}
-document.addEventListener('click',onCapture,true);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else build();
+function bootVoice(){build();const params=new URLSearchParams(location.search);if(!params.get('song')&&params.get('section')==='voice')showVoice()}
+document.addEventListener('click',onCapture,true);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootVoice);else bootVoice();
 })();
