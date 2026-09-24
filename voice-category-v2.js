@@ -46,7 +46,6 @@ function panelReady(mode,panel){
   if(!panel)return false;
   if(mode==='category')return !!panel.querySelector('.voice-exercise-list');
   if(mode==='routine')return !!panel.querySelector('[data-start-routine],.routine-progress,.routine-list');
-  if(mode==='academy')return !!panel.querySelector('.voice-academy-lesson');
   return false;
 }
 
@@ -87,7 +86,7 @@ function closeVoiceSubscreen(scroll=true){
     view.appendChild(panel);
   }
 
-  view.querySelectorAll('.voice-routine,.voice-card,.voice-academy-card').forEach(button=>{
+  view.querySelectorAll('.voice-routine,.voice-card').forEach(button=>{
     button.classList.remove('lg35-expanded');
     if(document.activeElement===button)button.blur();
   });
@@ -115,10 +114,6 @@ document.addEventListener('click',event=>{
     return;
   }
 
-  if(event.target.closest('[data-academy-lesson]')){
-    scheduleOpen('academy');
-    return;
-  }
 
   if(event.target.closest('[data-voice-category-back]')){
     event.preventDefault();
