@@ -168,43 +168,66 @@ Estrategia inicial:
 - escrituras realizadas sin conexión se pueden encolar para sincronizar después;
 - conflictos se resolverán en una fase posterior con una política explícita.
 
-## Fases
+## Estado actual de implementación
 
-### Fase 1 — Base
+### Implementado
+
 - autenticación real;
 - profiles;
 - ministries;
 - ministry_members;
-- ministry_repertoire;
-- permisos/RLS;
-- invitado local sin cambios.
-
-### Fase 2 — Repertorio sincronizado
-- Favoritos de miembros pasan a repertorio de ministerio;
-- Cantos/Himnos siguen separados en la interfaz;
-- tono oficial compartido.
-
-### Fase 3 — Trabajo de grupo
-- notas compartidas;
-- calendario en nube;
-- setlists compartidos;
-- roles y permisos más finos.
-
-### Fase 4 — Plataforma
-- creación y unión de nuevos ministerios;
+- roster;
+- creación y unión de ministerios;
 - invitaciones/códigos;
-- planes y suscripciones;
-- panel de administración del ministerio.
+- roles owner/admin/leader/member;
+- funciones musicales separadas de roles;
+- perfil musical propio;
+- repertorio compartido;
+- tonalidad oficial;
+- notas compartidas;
+- favoritos privados;
+- notas personales privadas;
+- calendario;
+- ensayos/servicios;
+- setlists;
+- asignaciones de integrantes;
+- respuestas personales de participación;
+- progreso de Academia;
+- fallbacks offline y reintentos por dominio;
+- diagnóstico de esquema/capacidades.
 
-### Fase 5 — Distribución
-- empaquetado multiplataforma;
-- Android / Play Store;
-- iOS / iPadOS / App Store;
-- otras tiendas o escritorio cuando convenga;
-- una sola base de código compartida.
+Supabase (PostgreSQL + Auth + Row Level Security) ya es la arquitectura elegida y utilizada.
 
-## Primera decisión técnica propuesta
+## Pendiente de verificación operativa
 
-Backend recomendado para la primera implementación: Supabase (PostgreSQL + Auth + Row Level Security), manteniendo La Grey como cliente web/PWA y preparando posteriormente el empaquetado móvil.
+Los archivos de migración dentro del repositorio no demuestran por sí solos que el proyecto remoto tenga todo aplicado.
 
-Esta decisión debe validarse antes de introducir credenciales o dependencias de producción.
+La comprobación debe hacerse con:
+
+- Estado de nube en Ajustes;
+- `LAGREY_CLOUD_DIAGNOSTICS`;
+- pruebas RLS descritas en `supabase/tests/README.md`.
+
+## Próxima evolución de Cloud
+
+Diseñar/implementar solo cuando exista necesidad real:
+
+- práctica e historial detallado;
+- mentoría voluntaria;
+- historial/analítica avanzada del ministerio;
+- capacidades Premium;
+- posibles integraciones externas.
+
+La política de conflictos/offline queda documentada en `CLOUD-CONFLICT-POLICY-v1.md`.
+
+## Distribución
+
+El cliente sigue siendo una PWA con una sola base de código.
+
+Empaquetado Android/iOS queda pausado hasta que convenga asumir costos/cuentas de tiendas.
+
+## Decisión técnica vigente
+
+Backend: Supabase (PostgreSQL + Auth + Row Level Security).
+
+Cliente: La Grey web/PWA, con catálogo global empaquetado y datos personales/ministeriales sincronizables.
