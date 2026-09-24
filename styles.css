@@ -153,3 +153,16 @@ body.lg-modal-open>nav,body.lg-modal-open .exact-bottom,body.lg-modal-open #read
 @media(min-width:1100px){.academy-screen{min-height:calc(100vh - 20px)}.academy-lesson-screen{height:100vh;padding-top:14px;display:flex;flex-direction:column;overflow:hidden}.academy-lesson-screen.hidden{display:none}.academy-lesson-layout{flex:1;min-height:0}.academy-lesson-nav{flex:0 0 auto}}
 @media(max-width:1099px){.academy-screen{padding:14px 0}.academy-desktop-head{display:grid}.academy-search-wrap{width:100%}.academy-instrument-hero{grid-template-columns:88px 1fr}.academy-instrument-next{grid-column:1/-1}.academy-level-grid{grid-template-columns:repeat(2,1fr)}.academy-course-title{grid-template-columns:52px 1fr}.academy-course-progress{grid-column:1/-1}.academy-lesson-grid{grid-template-columns:1fr}.academy-lesson-layout{grid-template-columns:1fr}.academy-lesson-rail{order:-1;display:flex;overflow-x:auto;gap:5px;padding:8px;min-height:auto}.academy-lesson-rail h3{display:none}.academy-lesson-rail button{min-width:190px;border:1px solid rgba(135,158,181,.12);border-radius:8px}.academy-video-stage,.academy-photo-stage{height:auto;aspect-ratio:16/9}}
 @media(max-width:620px){.academy-tabs{display:flex;overflow-x:auto}.academy-tab{min-width:105px;height:52px}.academy-desktop-head h1{font-size:30px}.academy-instrument-hero{grid-template-columns:82px 1fr;padding:10px}.academy-instrument-photo{height:74px}.academy-level-grid{grid-template-columns:1fr 1fr}.academy-level-card{min-height:88px;padding:10px}.academy-course-title p{display:none}.academy-lesson-card{grid-template-columns:88px 1fr auto}.academy-lesson-thumb{height:68px}.academy-lesson-page-head>div h1{font-size:23px}.academy-lesson-page-head p{display:none}.academy-lesson-main{padding:8px}.academy-photo-strip button{height:64px}.academy-lesson-nav .btn{flex:1}}
+
+@media(min-width:1100px){
+ .academy-mobile-back{display:none!important}
+ .academy-tabs{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+ .academy-tab-photo{height:105px!important;position:relative!important;overflow:hidden!important;padding:0!important;display:block!important;text-align:left!important;background:#101923!important;border-radius:11px!important}
+ .academy-tab-photo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.85) brightness(.62)}
+ .academy-tab-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,12,20,.35),rgba(4,12,20,.77))}
+ .academy-tab-text{position:absolute;left:13px;right:12px;bottom:11px;display:grid;gap:2px;z-index:2}
+ .academy-tab-text b{font-size:17px;color:#fff}.academy-tab-text small{font-size:10px;line-height:1.2;color:#c7d0db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .academy-tab-photo.active{box-shadow:0 0 0 2px #1488ff inset,0 0 20px rgba(0,123,255,.16)!important}
+ .academy-tab-photo.active>img{filter:saturate(.95) brightness(.72)}
+}
+@media(max-width:1099px){.academy-mobile-back{display:inline-flex;margin-bottom:10px}.academy-tab-photo>img,.academy-tab-photo .academy-tab-shade{display:none}.academy-tab-text{display:contents}.academy-tab-text small{display:none}}
