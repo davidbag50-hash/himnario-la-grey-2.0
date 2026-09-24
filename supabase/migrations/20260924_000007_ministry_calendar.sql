@@ -146,7 +146,7 @@ begin
     where id=saved_event_id;
   end if;
 
-  -- Evita ambigüedad con el nombre de variable en DELETE anterior.
+  -- El setlist se reemplaza completo dentro de la misma transacción.
   delete from public.ministry_event_setlist s
   where s.event_id=saved_event_id;
 
@@ -173,6 +173,7 @@ begin
       from public.ministry_repertoire r
       where r.ministry_id=target_ministry
         and r.song_id=item_song_id
+        and r.song_type=item_song_type
     ) then
       raise exception 'Song is not in ministry repertoire';
     end if;
