@@ -222,15 +222,16 @@ La Academia debe responder tres preguntas:
 
 No mostrar un catálogo enorme sin orientación.
 
-## Navegación futura
+## Navegación actual
 
 Inicio de Academia:
 
-- Continuar aprendiendo.
-- Ruta recomendada.
-- Mis rutas.
-- Explorar.
-- Preparar repertorio.
+- Continuar aprendiendo según progreso real.
+- Ruta recomendada según función/instrumento preferido.
+- Rutas del instrumento priorizadas en orden de nivel.
+- Preparar el repertorio del próximo evento cuando haya setlist.
+
+La personalización prioriza contenido, pero nunca bloquea otras rutas.
 
 Dentro de una ruta:
 
@@ -251,17 +252,26 @@ Cada track/item puede tener una política de acceso, pero:
 
 La definición comercial vive en un documento separado.
 
-## Orden de implementación
+## Estado de implementación
 
-1. Mantener IDs actuales.
-2. Crear un catálogo de tracks cuando haya al menos dos rutas con contenido real.
-3. Reutilizar el motor de progreso existente.
-4. Construir Piano/Guitarra antes de una pantalla general vacía.
-5. Crear la pantalla general de Academia cuando pueda mostrar contenido real.
-6. Conectar repertorio/setlists.
-7. Añadir Bajo/Batería.
-8. Añadir expansión premium.
-9. Añadir tutor IA al final.
+Ya implementado:
+
+1. IDs estables de tracks/items.
+2. Catálogo con rutas reales.
+3. Motor genérico de progreso.
+4. Academia general.
+5. Fundamentos para Voz, Piano, Guitarra, Bajo y Batería.
+6. Voz avanzada.
+7. Piano/Guitarra/Bajo/Batería intermedio.
+8. Repertorio y preparación de setlists conectados.
+9. Recomendación contextual y “Continuar aprendiendo”.
+
+Siguiente expansión conceptual:
+
+- más niveles/contenido;
+- seguimiento de práctica más rico;
+- expansión Premium con valor adicional;
+- tutor IA solo cuando la base editorial esté madura.
 
 ## Regla de producto
 
