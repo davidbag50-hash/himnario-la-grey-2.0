@@ -110,6 +110,30 @@ class MinistryCloudAdapter{
 
   async getRepertoire(){
     const rows=this._ok(await this.client.from('ministry_repertoire').select('*').eq('ministry_id',this.ministryId).order('added_at',{ascending:true}))||[];
+    const responsesByKey=new Map();
+    if(eventIds.length){
+      try{
+        const responseResult=await this.client
+          .from('ministry_event_responses')
+          .select('event_id,roster_member_id,response_status,responded_at')
+          .in('event_id',eventIds);
+        if(responseResult.error)throw responseResult.error;
+        for(const item of responseResult.data||[]){
+          responsesByKey.set(`${item.event_id}:${item.roster_member_id}`,{
+            status:item.response_status||'pending',
+            respondedAt:item.responded_at||null
+          });
+        }
+      }catch(error){
+        console.warn('[La Grey Cloud] event participation responses unavailable',error);
+      }
+    }
+    for(const [eventId,list] of assignmentsByEvent){
+      assignmentsByEvent.set(eventId,list.map(item=>{
+        const response=responsesByKey.get(`${eventId}:${item.rosterMemberId}`);
+        return{...item,responseStatus:response?.status||'pending',respondedAt:response?.respondedAt||null};
+      }));
+    }
     return rows.map(row=>({
       id:row.id,
       songId:row.song_id,
@@ -254,6 +278,16 @@ class MinistryCloudAdapter{
     });
     if(error)throw error;
     return true;
+  }
+
+  async respondToEvent(eventId,status){
+    const clean=['pending','confirmed','tentative','unavailable'].includes(String(status||''))?String(status):'pending';
+    const {data,error}=await this.client.rpc('respond_to_ministry_event',{
+      target_event:eventId,
+      new_status:clean
+    });
+    if(error)throw error;
+    return data||clean;
   }
 
   async deleteEvent(eventId){
