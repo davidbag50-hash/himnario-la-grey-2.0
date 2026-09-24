@@ -57,38 +57,3 @@ body.exact-home-screen #home>.search,body.exact-home-screen #home>.home-grid,bod
 /* Apertura oficial de La Grey: collage original en alta resolución durante 5 segundos. */
 body.exact-home-screen:not(.lg-startup-finished)::after{content:'';position:fixed;inset:0;z-index:2147483647;background:#f4eee4 url('la-grey-collage-recorte-como-referencia-2.png') center/contain no-repeat;pointer-events:none;opacity:1;visibility:visible;animation:lgStartupCollage 5s linear forwards}
 @keyframes lgStartupCollage{0%,98%{opacity:1;visibility:visible}100%{opacity:0;visibility:hidden}}
-
-/* Home oficial de escritorio: dashboard amplio; móvil conserva su composición propia. */
-@media(min-width:1100px){
-  body.exact-home-screen #lgExactHome{max-width:1280px;margin:0 auto;padding:24px 26px 42px;display:grid;grid-template-columns:minmax(0,1fr) 350px;grid-auto-rows:auto;gap:14px 18px;align-items:start}
-  #lgExactHome .exact-brand{grid-column:1;grid-row:1;min-height:142px;height:142px;padding:0;text-align:left;border:1px solid #183e5f;border-radius:18px;background:linear-gradient(120deg,#06182b,#0a2037);box-shadow:0 10px 28px rgba(0,0,0,.25)}
-  #lgExactHome .exact-brand:before{background:radial-gradient(circle at 88% 50%,rgba(42,140,224,.16),transparent 28%),linear-gradient(120deg,#06182b,#0a2037)}
-  #lgExactHome .exact-logo-mark{width:78px;height:102px;left:18px;top:22px}
-  #lgExactHome .exact-crown{left:61px;top:13px;font-size:23px}
-  #lgExactHome .exact-kicker{font-size:12px;letter-spacing:2.2px;margin:36px 0 0;padding-left:116px}
-  #lgExactHome .exact-wordmark{font-size:60px;margin:4px 0 0;padding-left:112px;line-height:.9}
-  #lgExactHome .exact-brand .exact-staff{width:245px;height:80px;right:18px;top:53px}
-  #lgExactHome .exact-brand .exact-cross{right:22px;top:10px;font-size:74px}
-  #lgExactHome .exact-actions{grid-column:2;grid-row:1;margin:0;display:grid;grid-template-columns:1fr 1fr 56px;gap:8px;align-self:center}
-  #lgExactHome .exact-pill{height:48px;border-radius:13px;font-size:14px;box-shadow:none}
-  #lgExactHome .exact-pill.exact-gear{width:56px}
-  #lgExactHome .exact-divider{display:none}
-  #lgExactHome .exact-personal-greeting{grid-column:1;grid-row:2;margin:0;min-height:60px}
-  #lgExactHome .exact-search-wrap{grid-column:1;grid-row:3;margin:0}
-  #lgExactHome .exact-search{height:54px;border-radius:14px;font-size:15px;box-shadow:none}
-  #lgExactHome .exact-daily-verse{grid-column:2;grid-row:2 / span 2;margin:0;min-height:128px;display:grid;align-content:center}
-  #lgExactHome .exact-card-grid{grid-column:1;grid-row:4 / span 8;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0}
-  #lgExactHome .exact-card{height:180px;border-radius:14px;padding:12px 10px 17px;box-shadow:0 7px 20px rgba(0,0,0,.23)}
-  #lgExactHome .exact-illustration{height:110px}
-  #lgExactHome .exact-illustration svg{height:106px;width:min(112px,92%)}
-  #lgExactHome .exact-card h2{font-size:18px;margin:2px 0 5px}
-  #lgExactHome .exact-card .exact-mini{bottom:8px}
-  #lgExactHome .exact-favorite{grid-column:2;margin:0;width:100%;height:92px;grid-template-columns:92px 1fr 24px;padding-right:12px;border-radius:13px;box-shadow:0 7px 20px rgba(0,0,0,.22)}
-  #lgExactHome .exact-favorite:before{width:100px}
-  #lgExactHome .exact-favorite .exact-fav-art svg{width:67px;height:61px}
-  #lgExactHome .exact-fav-copy h2{font-size:18px;margin-bottom:2px}
-  #lgExactHome .exact-fav-copy small{font-size:11px}
-  #lgExactHome .exact-favorite .exact-chevron{font-size:27px}
-  #lgExactHome .exact-bottom{display:none!important}
-  #home>#results:not(.hidden){position:relative;grid-column:1;margin:0;padding:0;max-width:none}
-}
