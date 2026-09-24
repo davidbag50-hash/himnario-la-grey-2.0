@@ -146,6 +146,17 @@ Para un integrante asignado a un evento:
 - al quitar a una persona de todas sus funciones del evento, su respuesta anterior se elimina;
 - cambiar solo la función musical de la misma persona conserva su respuesta.
 
+## 4.2 Historial privado de práctica
+
+Para un usuario autenticado:
+
+- puede crear, leer, editar y eliminar únicamente filas de `user_practice_sessions` con su propio `user_id`;
+- otro usuario, incluso del mismo ministerio, no puede leer su historial;
+- el invitado no tiene acceso a la tabla;
+- duración válida: 1 a 720 minutos cuando se define;
+- función válida: `voice`, `guitar`, `piano`, `bass`, `drums`, `all`, `none`;
+- una nota no puede superar 2000 caracteres.
+
 ## 5. Datos personales
 
 Usar al menos dos usuarios autenticados.
